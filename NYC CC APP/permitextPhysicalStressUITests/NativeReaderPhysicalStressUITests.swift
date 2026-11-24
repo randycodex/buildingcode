@@ -1236,6 +1236,58 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testCalculatorAndSavedEvidenceOpenProjectAssistant() throws {
+#if !DEBUG
+        throw XCTSkip("Project Assistant acceptance uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
+            "--native-project-calculator-fixture", "--native-project-overview-fixture",
+            "--native-project-evidence-toolbar-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+            "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        let calculator = app.buttons["project-section-calculator"]
+        reveal(calculator, in: app)
+        calculator.tap()
+        let function = element(in: app, identifier: "calculator-function")
+        XCTAssertTrue(function.waitForExistence(timeout: 20))
+        function.tap()
+        let classroom = app.buttons["Educational — Classroom area"]
+        for _ in 0..<12 where !classroom.isHittable { app.swipeUp() }
+        classroom.tap()
+        let ask = app.buttons["calculator-ask-assistant"]
+        reveal(ask, in: app)
+        ask.tap()
+        XCTAssertTrue(element(in: app, identifier: "research-selected-evidence").waitForExistence(timeout: 18), app.debugDescription)
+        let composer = element(in: app, identifier: "research-composer")
+        let draft = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            (composer.value as? String ?? "").contains("Table 1004.1.3") &&
+            (composer.value as? String ?? "").contains("Classroom area")
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [draft], timeout: 12), .completed, composer.debugDescription)
+        XCTAssertTrue(app.staticTexts["1 code reference"].exists)
+        keepScreenshot(named: "Calculator Assistant with referenced source and editable question", from: app)
+
+        app.buttons["main-tab-saved"].tap()
+        let calculatorBar = app.navigationBars["Calculator"]
+        if calculatorBar.exists { calculatorBar.buttons.firstMatch.tap() }
+        let evidence = app.buttons["project-section-evidence"]
+        XCTAssertTrue(evidence.waitForExistence(timeout: 10))
+        reveal(evidence, in: app)
+        evidence.tap()
+        let select = app.buttons["Select sections"]
+        XCTAssertTrue(select.waitForExistence(timeout: 10))
+        select.tap()
+        app.buttons["Select All"].tap()
+        app.buttons["Ask Assistant about selected evidence"].tap()
+        XCTAssertTrue(element(in: app, identifier: "research-selected-evidence").waitForExistence(timeout: 18), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["2 code references"].waitForExistence(timeout: 15))
+        keepScreenshot(named: "Selected Evidence opens project Assistant", from: app)
+#endif
+    }
+
     func testProjectCalculatorSavesCitedResultToNewAndExistingNotes() throws {
 #if !DEBUG
         throw XCTSkip("Calculator acceptance uses the isolated Debug fixture.")
@@ -1524,6 +1576,37 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Pinned code header after scrolling", from: app)
         group.tap()
         XCTAssertTrue((group.value as? String)?.hasPrefix("Collapsed") == true)
+    }
+
+    func testExactFireSubsectionOpensUnderLogicalChapter() throws {
+#if !DEBUG
+        throw XCTSkip("Search acceptance uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+            "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        let searchTab = app.buttons["main-tab-search"]
+        XCTAssertTrue(searchTab.waitForExistence(timeout: 10))
+        searchTab.tap()
+        let search = app.textFields["Search codes"]
+        XCTAssertTrue(search.waitForExistence(timeout: 15))
+        search.tap()
+        search.typeText("FC 403.1\n")
+        let result = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+            "search-result-", "403.1 General.")).firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 35), app.debugDescription)
+        XCTAssertTrue(result.label.contains("Chapter 4"))
+        result.tap()
+        let passage = app.staticTexts["passage-fire-subsection"]
+        XCTAssertTrue(passage.waitForExistence(timeout: 15), app.debugDescription)
+        XCTAssertEqual(passage.label, "403.1 General.")
+        XCTAssertTrue(app.staticTexts["Chapter 4"].exists)
+        XCTAssertTrue(app.buttons["View full section"].exists)
+        keepScreenshot(named: "Fire Code exact subsection in Chapter 4", from: app)
+#endif
     }
 
     func testExact2022SearchResultOpensPassageAndReturnsToQuery() throws {
@@ -2443,6 +2526,36 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         verifyNativePartialLookup(largeText: true)
     }
 
+    func testNameOnlyProjectAndDesktopReportLink() throws {
+#if !DEBUG
+        throw XCTSkip("Project acceptance uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons["New project"].tap()
+        let form = app.navigationBars["New project"]
+        let name = app.textFields["e.g. Bronx R-2 Passive House"]
+        XCTAssertTrue(name.waitForExistence(timeout: 10))
+        name.tap()
+        name.typeText("Research before site selection")
+        let save = form.buttons["Save"]
+        XCTAssertTrue(save.isEnabled)
+        save.tap()
+        XCTAssertEqual(app.staticTexts["project-workspace-name"].label, "Research before site selection")
+        let reports = app.buttons["project-section-reports"]
+        reveal(reports, in: app)
+        reports.tap()
+        let copy = app.buttons["reports-copy-desktop-project-link"]
+        XCTAssertTrue(copy.waitForExistence(timeout: 10))
+        XCTAssertEqual(copy.label, "Copy project link for desktop")
+        copy.tap()
+        XCTAssertEqual(copy.label, "Project link copied")
+        keepScreenshot(named: "Name-only project copies a desktop workspace link", from: app)
+#endif
+    }
+
     private func verifyNativePartialLookup(largeText: Bool) {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-project-partial-lookup-fixture"]
@@ -2456,13 +2569,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(address.exists)
         address.tap()
         address.typeText("100 Synthetic Fixture Street")
-        let description = app.descendants(matching: .any)["project-editor-description"]
-        description.tap() // Address blur exercises the real lookup handler.
-        description.typeText("Preserve this draft.")
-        let confirmation = app.staticTexts["Imported 1 sourced facts from NYC Planning."]
+        name.tap() // Address blur exercises the real lookup handler.
+        let confirmation = app.staticTexts["Partial import. Imported 1 sourced fact from NYC Planning."]
         XCTAssertTrue(confirmation.waitForExistence(timeout: 15))
-        XCTAssertFalse(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Mapped-area facts were unavailable.")).firstMatch.exists)
-        XCTAssertEqual(address.value as? String, "100 SYNTHETIC FIXTURE STREET, NEW YORK, NY")
+        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Mapped-area facts were unavailable.")).firstMatch.exists)
+        XCTAssertTrue(app.staticTexts["Matched tax-lot address: 100 SYNTHETIC FIXTURE STREET, NEW YORK, NY"].exists)
+        XCTAssertEqual(address.value as? String, "100 Synthetic Fixture Street")
         let save = app.buttons["Save"]
         XCTAssertTrue(save.isEnabled)
         keepScreenshot(named: "Native partial property lookup confirmation retains saveable project", from: app)
@@ -2470,8 +2582,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let summary = app.staticTexts["native-partial-lookup-saved-summary"]
         XCTAssertTrue(summary.waitForExistence(timeout: 10))
         XCTAssertTrue(summary.label.contains("Synthetic partial lookup"))
-        XCTAssertTrue(summary.label.contains("100 SYNTHETIC FIXTURE STREET, NEW YORK, NY"))
-        XCTAssertTrue(summary.label.contains("Preserve this draft."))
+        XCTAssertTrue(summary.label.contains("Address: 100 Synthetic Fixture Street."))
         XCTAssertTrue(summary.label.contains("Facts: 1. Stories: 3."))
         keepScreenshot(named: "Native partial lookup saves available synthetic facts", from: app)
     }

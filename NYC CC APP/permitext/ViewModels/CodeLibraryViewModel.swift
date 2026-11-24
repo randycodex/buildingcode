@@ -272,6 +272,7 @@ final class CodeLibraryViewModel: ObservableObject {
             restoreWorkspaceSelection()
             if oldValue != nil {
                 pendingResearchSelections = []
+                pendingResearchPrompt = nil
                 pendingProSave = nil
             } else if var pending = pendingProSave {
                 if pending.accountID == nil || pending.accountID == signedInAccount?.appUserID {
@@ -369,6 +370,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published var researchHistoryProjectFilter = "all"
     @Published var researchHistoryIsPresented = false
     @Published private(set) var pendingResearchSelections: [ResearchSelectionRequest] = []
+    private var pendingResearchPrompt: String?
     @Published private(set) var pendingDeepLinkedSectionID: Int64? = nil
     private var pendingDeepLinkedCodeVersion: String?
     private var pendingDeepLinkedError: String?
@@ -1119,6 +1121,7 @@ final class CodeLibraryViewModel: ObservableObject {
             projectWorkspaceSessionID = UUID()
             if activeResearchConversationID != nil { activeResearchConversationID = nil }
             if !pendingResearchSelections.isEmpty { pendingResearchSelections = [] }
+            pendingResearchPrompt = nil
         }
         openProjectID = folderID
         activateProject(project, deferSyncQueue: true)
@@ -1145,6 +1148,7 @@ final class CodeLibraryViewModel: ObservableObject {
         openProjectID = nil
         activeResearchConversationID = nil
         pendingResearchSelections = []
+        pendingResearchPrompt = nil
         researchHistoryProjectFilter = "all"
         researchHistoryIsPresented = true
         selectedTab = .bookmarks
@@ -2448,7 +2452,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 }
                 let cacheKey: CompletedSearchCache.Key? = revisions.count == versions.count && !versions.isEmpty
                     ? .init(query: query, scope: cacheScope, corpusRevision: revisions.joined(separator: "\n"),
-                            engineRevision: "native-exact-phrase-v2") : nil
+                            engineRevision: "native-exact-phrase-v3") : nil
                 if let cacheKey, let cached = await CompletedSearchCache.shared.value(for: cacheKey) {
                     try Task.checkCancellation()
                     var expectedFilters: [CodeSectionCategory] = []
@@ -2664,7 +2668,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 let cacheKey = authoredCodeStore.searchCorpusRevision.map {
                     CompletedSearchCache.Key(query: trimmedQuery,
                         scope: ["selected-edition"] + versionScope + [selectedCodeSectionID.map(String.init) ?? "all-categories"] + activeScope,
-                        corpusRevision: $0, engineRevision: "native-exact-phrase-v2")
+                        corpusRevision: $0, engineRevision: "native-exact-phrase-v3")
                 }
                 if let cacheKey, let cached = await CompletedSearchCache.shared.value(for: cacheKey),
                    !Task.isCancelled {
@@ -3839,6 +3843,21 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func askAssistant(in folderID: Int64, about selections: [ResearchSelectionRequest], prompt: String? = nil) {
+        guard hasResearchAccess, !selections.isEmpty else { return }
+        if openProjectID != folderID { openProjectWorkspace(folderID) }
+        guard openProjectID == folderID, activeBackendProjectID != nil else { return }
+        activeResearchConversationID = nil
+        pendingResearchPrompt = prompt
+        sendToResearch(selections)
+    }
+
+    func takeResearchPrompt() -> String? {
+        guard pendingResearchSelections.isEmpty else { return nil }
+        defer { pendingResearchPrompt = nil }
+        return pendingResearchPrompt
+    }
+
     func acknowledgePendingResearchSelections(_ selections: [ResearchSelectionRequest]) {
         guard pendingResearchSelections.starts(with: selections) else { return }
         pendingResearchSelections.removeFirst(selections.count)
@@ -4373,7 +4392,11 @@ final class CodeLibraryViewModel: ObservableObject {
         guard digest == file.contentHash else {
             throw URLError(.cannotDecodeContentData)
         }
-        let safeName = projectName
+        return try writeProjectReportPDF(data, title: projectName, version: file.reportVersion)
+    }
+
+    private func writeProjectReportPDF(_ data: Data, title: String, version: Int) throws -> URL {
+        let safeName = title
             .replacingOccurrences(
                 of: #"[^a-zA-Z0-9]+"#,
                 with: "-",
@@ -4386,7 +4409,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("per-codes-report-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let url = directory.appendingPathComponent("\(fileName)-v\(file.reportVersion).pdf")
+        let url = directory.appendingPathComponent("\(fileName)-v\(version).pdf")
         try data.write(to: url, options: .atomic)
         return url
     }
@@ -4412,18 +4435,9 @@ final class CodeLibraryViewModel: ObservableObject {
             guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             return url
         }
-        let rendered = try await Task.detached(priority: .userInitiated) {
-            let url = try ProjectReportExportBuilder(manifest: manifest).build()
-            return (url, try Data(contentsOf: url))
-        }.value
+        let data = try await accountBackendClient.renderProjectReportPDF(account: signedInAccount, manifestID: manifest.id)
         guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
-        _ = try await accountBackendClient.saveProjectReportPDF(
-            account: signedInAccount,
-            projectID: manifest.project.id,
-            manifestID: manifest.id,
-            data: rendered.1
-        )
-        return rendered.0
+        return try writeProjectReportPDF(data, title: manifest.title, version: manifest.reportVersion)
     }
 
     private func denyIfNeeded(_ decision: EntitlementDecision) -> Bool {

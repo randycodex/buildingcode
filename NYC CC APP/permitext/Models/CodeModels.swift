@@ -2837,6 +2837,7 @@ protocol PermitextBackendTransport {
         data: Data
     ) async throws -> BackendProjectReportFileUploadResponse
     func projectReportFile(_ request: BackendProjectReportFileReadRequest) async throws -> Data
+    func renderProjectReportPDF(_ request: BackendProjectReportManifestRequest) async throws -> Data
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult
     func checkpointUserContent(_ request: BackendUserContentCheckpointRequest) async throws -> ServerUserContentCheckpointResult
@@ -3328,15 +3329,23 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     }
 
     func projectReportFile(_ report: BackendProjectReportFileReadRequest) async throws -> Data {
-        var request = URLRequest(url: baseURL.appendingPathComponent("reports/files/read"))
+        try await reportPDF("reports/files/read", body: report, bearerToken: report.auth.bearerToken)
+    }
+
+    func renderProjectReportPDF(_ report: BackendProjectReportManifestRequest) async throws -> Data {
+        try await reportPDF("reports/files/render", body: report, bearerToken: report.auth.bearerToken)
+    }
+
+    private func reportPDF<Body: Encodable>(_ path: String, body: Body, bearerToken: String?) async throws -> Data {
+        var request = URLRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = "POST"
         request.timeoutInterval = requestTimeout
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/pdf", forHTTPHeaderField: "Accept")
-        if let token = report.auth.bearerToken, !token.isEmpty {
+        if let token = bearerToken, !token.isEmpty {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
-        request.httpBody = try encoder.encode(report)
+        request.httpBody = try encoder.encode(body)
         let (data, response) = try await session.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {
             throw PermitextBackendHTTPError.invalidResponse
@@ -4275,10 +4284,11 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             kind: "selection",
             relationship: "governing",
             sectionID: selection.sectionID,
-            sectionNumber: "101.1",
-            title: "Title",
+            sectionNumber: selection.sectionID == "2152" ? "1004.1.3" : "101.1",
+            title: selection.sectionID == "2152" ? "Areas without fixed seating" : "Title",
             codePrefix: "BC",
-            selectedText: selection.selectedText
+            selectedText: selection.selectedText,
+            selectionMode: selection.selectionMode
         )
     }
 
@@ -4886,6 +4896,10 @@ struct CodeSearchResult: Identifiable, Hashable, Sendable {
     var sourceEdition: String? = nil
     var sourceCodeName: String? = nil
     var searchFilterID: Int64? = nil
+    var fireSubsection: NativeFireCodeSubsection? = nil
+    var displayChapterNumber: String {
+        fireSubsection?.chapterNumber ?? NativeFireCodeSubsection.chapter(forParentTitle: title)?.chapter ?? chapterNumber
+    }
 
     var searchIdentity: String { "\(sourceVersion ?? "current")|\(id)" }
 
@@ -5718,6 +5732,7 @@ protocol AccountBackendClient {
     func notebookAsset(account: SignedInAccount, projectID: String, assetID: String) async throws -> Data
     func projectReportManifest(account: SignedInAccount, manifestID: String) async throws -> ProjectReportManifest
     func projectReportExportSnapshot(account: SignedInAccount, manifestID: String) async throws -> BackendProjectReportManifestResponse
+    func renderProjectReportPDF(account: SignedInAccount, manifestID: String) async throws -> Data
     func saveProjectReportPDF(
         account: SignedInAccount,
         projectID: String,
@@ -6874,6 +6889,10 @@ extension String {
 
 // Older local transports and mocks do not support server recovery migration.
 extension PermitextBackendTransport {
+    func renderProjectReportPDF(_ request: BackendProjectReportManifestRequest) async throws -> Data {
+        throw URLError(.unsupportedURL)
+    }
+
     func researchConversationPin(_ request: ResearchConversationPinRequest) async throws -> ResearchConversationResponse { throw URLError(.unsupportedURL) }
     func researchProjectSnapshot(_ request: ResearchProjectSnapshotRequest) async throws -> ResearchProjectSnapshotResponse { throw URLError(.unsupportedURL) }
     func updateResearchProjectSnapshot(_ request: ResearchProjectSnapshotUpdateRequest) async throws -> ResearchConversationResponse { throw URLError(.unsupportedURL) }
@@ -6881,6 +6900,10 @@ extension PermitextBackendTransport {
     func researchRetainInterrupted(_ request: ResearchRetainInterruptedRequest) async throws -> ResearchRetainInterruptedResponse { throw URLError(.unsupportedURL) }
 }
 extension AccountBackendClient {
+    func renderProjectReportPDF(account: SignedInAccount, manifestID: String) async throws -> Data {
+        throw URLError(.unsupportedURL)
+    }
+
     func projectReportExportSnapshot(account: SignedInAccount, manifestID: String) async throws -> BackendProjectReportManifestResponse {
         BackendProjectReportManifestResponse(
             manifest: try await projectReportManifest(account: account, manifestID: manifestID), files: nil)

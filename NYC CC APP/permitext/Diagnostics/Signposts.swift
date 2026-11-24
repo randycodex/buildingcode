@@ -496,7 +496,8 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
                 auth: authContext(for: account),
                 sectionID: selection.sectionID,
                 selectedText: selection.selectedText,
-                includeOfficialFigures: true
+                includeOfficialFigures: true,
+                codeVersion: selection.codeVersion
             )
         )
     }
@@ -740,6 +741,12 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
                 auth: authContext(for: account),
                 manifestID: manifestID
             )
+        )
+    }
+
+    func renderProjectReportPDF(account: SignedInAccount, manifestID: String) async throws -> Data {
+        try await transport.renderProjectReportPDF(
+            BackendProjectReportManifestRequest(auth: authContext(for: account), manifestID: manifestID)
         )
     }
 

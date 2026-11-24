@@ -95,7 +95,13 @@ struct ProjectCalculatorView: View {
                     try cache.store(raw, accountID: page.accountID, projectID: page.projectID, scope: Self.draftScope)
                 }, onSave: { request in
                     try await chooseNote(for: request, page: page)
-                })
+                }, onAskAboutFootnotes: library.hasResearchAccess ? { row, location in
+                    guard isCurrent(page) else { return }
+                    let space = location.isEmpty ? "" : " The location entered in Calculator is \(location)."
+                    library.askAssistant(in: folderID, about: [
+                        .sectionReference(id: ProjectOccupantLoadSource.sectionID, codeVersion: ProjectOccupantLoadSource.codeVersion)
+                    ], prompt: "Which footnotes to 2022 NYC Building Code Table 1004.1.3 apply to \(row)?\(space)")
+                } : nil)
                 .id(page.id)
             } else if loadError == nil {
                 ProgressView("Loading calculator…")
@@ -313,6 +319,7 @@ private struct CalculatorForm: View {
     let page: CalculatorPage
     let onDrafts: (String) throws -> Void
     let onSave: (ProjectCalculatorNote) async throws -> ProjectCalculatorDraft.SavedNote?
+    let onAskAboutFootnotes: ((String, String) -> Void)?
 
     @State private var calculation: ProjectCalculatorSnapshot
     @State private var input: [String: String]
@@ -329,10 +336,12 @@ private struct CalculatorForm: View {
     }
 
     init(page: CalculatorPage, onDrafts: @escaping (String) throws -> Void,
-         onSave: @escaping (ProjectCalculatorNote) async throws -> ProjectCalculatorDraft.SavedNote?) {
+         onSave: @escaping (ProjectCalculatorNote) async throws -> ProjectCalculatorDraft.SavedNote?,
+         onAskAboutFootnotes: ((String, String) -> Void)?) {
         self.page = page
         self.onDrafts = onDrafts
         self.onSave = onSave
+        self.onAskAboutFootnotes = onAskAboutFootnotes
         _calculation = State(initialValue: page.initialState)
         _input = State(initialValue: page.initialState.record.input)
         _storedDrafts = State(initialValue: page.storedDrafts)
@@ -494,6 +503,14 @@ private struct CalculatorForm: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Table row and footnotes").font(.headline).accessibilityAddTraits(.isHeader)
                     Text(row.description).font(.subheadline)
+                    if let onAskAboutFootnotes {
+                        Button("Ask Assistant about footnotes", systemImage: "sparkle") {
+                            focus = nil
+                            onAskAboutFootnotes(row.label, value(.spaceLocation).trimmingCharacters(in: .whitespacesAndNewlines))
+                        }
+                        .buttonStyle(.bordered)
+                        .accessibilityIdentifier("calculator-ask-assistant")
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(12)

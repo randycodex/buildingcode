@@ -87,15 +87,20 @@ struct FolderEditorSheet: View {
     @State private var propertyLookupSucceeded = false
     @State private var propertyLookupAddress = ""
     @State private var propertyContext: BackendProjectPropertyContext?
+    @State private var pendingPropertyLookup: PropertyLookup?
+    @State private var propertyWarnings: [String] = []
+
+    private struct PropertyLookup {
+        let id = UUID()
+        let address: String
+        let task: Task<BackendProjectPropertyContext, Error>
+    }
     @FocusState private var addressIsFocused: Bool
 
     private var isEditing: Bool { existing != nil }
     private var folderType: CodeFolderType { existing?.folderType ?? .project }
     private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
-    private var canSave: Bool {
-        !trimmedName.isEmpty && !isSaving &&
-        (folderType != .project || !address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-    }
+    private var canSave: Bool { !trimmedName.isEmpty && !isSaving }
     private var detents: Set<PresentationDetent> {
         isEditing || folderType == .project ? [.large] : [.medium, .large]
     }
@@ -110,7 +115,7 @@ struct FolderEditorSheet: View {
                 }
 
                 if folderType == .project {
-                    Section("Project address (required)") {
+                    Section("Project address (optional)") {
                         TextField("Address", text: $address, axis: .vertical)
                             .accessibilityIdentifier("project-editor-address")
                             .textInputAutocapitalization(.words)
@@ -127,6 +132,18 @@ struct FolderEditorSheet: View {
                             }
                             .font(.caption)
                             .foregroundStyle(propertyLookupSucceeded ? Color.green : Color.secondary)
+                        }
+                        if let matchedAddress = propertyContext?.normalizedAddress,
+                           !matchedAddress.isEmpty,
+                           matchedAddress.caseInsensitiveCompare(address.trimmingCharacters(in: .whitespacesAndNewlines)) != .orderedSame {
+                            Text("Matched tax-lot address: \(matchedAddress)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        ForEach(propertyWarnings, id: \.self) { warning in
+                            Label(warning, systemImage: "exclamationmark.triangle")
+                                .font(.caption)
+                                .foregroundStyle(.primary)
                         }
                     }
                 }
@@ -164,6 +181,7 @@ struct FolderEditorSheet: View {
                     }
                 }
             }
+            .disabled(isSaving)
             .navigationTitle(isEditing ? "Edit \(folderType.rawValue)" : "New \(folderType.rawValue)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -200,11 +218,17 @@ struct FolderEditorSheet: View {
                 }
             }
             .onChange(of: address) { _, newValue in
-                if newValue.trimmingCharacters(in: .whitespacesAndNewlines) != propertyLookupAddress {
+                let trimmedAddress = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                if let pendingPropertyLookup, pendingPropertyLookup.address != trimmedAddress {
+                    pendingPropertyLookup.task.cancel()
+                    self.pendingPropertyLookup = nil
+                }
+                if trimmedAddress != propertyLookupAddress, pendingPropertyLookup?.address != trimmedAddress {
                     propertyContext = nil
                     propertyLookupAddress = ""
                     propertyLookupStatus = ""
                     propertyLookupSucceeded = false
+                    propertyWarnings = []
                 }
             }
             .onChange(of: addressIsFocused) { _, isFocused in
@@ -230,24 +254,41 @@ struct FolderEditorSheet: View {
             propertyLookupSucceeded = false
             return nil
         }
-        propertyLookupStatus = "Looking up official NYC property data…"
-        propertyLookupSucceeded = false
-        do {
-            let result = try await library.projectPropertyContext(address: trimmedAddress)
-            guard address.trimmingCharacters(in: .whitespacesAndNewlines) == trimmedAddress else { return nil }
-            propertyContext = result
-            propertyLookupAddress = result.normalizedAddress
-            address = result.normalizedAddress
-            let sourcedCount = result.structuredFacts.filter { $0.status == "sourced" }.count
-            propertyLookupStatus = "Imported \(sourcedCount) sourced facts from NYC Planning."
-            propertyLookupSucceeded = true
-            return result
-        } catch {
-            guard address.trimmingCharacters(in: .whitespacesAndNewlines) == trimmedAddress else { return nil }
-            propertyContext = nil
-            propertyLookupAddress = trimmedAddress
-            propertyLookupStatus = "NYC property facts could not be imported. The Project can still be saved."
+        let lookup: PropertyLookup
+        if let pendingPropertyLookup, pendingPropertyLookup.address == trimmedAddress {
+            lookup = pendingPropertyLookup
+        } else {
+            pendingPropertyLookup?.task.cancel()
+            lookup = PropertyLookup(address: trimmedAddress, task: Task {
+                try await library.projectPropertyContext(address: trimmedAddress)
+            })
+            pendingPropertyLookup = lookup
+            propertyLookupStatus = "Looking up official NYC property data…"
             propertyLookupSucceeded = false
+        }
+        let outcome = await lookup.task.result
+        guard address.trimmingCharacters(in: .whitespacesAndNewlines) == trimmedAddress else { return nil }
+        guard pendingPropertyLookup?.id == lookup.id else {
+            return propertyLookupAddress == trimmedAddress ? propertyContext : nil
+        }
+        pendingPropertyLookup = nil
+        propertyLookupAddress = trimmedAddress
+        switch outcome {
+        case .success(let result):
+            propertyContext = result
+            var seenWarnings: Set<String> = []
+            propertyWarnings = result.warnings.filter { !$0.isEmpty && seenWarnings.insert($0).inserted }
+            let count = result.structuredFacts.filter { $0.status == "sourced" }.count
+            let facts = count == 1 ? "1 sourced fact" : "\(count) sourced facts"
+            propertyLookupStatus = propertyWarnings.isEmpty
+                ? "Imported \(facts) from NYC Planning."
+                : "Partial import. Imported \(facts) from NYC Planning."
+            propertyLookupSucceeded = propertyWarnings.isEmpty
+            return result
+        case .failure:
+            propertyContext = nil
+            propertyWarnings = []
+            propertyLookupStatus = "NYC property facts could not be imported. The Project can still be saved."
             return nil
         }
     }
@@ -256,15 +297,21 @@ struct FolderEditorSheet: View {
     private func save() async {
         guard canSave else { return }
         isSaving = true
+        defer { isSaving = false }
+        let enteredAddress = address.trimmingCharacters(in: .whitespacesAndNewlines)
+        let warningsWereVisible = propertyLookupAddress == enteredAddress && !propertyWarnings.isEmpty
         let property = await lookupPropertyContext()
-        let savedAddress = property?.normalizedAddress ?? address
-        let addressChanged = savedAddress.trimmingCharacters(in: .whitespacesAndNewlines) !=
-            (existing?.address.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
-        let savedFacts = property?.structuredFacts ?? (addressChanged ? [] : existing?.structuredFacts ?? [])
+        // Give users who submit directly a chance to read a newly returned warning.
+        if !warningsWereVisible && !propertyWarnings.isEmpty { return }
+        let addressChanged = enteredAddress != (existing?.address.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
+        let existingFacts = existing?.structuredFacts ?? []
+        let retainedFacts = addressChanged ? existingFacts.filter { $0.source != "nyc-planning" } : existingFacts
+        let retainedKeys = Set(retainedFacts.map(\.key))
+        let savedFacts = retainedFacts + (property?.structuredFacts ?? []).filter { !retainedKeys.contains($0.key) }
         let savedDescription = folderType == .project
             ? existing.flatMap { library.folder(id: $0.id) }?.description ?? existing?.description ?? ""
             : description
-        onSave(trimmedName, savedAddress, savedDescription, savedFacts, colorHex, folderType)
+        onSave(trimmedName, enteredAddress, savedDescription, savedFacts, colorHex, folderType)
         dismiss()
     }
 

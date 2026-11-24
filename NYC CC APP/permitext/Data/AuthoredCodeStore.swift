@@ -333,6 +333,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private struct SearchHit {
         let rank: Int
         let indexed: IndexedSection
+        let fireSubsection: NativeFireCodeSubsection?
     }
 
     private struct PreparedSectionContent: Decodable {
@@ -1477,13 +1478,15 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                           let name = codeSectionNameByID[categoryID],
                           citation.permits(codeName: name) else { return nil }
                 }
-                let text = [indexed.section.sectionNumber, indexed.section.title, searchOfficialText(for: indexed)].joined(separator: " ")
+                let official = searchOfficialText(for: indexed)
+                let text = [indexed.section.sectionNumber, indexed.section.title, official].joined(separator: " ")
                 guard exactPhrase?.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil else { return nil }
 
                 let sectionNumber = indexed.section.sectionNumber.lowercased()
                 let title = indexed.section.title.lowercased()
+                let fireSubsection = NativeFireCodeSubsection.match(query: trimmed, parentTitle: indexed.section.title, text: official)
                 let rank: Int
-                if sectionNumber == lowercasedQuery {
+                if sectionNumber == lowercasedQuery || fireSubsection != nil {
                     rank = 0
                 } else if sectionNumber.hasPrefix(lowercasedQuery) {
                     rank = 1
@@ -1494,7 +1497,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 }
                 return SearchHit(
                     rank: rank,
-                    indexed: indexed
+                    indexed: indexed,
+                    fireSubsection: fireSubsection
                 )
             }
         os_signpost(.end, log: AppSignpost.search, name: "searchMatchVerification", signpostID: signpostID)
@@ -1527,7 +1531,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         defer { os_signpost(.end, log: AppSignpost.search, name: "searchResultMetadata", signpostID: signpostID) }
         return hits.prefix(resultLimit.map { max(1, $0) } ?? hits.count).map { hit in
             let indexed = hit.indexed
-            return CodeSearchResult(
+            var result = CodeSearchResult(
                 id: indexed.section.id,
                 codeSectionID: indexed.chapter.codeSectionID,
                 chapterNumber: indexed.chapter.chapterNumber,
@@ -1538,6 +1542,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                     : "",
                 kind: indexed.section.kind
             )
+            result.fireSubsection = hit.fireSubsection
+            return result
         }
     }
 

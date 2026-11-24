@@ -35,6 +35,7 @@ struct ReaderView: View {
     let returnsToProjectsAfterRemoval: Bool
     let usesCompactSourceHeader: Bool
     let selectedExcerpts: [String]
+    let fireSubsection: NativeFireCodeSubsection?
 
     init(
         sectionID: Int64,
@@ -43,6 +44,7 @@ struct ReaderView: View {
         returnsToProjectsAfterRemoval: Bool = false,
         usesCompactSourceHeader: Bool = false,
         selectedExcerpts: [String] = [],
+        fireSubsection: NativeFireCodeSubsection? = nil,
         preparedPassage: PreparedPassage? = nil
     ) {
         self.sectionID = sectionID
@@ -51,6 +53,7 @@ struct ReaderView: View {
         self.returnsToProjectsAfterRemoval = returnsToProjectsAfterRemoval
         self.usesCompactSourceHeader = usesCompactSourceHeader
         self.selectedExcerpts = selectedExcerpts
+        self.fireSubsection = fireSubsection
         let passage = preparedPassage.flatMap { $0.detail.id == sectionID ? $0 : nil }
         _detail = State(initialValue: passage?.detail)
         _loadState = State(initialValue: passage == nil ? .loading : .loaded)
@@ -61,6 +64,7 @@ struct ReaderView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var pendingSourceEnable: ActiveCodeSourceNavigationTarget?
     @State private var pendingSourceContext: CodeLibraryViewModel.CodeSourceNavigationContext?
+    @State private var showsFireParent = false
     @State private var openingRetry = 0
     @State private var openingGeneration = UUID()
     @State private var detail: ReaderSectionDetail?
@@ -136,14 +140,26 @@ struct ReaderView: View {
                             }
                         }
 
-                        ContentBlockListView(
-                            detail: detail,
-                            fallbackText: detail.contentBlocks.isEmpty
-                                ? library.bodyNSText(for: detail)
-                                : NSAttributedString(string: ""),
-                            onOpenImage: { expandedInlineImage = $0 }
-                        )
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        if let fireSubsection, !showsFireParent,
+                           let passage = fireSubsection.body(in: detail.officialText) {
+                            Text(fireSubsection.heading)
+                                .font(CodeTypography.codeSectionTitle)
+                                .accessibilityAddTraits(.isHeader)
+                                .accessibilityIdentifier("passage-fire-subsection")
+                            if !passage.isEmpty {
+                                Text(passage).textSelection(.enabled)
+                            }
+                            Button("View full section") { showsFireParent = true }
+                        } else {
+                            ContentBlockListView(
+                                detail: detail,
+                                fallbackText: detail.contentBlocks.isEmpty
+                                    ? library.bodyNSText(for: detail)
+                                    : NSAttributedString(string: ""),
+                                onOpenImage: { expandedInlineImage = $0 }
+                            )
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
 
                         if !references.isEmpty {
                             CodeHairline().padding(.top, 2)
@@ -357,8 +373,13 @@ struct ReaderView: View {
 
     private func header(detail: ReaderSectionDetail) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Chapter \(detail.chapterNumber) · \(detail.chapterTitle)")
-                .font(.subheadline).foregroundStyle(.secondary)
+            if let logicalChapter = fireSubsection?.chapterNumber ?? NativeFireCodeSubsection.chapter(forParentTitle: detail.title)?.chapter {
+                Text("Chapter \(logicalChapter)")
+                    .font(.subheadline).foregroundStyle(.secondary)
+            } else {
+                Text("Chapter \(detail.chapterNumber) · \(detail.chapterTitle)")
+                    .font(.subheadline).foregroundStyle(.secondary)
+            }
             if let group = detail.sectionGroupLabel, !group.isEmpty {
                 Text(group).font(.subheadline.weight(.semibold)).foregroundStyle(accentColor)
             }
@@ -425,6 +446,7 @@ struct ReaderView: View {
     }
 
     private var navigationTitle: String {
+        if let fireSubsection, !showsFireParent { return fireSubsection.number }
         guard usesCompactSourceHeader else { return "" }
         guard let detail else { return "Reader" }
         return detail.kind == .textBlock ? detail.displayTitle : detail.sectionNumber

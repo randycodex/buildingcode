@@ -54,6 +54,17 @@ try {
   const create = (selections, extra = {}) => request("/research/conversations/create", { auth, selections, ...extra }, token);
   const ask = (conversationID, question) => request("/research/conversations/message", { auth, conversationID, question, answerMode: "verified", requestID: randomUUID() }, token);
   const reference = { sectionID: "20018523", selectionMode: "section_reference" };
+  const calculatorReference = {
+    sectionID: "2152", selectionMode: "section_reference", selectedText: "",
+    codeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+  };
+  const calculator = await create([calculatorReference]);
+  assert.equal(calculator.status, 201, JSON.stringify(calculator.body));
+  assert(calculator.body.conversation.sources.some(source => source.sectionID === "2152" &&
+    source.selectionMode === "section_reference" && source.codeVersion === calculatorReference.codeVersion));
+  const wrongEdition = await create([{...calculatorReference, codeVersion: "2014 Construction Codes"}]);
+  assert.equal(wrongEdition.status, 400);
+  assert.equal(wrongEdition.body.code, "INVALID_RESEARCH_SECTION");
   for (const selection of [
     { ...reference, selectedText: "Invented highlight" }, { ...reference, richSourceIDs: [] },
     { ...reference, visualSourceIDs: [] }, { ...reference, visualReviewConfirmed: true },

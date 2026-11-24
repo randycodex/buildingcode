@@ -86,6 +86,18 @@ try {
     body: JSON.stringify({auth: {accountUserID: userID}, projectID, generatedReportID: first.generatedReport.file.generatedReportID})});
   assert.equal(download.status, 200); const pdf = Buffer.from(await download.arrayBuffer()); assert.equal(pdf.subarray(0, 5).toString(), '%PDF-');
   if (process.env.PERMITEXT_TEST_REPORT_CALCULATION_PDF) await writeFile(process.env.PERMITEXT_TEST_REPORT_CALCULATION_PDF, pdf);
+  await post('/reports/files/render', {manifestID: first.manifest.id}, 401, 'invalid-session');
+  await post('/reports/files/render', {manifestID: 'unavailable-report'}, 404);
+  async function renderIssuedPDF() {
+    const response = await fetch(base + '/reports/files/render', {method: 'POST',
+      headers: {'content-type': 'application/json', authorization: 'Bearer ' + token},
+      body: JSON.stringify({auth: {accountUserID: userID}, manifestID: first.manifest.id})});
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get('cache-control'), /private.*no-store/);
+    assert.equal(response.headers.get('content-type'), 'application/pdf');
+    return Buffer.from(await response.arrayBuffer());
+  }
+  assert.deepEqual(await renderIssuedPDF(), pdf, 'Rebuilding the issued manifest produces the same canonical PDF.');
   await post('/projects/calculations/save', {projectID, context, calculationID: source.id, expectedVersion: saved.calculation.version,
     input: {...input, spaceName: 'Renamed office example', area: '2000'}});
   const updatedPreview = await post('/reports/sources/preview', {projectID, kind: 'calculation', sourceID: source.id});
@@ -97,6 +109,9 @@ try {
   assert.equal(second.manifest.items[0].title, 'Renamed office example');
   assert.deepEqual((await post('/reports/manifests/get', {projectID, manifestID: first.manifest.id})).manifest, first.manifest,
     'Later calculation edits cannot rewrite a saved PDF version.');
+  const reconstructed = await renderIssuedPDF();
+  assert.deepEqual(reconstructed, pdf, 'A later change cannot alter a rebuilt issued PDF.');
+  if (process.env.PERMITEXT_TEST_REPORT_RENDERED_PDF) await writeFile(process.env.PERMITEXT_TEST_REPORT_RENDERED_PDF, reconstructed);
   const removed = await post('/reports/drafts/save', {projectID, draftID: draft.id, expectedVersion: draft.version, title: draft.title, blocks: []});
   assert.equal(removed.draft.blocks.length, 0); assert.equal((await post('/projects/calculations/list', {projectID})).calculations.length, 3);
   assert.equal((await post('/notebook/cards/list', {projectID})).cards.length, 0, 'Adding calculations to Report creates no Notes.');

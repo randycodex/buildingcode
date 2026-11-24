@@ -34,6 +34,48 @@ struct NativeSearchCitation: Equatable {
     }
 }
 
+struct NativeFireCodeSubsection: Codable, Hashable, Sendable {
+    let number: String
+    let heading: String
+    let chapterNumber: String
+
+    static func chapter(forParentTitle title: String) -> (parent: String, chapter: String)? {
+        guard let range = title.range(of: #"^(?:Section )?FC [0-9]{3,4}(?=:|\s|$)"#,
+                                      options: [.regularExpression, .caseInsensitive]),
+              let parent = title[range].split(separator: " ").last else { return nil }
+        return (String(parent), String(parent.dropLast(2)))
+    }
+
+    static func match(query: String, parentTitle: String, text: String) -> Self? {
+        guard let identity = chapter(forParentTitle: parentTitle), query.hasPrefix(identity.parent + "."),
+              query.range(of: #"^[0-9]+(?:\.[0-9]+)+$"#, options: .regularExpression) != nil,
+              let heading = text.split(whereSeparator: \.isNewline).lazy
+                  .map({ $0.trimmingCharacters(in: .whitespaces) })
+                  .first(where: { headingNumber(in: $0) == query })
+        else { return nil }
+        return Self(number: query, heading: heading, chapterNumber: identity.chapter)
+    }
+
+    func body(in text: String) -> String? {
+        let lines = text.components(separatedBy: .newlines)
+        guard let start = lines.firstIndex(where: { Self.headingNumber(in: $0) == number }) else { return nil }
+        let body = lines.dropFirst(start + 1).prefix { line in
+            guard let next = Self.headingNumber(in: line) else { return true }
+            return next.hasPrefix(number + ".")
+        }
+        return body.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func headingNumber(in value: String) -> String? {
+        let line = value.trimmingCharacters(in: .whitespaces)
+        guard let number = line.split(whereSeparator: \.isWhitespace).first,
+              number.range(of: #"^[0-9]+(?:\.[0-9]+)+\.?$"#, options: .regularExpression) != nil,
+              line.dropFirst(number.count).first(where: { !$0.isWhitespace })?.isUppercase == true
+        else { return nil }
+        return number.trimmingCharacters(in: CharacterSet(charactersIn: "."))
+    }
+}
+
 struct NativeSearchResultPresentation: Equatable {
     let source: String
     let context: String

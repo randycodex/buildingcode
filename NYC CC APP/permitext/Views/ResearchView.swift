@@ -1625,8 +1625,13 @@ private struct ResearchSessionView: View {
     private func evidenceSummary(_ sources: [ResearchSource]) -> some View {
         let selected = sources.filter { $0.kind == "selection" }
         let figureCount = selected.reduce(0) { $0 + ($1.attachedFigureCount ?? 0) }
-        let passages = "\(selected.count) selected passage\(selected.count == 1 ? "" : "s")"
-        let title = figureCount > 0 ? "\(passages) · \(figureCount) figure\(figureCount == 1 ? "" : "s")" : passages
+        let referenceCount = selected.filter { $0.selectionMode == "section_reference" }.count
+        let passageCount = selected.count - referenceCount
+        let title = [
+            passageCount > 0 ? "\(passageCount) selected passage\(passageCount == 1 ? "" : "s")" : nil,
+            referenceCount > 0 ? "\(referenceCount) code reference\(referenceCount == 1 ? "" : "s")" : nil,
+            figureCount > 0 ? "\(figureCount) figure\(figureCount == 1 ? "" : "s")" : nil
+        ].compactMap { $0 }.joined(separator: " · ")
         return DisclosureGroup {
             VStack(alignment: .leading, spacing: 12) {
                 ForEach(selected) { source in
@@ -2117,6 +2122,13 @@ private struct ResearchSessionView: View {
                 continue
             }
             let originalSelection = library.pendingResearchSelections[0]
+            if originalSelection.selectionMode == "section_reference" {
+                let references = Array(library.pendingResearchSelections.prefix { $0.selectionMode == "section_reference" })
+                guard await persistResearchSelections(references), isCurrentOwner, !Task.isCancelled else { return }
+                identity = library.researchRequestIdentity ?? identity
+                library.acknowledgePendingResearchSelections(references)
+                continue
+            }
             do {
                 let review = try await library.reviewResearchSelection(originalSelection)
                 guard isCurrent(identity) else { return }
@@ -2139,6 +2151,7 @@ private struct ResearchSessionView: View {
                 return
             }
         }
+        if let prompt = library.takeResearchPrompt(), question.isEmpty { question = prompt }
     }
 
     private func persistResearchSelections(_ selections: [ResearchSelectionRequest]) async -> Bool {

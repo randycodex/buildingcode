@@ -47,11 +47,18 @@ struct ResearchProjectContextReviewRequest: Codable, Hashable, Sendable {
 struct ResearchSelectionRequest: Codable, Hashable, Sendable {
     let sectionID: String
     let selectedText: String
+    var selectionMode: String? = nil
+    var codeVersion: String? = nil
     var savedItemID: String? = nil
     var richSourceIDs: [String]? = nil
     var visualSourceIDs: [String]? = nil
     var visualReviewConfirmed: Bool? = nil
     var includeOfficialFigures: Bool? = nil
+
+    static func sectionReference(id: Int64, codeVersion: String) -> Self {
+        Self(sectionID: String(id), selectedText: "", selectionMode: "section_reference",
+             codeVersion: UserContentSyncCodeVersion.server(codeVersion))
+    }
 }
 
 struct ResearchSelectionReviewRequest: Codable, Hashable, Sendable {
@@ -59,6 +66,7 @@ struct ResearchSelectionReviewRequest: Codable, Hashable, Sendable {
     let sectionID: String
     let selectedText: String
     var includeOfficialFigures: Bool? = nil
+    var codeVersion: String? = nil
 }
 
 struct ResearchVisualSource: Codable, Hashable, Identifiable, Sendable {
@@ -380,6 +388,7 @@ struct ResearchSource: Codable, Hashable, Identifiable, Sendable {
     var title: String? = nil
     var codePrefix: String? = nil
     var selectedText: String? = nil
+    var selectionMode: String? = nil
     var attachedFigureCount: Int? = nil
     var visualEvidenceNotice: String? = nil
 }

@@ -154,6 +154,13 @@ try {
   assert.equal(response.status, 200);
   const pdf = Buffer.from(await response.arrayBuffer());
   assert.equal(pdf.subarray(0, 5).toString(), "%PDF-");
+  const rebuilt = await fetch(base + "/reports/files/render", {
+    method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + token },
+    body: JSON.stringify({auth: {accountUserID: userID}, manifestID: issued.manifest.id})
+  });
+  assert.equal(rebuilt.status, 200);
+  assert.deepEqual(Buffer.from(await rebuilt.arrayBuffer()), pdf,
+    "The canonical fallback preserves the issued table, scoped sources, and formatting.");
   if (process.env.PERMITEXT_EXPORT_QA_PDF) { await writeFile(process.env.PERMITEXT_EXPORT_QA_PDF, pdf); await writeFile(`${process.env.PERMITEXT_EXPORT_QA_PDF}.json`, JSON.stringify(issued.manifest,null,2)); }
   await push([{ annotation: { id: "scope-note", userID, sectionID: String(current.id), codeVersion: defaultSyncCodeVersion, blockID: "", noteBody: "Revised scope note.", updatedAt: "2026-10-10T16:00:00.000Z" } }]);
   const reissued = await post("/reports/generate", { projectID, draftID: draft.id, expectedVersion: draft.version }, 201);

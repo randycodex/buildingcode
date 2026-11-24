@@ -1471,6 +1471,8 @@ struct ProjectView: View {
     @State private var collapsedEvidenceGroupIDs: Set<String> = []
     @State private var evidenceSearchQuery = ""
     @State private var isEvidenceSearchPresented = false
+    @State private var copiedDesktopProjectLink = false
+    @State private var showsResearchSelectionLimit = false
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let automaticProjectHubRefreshInterval: TimeInterval = 30
@@ -1706,7 +1708,27 @@ struct ProjectView: View {
         let reports = projectHubSnapshot?.reports ?? []
         VStack(alignment: .leading, spacing: 8) {
             if reports.isEmpty {
-                projectHubEmpty("No reports yet. Create a report in the web workspace to see it here.")
+                projectHubEmpty("No reports yet. Create a report in the desktop workspace to see it here.")
+                if let projectID = library.backendProjectID(for: folderID) {
+                    Button {
+                        var link = URLComponents()
+                        link.scheme = "https"
+                        link.host = "per.codes"
+                        link.path = "/workspace"
+                        let pathCharacters = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-._~"))
+                        guard let encodedID = projectID.addingPercentEncoding(withAllowedCharacters: pathCharacters) else { return }
+                        link.percentEncodedFragment = "cq/project/\(encodedID)"
+                        guard let url = link.url else { return }
+                        UIPasteboard.general.url = url
+                        copiedDesktopProjectLink = true
+                        UIAccessibility.post(notification: .announcement, argument: "Project link copied")
+                    } label: {
+                        Label(copiedDesktopProjectLink ? "Project link copied" : "Copy project link for desktop",
+                              systemImage: copiedDesktopProjectLink ? "checkmark" : "link")
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("reports-copy-desktop-project-link")
+                }
             } else {
                 ForEach(reports) { report in
                     VStack(alignment: .leading, spacing: 7) {
@@ -2259,6 +2281,11 @@ struct ProjectView: View {
             }
         }
         .safeAreaInset(edge: .bottom) { projectEvidenceUndo }
+        .alert("Select fewer passages", isPresented: $showsResearchSelectionLimit) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Assistant can take up to 24 passages at once, with 12,000 characters per passage.")
+        }
         .refreshable { library.refreshBookmarks() }
     }
 
@@ -2412,6 +2439,15 @@ struct ProjectView: View {
 
     @ViewBuilder
     private var selectedEvidenceActions: some View {
+        if isProjectFolder && library.hasResearchAccess {
+            Button {
+                if askAssistant(about: selectedBookmarks) { finishSelectingEvidence() }
+            } label: {
+                ToolbarActionIcon(systemImage: "sparkle")
+            }
+            .accessibilityLabel("Ask Assistant about selected evidence")
+            .disabled(selectedBookmarks.isEmpty)
+        }
         if !isProjectFolder {
             Button {
                 pendingExport = BookmarkExportRequest(
@@ -2432,6 +2468,28 @@ struct ProjectView: View {
                 .foregroundStyle(Color.appChrome)
         }
         .accessibilityLabel("Remove from project")
+    }
+
+    @discardableResult
+    private func askAssistant(about bookmarks: [BookmarkedSection]) -> Bool {
+        let selections = bookmarks.flatMap { bookmark -> [ResearchSelectionRequest] in
+            let excerpts = bookmark.selectedExcerpts.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            if excerpts.isEmpty {
+                return [.sectionReference(id: bookmark.id, codeVersion: bookmark.codeVersion)]
+            }
+            let edition = UserContentSyncCodeVersion.server(bookmark.codeVersion)
+            return excerpts.map {
+                ResearchSelectionRequest(sectionID: String(bookmark.id), selectedText: $0, codeVersion: edition)
+            }
+        }
+        guard !selections.isEmpty else { return false }
+        guard selections.count <= 24, selections.allSatisfy({ $0.selectedText.utf16.count <= 12_000 }),
+              selections.reduce(0, { $0 + $1.selectedText.utf16.count }) <= 48_000 else {
+            showsResearchSelectionLimit = true
+            return false
+        }
+        library.askAssistant(in: folderID, about: selections)
+        return true
     }
 
     private func removeProjectEvidence(_ sections: [BookmarkedSection]) {
@@ -2482,6 +2540,11 @@ struct ProjectView: View {
                 } label: {
                     projectBookmarkContent(bookmark, showsSource: showsSource)
                         .contentShape(Rectangle())
+                }
+                .contextMenu {
+                    if isProjectFolder && library.hasResearchAccess {
+                        Button("Ask Assistant", systemImage: "sparkle") { askAssistant(about: [bookmark]) }
+                    }
                 }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button {

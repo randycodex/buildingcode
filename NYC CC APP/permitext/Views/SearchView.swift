@@ -107,6 +107,7 @@ struct SearchReaderRoute: Hashable {
     let sectionNumber: String?
     let title: String?
     let kind: CodeSectionKind?
+    let fireSubsection: NativeFireCodeSubsection?
 
     init(sectionID: Int64, sourceVersion: String? = nil) {
         self.sectionID = sectionID
@@ -116,6 +117,7 @@ struct SearchReaderRoute: Hashable {
         self.sectionNumber = nil
         self.title = nil
         self.kind = nil
+        self.fireSubsection = nil
     }
 
     init(result: CodeSearchResult) {
@@ -126,6 +128,7 @@ struct SearchReaderRoute: Hashable {
         sectionNumber = result.sectionNumber
         title = result.title
         kind = result.kind
+        fireSubsection = result.fireSubsection
     }
 }
 
@@ -138,6 +141,7 @@ struct PreparedSearchReaderDestination: Identifiable {
     let section: CodeSectionSummary
     let nativeOpening: NativeReaderPreparedOpening?
     let passage: ReaderView.PreparedPassage?
+    let fireSubsection: NativeFireCodeSubsection?
 
     nonisolated var id: ObjectIdentifier { ObjectIdentifier(library) }
 
@@ -228,7 +232,8 @@ struct PreparedSearchReaderDestination: Identifiable {
         try Task.checkCancellation()
         guard sharedLibrary.activeCodeSourceRevision == revision,
               sharedLibrary.captureCodeSourceNavigationContext() == context else { throw CancellationError() }
-        return Self(library: library, chapter: chapter, section: section, nativeOpening: nativeOpening, passage: passage)
+        return Self(library: library, chapter: chapter, section: section, nativeOpening: nativeOpening, passage: passage,
+                    fireSubsection: route.fireSubsection)
     }
 
     enum PreparationError: LocalizedError {
@@ -821,7 +826,10 @@ struct SearchView: View {
         guard !didResolveAutomaticExpansion, !library.isSearchInProgress, !isSearchRequestPending,
               !cachedGroupedResults.isEmpty else { return }
         didResolveAutomaticExpansion = true
-        if let id = NativeSearchGroupExpansion.automaticGroup(groupIDs: cachedGroupedResults.map(\.id),
+        if NativeSearchCitation(query).codePrefix == "FC",
+           let exact = cachedGroupedResults.first(where: { $0.results.contains { $0.fireSubsection != nil } }) {
+            expandedSearchGroups = [exact.id]
+        } else if let id = NativeSearchGroupExpansion.automaticGroup(groupIDs: cachedGroupedResults.map(\.id),
             isSearching: library.isSearchInProgress, isPending: isSearchRequestPending) {
             expandedSearchGroups = [id]
         }
@@ -1611,14 +1619,15 @@ struct SearchView: View {
 
     private func resultRow(_ result: CodeSearchResult) -> some View {
         let accent = Color(uiColor: library.accentColor(for: result.codeSectionID))
+        let subsection = result.fireSubsection
         let presentation = NativeSearchResultPresentation(
-            sectionNumber: result.sectionNumber,
-            title: result.displayTitle.displayTitle(for: result.sectionNumber),
+            sectionNumber: subsection?.number ?? result.sectionNumber,
+            title: subsection?.heading ?? result.displayTitle.displayTitle(for: result.sectionNumber),
             isParagraph: result.kind == .textBlock,
             codeName: result.sourceCodeName ?? "Code",
             edition: result.sourceVersion.map { NativeReaderEditionLabel.label(for: $0) } ?? "",
-            chapterNumber: result.chapterNumber,
-            parentLabels: resultParentLabels[result.searchIdentity] ?? [],
+            chapterNumber: result.displayChapterNumber,
+            parentLabels: subsection == nil ? resultParentLabels[result.searchIdentity] ?? [] : [],
             snippet: resultPreviews[result.searchIdentity] ?? result.snippet)
         return VStack(alignment: .leading, spacing: 5) {
             Text(presentation.source)
@@ -1722,6 +1731,7 @@ private struct SearchChapterReaderDestination: View {
     let initialSection: CodeSectionSummary
     let nativeOpening: NativeReaderPreparedOpening?
     let passage: ReaderView.PreparedPassage?
+    let fireSubsection: NativeFireCodeSubsection?
     let showsDetail: Bool
 
     init(prepared: PreparedSearchReaderDestination, sharedLibrary: CodeLibraryViewModel, showsDetail: Bool = false) {
@@ -1731,6 +1741,7 @@ private struct SearchChapterReaderDestination: View {
         self.initialSection = prepared.section
         self.nativeOpening = prepared.nativeOpening
         self.passage = prepared.passage
+        self.fireSubsection = prepared.fireSubsection
         _library = StateObject(wrappedValue: prepared.library)
     }
 
@@ -1745,6 +1756,7 @@ private struct SearchChapterReaderDestination: View {
                     sectionID: initialSection.id,
                     codeVersion: library.selectedVersion?.codeVersion,
                     usesCompactSourceHeader: true,
+                    fireSubsection: fireSubsection,
                     preparedPassage: verifiedPassage
                 )
             } else {

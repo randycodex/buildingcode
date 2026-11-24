@@ -30,13 +30,14 @@ actor CompletedSearchCache {
         let sourceEdition: String?
         let sourceCodeName: String?
         let searchFilterID: Int64?
+        let fireSubsection: NativeFireCodeSubsection?
 
         init(_ value: CodeSearchResult) {
             id = value.id; codeSectionID = value.codeSectionID
             chapterNumber = value.chapterNumber; sectionNumber = value.sectionNumber
             title = value.title; kind = value.kind; sourceVersion = value.sourceVersion
             sourceEdition = value.sourceEdition; sourceCodeName = value.sourceCodeName
-            searchFilterID = value.searchFilterID
+            searchFilterID = value.searchFilterID; fireSubsection = value.fireSubsection
         }
 
         var result: CodeSearchResult {
@@ -44,7 +45,7 @@ actor CompletedSearchCache {
                 chapterNumber: chapterNumber, sectionNumber: sectionNumber,
                 title: title, snippet: "", kind: kind)
             value.sourceVersion = sourceVersion; value.sourceEdition = sourceEdition
-            value.sourceCodeName = sourceCodeName; value.searchFilterID = searchFilterID
+            value.sourceCodeName = sourceCodeName; value.searchFilterID = searchFilterID; value.fireSubsection = fireSubsection
             return value
         }
     }

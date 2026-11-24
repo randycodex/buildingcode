@@ -12530,8 +12530,12 @@ function automaticResearchFigureIDs(sources) {
   return sources.map(source => source.id);
 }
 
-async function researchSourcesForSectionReference(sectionID) {
+async function researchSourcesForSectionReference(sectionID, codeVersion) {
   const [primary] = await researchEvidenceForSectionIDs([sectionID], { allowOptInCorpora: true });
+  if (codeVersion && primary.codeVersion !== canonicalCodeVersion(codeVersion)) {
+    throw Object.assign(new Error("The source edition changed. Reopen the source in Reader."),
+      { code: "INVALID_RESEARCH_SECTION" });
+  }
   // A reference pins the section identity, not an invented passage or a map.
   // Canonical retrieval selects relevant text for the actual question later.
   return [{
@@ -12560,6 +12564,7 @@ function requestedResearchSelections(body) {
     selections = body.selections.map((selection) => ({
       sectionID: selection.sectionID,
       selectionMode: selection.selectionMode,
+      codeVersion: selection.codeVersion,
       selectedText: selection.selectedText,
       richSourceIDs: selection.richSourceIDs ?? (body.selections.length === 1 ? body.richSourceIDs : undefined),
       includeOfficialFigures: selection.includeOfficialFigures,
@@ -12576,6 +12581,7 @@ function requestedResearchSelections(body) {
     selections = [{
       sectionID: body.sectionID,
       selectionMode: body.selectionMode,
+      codeVersion: body.codeVersion,
       selectedText: body.selectedText,
       richSourceIDs: body.richSourceIDs,
       includeOfficialFigures: body.includeOfficialFigures,
@@ -12642,7 +12648,7 @@ async function researchSourcesForSelections(selections, existingSources = [], { 
       throw error;
     }
     resolvedBatches.push(selection.selectionMode === "section_reference"
-      ? await researchSourcesForSectionReference(selection.sectionID)
+      ? await researchSourcesForSectionReference(selection.sectionID, selection.codeVersion)
       : await researchSourcesForSelection(
       selection.sectionID,
       selection.selectedText,
@@ -18413,6 +18419,41 @@ async function handleReportManifestGet(request, response) {
   sendJSON(response, 200, { manifest: artifact.payload, files });
 }
 
+async function handleReportFileRender(request, response) {
+  const context = await authenticatedReportBody(request, response);
+  if (!context) return;
+  const result = await accessibleReportManifest(context.userID, context.body.manifestID);
+  if (!result) {
+    sendError(response, 404, "Report not found.");
+    return;
+  }
+  const { access, artifact } = result;
+  const manifest = artifact.payload;
+  const material = await reportProjectMaterialBySourceID(access.storageOwnerUserID, access.projectID, manifest);
+  for (const image of manifest.sourceVersions?.images || []) {
+    if (material.get(image.url)?.contentHash !== image.contentHash) {
+      sendError(response, 409, "An image no longer matches the issued Report.");
+      return;
+    }
+  }
+  const pdf = await renderReportPDFOnDemand(manifest, {
+    projectMaterialBySourceID: material,
+    showCover: Boolean(manifest.presentation?.organization)
+  });
+  if (!pdf.length || pdf.length > maxReportFileBytes) {
+    sendError(response, 422, "The generated Report PDF exceeds the supported file size.");
+    return;
+  }
+  response.writeHead(200, {
+    ...securityHeaders(),
+    "cache-control": "private, no-store",
+    "content-type": "application/pdf",
+    "content-length": String(pdf.length),
+    "vary": "Authorization"
+  });
+  response.end(pdf);
+}
+
 async function handleReportFileUpload(request, response) {
   const userID = String(request.headers["x-permitext-user-id"] || "").trim();
   const url = requestURL(request);
@@ -19475,6 +19516,7 @@ function researchConversationCreateFingerprint({ projectID, selections, originSu
     selections: selections.map((selection) => ({
       sectionID: String(selection.sectionID || "").trim(),
       ...(selection.selectionMode === "section_reference" ? { selectionMode: "section_reference" } : {}),
+      ...(selection.codeVersion ? {codeVersion: canonicalCodeVersion(selection.codeVersion)} : {}),
       selectedText: readableResearchSelectionText(
         selection.selectedText,
         maximumResearchSelectionCharacters
@@ -35325,6 +35367,7 @@ const handlers = {
   "reports/manifests/get": handleReportManifestGet,
   "reports/files/upload": handleReportFileUpload,
   "reports/files/read": handleReportFileRead,
+  "reports/files/render": handleReportFileRender,
   "internal/evaluations/data": handleInternalEvaluationData,
   "internal/evaluations/archive/export": (request, response) => handleInternalEvaluationData(request, response, true),
   "internal/research-spend/data": handleInternalResearchSpend,
