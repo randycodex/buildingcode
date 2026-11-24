@@ -18,6 +18,32 @@ const fireDirectReferencePhrasePattern = new RegExp(
   inlineDirectReferencePhrasePattern.flags
 );
 const inlineReferenceNumberPattern = new RegExp(inlineReferenceNumberSource, "gi");
+const constructionCodeNames = {
+  "building code": "BC",
+  "plumbing code": "PC",
+  "mechanical code": "MC",
+  "fuel gas code": "FGC",
+  "fire code": "FC"
+};
+
+export function qualifiedReaderReference(suffix) {
+  const match = String(suffix || "").slice(0, 140).replace(/\s+/g, " ").match(
+    /^\s*(?:,\s*exception\s+(\d+))?\s+of\s+the\s+(?:(?:new\s+york\s+city|nyc)\s+)?(building code|plumbing code|mechanical code|fuel gas code|fire code)\b/i
+  );
+  if (!match) return null;
+  return {
+    codePrefix: constructionCodeNames[match[2].toLowerCase()],
+    ...(match[1] ? {exceptionNumber: match[1]} : {})
+  };
+}
+
+export function renumberedReaderException({sourceCode, codePrefix, sectionNumber, exceptionNumber, is2022Edition}) {
+  // NYC PC Table 403.1 still cites the exception by number. Its 2022 BC
+  // counterpart is the separately numbered provision for nonaccessory spaces.
+  if (is2022Edition && sourceCode === "PC" && codePrefix === "BC" &&
+      sectionNumber === "303.1" && exceptionNumber === "2") return "303.1.2";
+  return null;
+}
 
 function normalizedAnchor(value) {
   return String(value || "").trim().replace(/^#?JD_/i, "");

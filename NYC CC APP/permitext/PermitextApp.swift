@@ -176,6 +176,7 @@ enum PermitextLifecyclePolicy {
 @main
 struct PermitextApp: App {
     @StateObject private var library: CodeLibraryViewModel
+    @State private var savedReportLink: SavedProjectReportLink?
     @Environment(\.scenePhase) private var scenePhase
     private let offersFirstUseExperience: Bool
     private let clerk: Clerk?
@@ -298,7 +299,7 @@ struct PermitextApp: App {
                         NativeProjectPartialLookupHarness()
                     } else if ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture") {
                         NavigationStack {
-                            ProjectNotebookView(projectID: "native-notebook-fixture", projectName: "Notebook fixture", accentColor: .blue, referenceCandidates: [],
+                            ProjectNotebookView(projectID: phase3ResearchConfiguration.notebookProjectID, projectName: "Notebook fixture", accentColor: .blue, referenceCandidates: [],
                                 // Conflict/deletion acceptance must open its seeded draft
                                 // from the real list so dismiss returns to that list.
                                 initialCardID: ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") ? "native-reference-card" : nil,
@@ -348,10 +349,8 @@ struct PermitextApp: App {
                 // splash or animation that can delay an already-ready screen.
                 library.recordStartupSplashDismissed()
             }
-            .environmentObject(library)
             .tint(Color.appChrome)
             .modifier(PermitextAccountFlowPresentation(library: library, ownerID: nil))
-            .environment(\.permitextClerk, clerk)
             .onChange(of: library.browserTabSwitchRequest) { _, requestedContext in
                 guard let requestedContext else { return }
                 library.selectedTab = requestedContext == .primary ? .browse : .browseSecondary
@@ -429,11 +428,18 @@ struct PermitextApp: App {
             }
             .onOpenURL { url in
                 guard runsNormalLifecycle else { return }
+                if let report = SavedProjectReportLink(url: url) {
+                    savedReportLink = report
+                    return
+                }
                 Task {
                     if await library.handleClerkOpenURL(url, clerk: clerk) { return }
                     library.handleOpenURL(url)
                 }
             }
+            .modifier(SavedReportLinkPresentation(library: library, savedReportLink: $savedReportLink))
+            .environmentObject(library)
+            .environment(\.permitextClerk, clerk)
             .onAppear {
                 guard runsNormalLifecycle else { return }
                 library.startStoreKitTransactionObservation()
@@ -458,6 +464,123 @@ struct PermitextApp: App {
                 }
             }
         }
+    }
+
+}
+
+private struct SavedReportLinkPresentation: ViewModifier {
+    @ObservedObject var library: CodeLibraryViewModel
+    @Binding var savedReportLink: SavedProjectReportLink?
+    @State private var savedReportLinkStatus: String?
+    @State private var savedReportLinkRetry = UUID()
+    @State private var savedReportAccountPresented = false
+    @State private var linkedReportPDF: URL?
+
+    func body(content: Content) -> some View {
+        content
+            .task(id: SavedReportLinkAttempt(link: savedReportLink, account: library.privateRequestIdentity, retry: savedReportLinkRetry)) {
+                await openLinkedReport()
+            }
+            .onChange(of: savedReportLink) { _, link in
+                if link != nil { linkedReportPDF = nil }
+            }
+            .onChange(of: library.privateRequestIdentity) { _, _ in linkedReportPDF = nil }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if let status = savedReportLinkStatus {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(status).font(.footnote)
+                        HStack {
+                            Button(library.signedInAccount == nil ? "Sign in" : "Switch account") {
+                                savedReportAccountPresented = true
+                            }
+                            if library.signedInAccount != nil {
+                                Button("Retry") { savedReportLinkRetry = UUID() }
+                            }
+                            Spacer()
+                            Button("Dismiss") {
+                                savedReportLinkStatus = nil
+                                savedReportLink = nil
+                            }
+                        }
+                        .font(.footnote.weight(.semibold))
+                    }
+                    .padding(12)
+                    .background(.regularMaterial)
+                    .accessibilityIdentifier("saved-report-link-status")
+                }
+            }
+            .permitextAccountSheet(isPresented: $savedReportAccountPresented) {
+                PermitextAccountEntryView(initialSection: .account).environmentObject(library)
+            }
+            .sheet(isPresented: Binding(
+                get: { linkedReportPDF != nil && !savedReportAccountPresented && !library.isClerkAuthenticationPresented },
+                set: { if !$0 { linkedReportPDF = nil } }
+            )) {
+                if let linkedReportPDF {
+                    ProjectReportPDFPreviewSheet(fileURL: linkedReportPDF) { self.linkedReportPDF = nil }
+                }
+            }
+    }
+
+    @MainActor
+    private func openLinkedReport() async {
+        guard let link = savedReportLink else { return }
+        guard let account = library.signedInAccount else {
+            savedReportLinkStatus = "Sign in to open this saved PDF."
+            return
+        }
+        let attempt = savedReportLinkRetry
+        let identity = library.privateRequestIdentity
+        savedReportLinkStatus = nil
+        do {
+            let pdf = try await library.projectReportPDF(manifestID: link.manifestID, expectedProjectID: link.projectID)
+            guard !Task.isCancelled, savedReportLink == link, attempt == savedReportLinkRetry,
+                  identity == library.privateRequestIdentity else {
+                try? FileManager.default.removeItem(at: pdf.deletingLastPathComponent())
+                return
+            }
+            savedReportLink = nil
+            savedReportAccountPresented = false
+            linkedReportPDF = pdf
+        } catch {
+            guard !Task.isCancelled, savedReportLink == link, attempt == savedReportLinkRetry,
+                  identity == library.privateRequestIdentity else { return }
+            let name = account.email ?? account.displayName ?? "your current account"
+            savedReportLinkStatus = "Could not open this saved PDF as \(name). Switch to the account with access or retry."
+        }
+    }
+}
+
+private struct SavedReportLinkAttempt: Equatable {
+    let link: SavedProjectReportLink?
+    let account: NativePrivateRequestIdentity?
+    let retry: UUID
+}
+
+struct SavedProjectReportLink: Hashable {
+    let projectID: String
+    let manifestID: String
+
+    init(projectID: String, manifestID: String) {
+        self.projectID = projectID
+        self.manifestID = manifestID
+    }
+
+    init?(url: URL) {
+        guard let parts = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              parts.scheme == "https", parts.host == "per.codes" else { return nil }
+        let segments = parts.percentEncodedPath.split(separator: "/")
+        guard segments.count == 4, segments[0] == "open", segments[1] == "report",
+              let projectID = segments[2].removingPercentEncoding, !projectID.isEmpty,
+              let manifestID = segments[3].removingPercentEncoding, !manifestID.isEmpty else { return nil }
+        self.init(projectID: projectID, manifestID: manifestID)
+    }
+
+    var url: URL? {
+        let characters = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-._~"))
+        guard let project = projectID.addingPercentEncoding(withAllowedCharacters: characters),
+              let manifest = manifestID.addingPercentEncoding(withAllowedCharacters: characters) else { return nil }
+        return URL(string: "https://per.codes/open/report/\(project)/\(manifest)")
     }
 }
 
@@ -541,6 +664,7 @@ private struct Phase3EntitledResearchConfiguration {
     let defaults: UserDefaults
     let cacheDirectoryURL: URL
     let seedsReaderSelection: Bool
+    let notebookProjectID: String
 
     @MainActor
     static func prepareIfRequested() -> PreparedHarness? {
@@ -582,6 +706,8 @@ private struct Phase3EntitledResearchConfiguration {
             let transport: any PermitextBackendTransport
             let usesHTTPFixture = ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture")
             let fixtureToken: String?
+            let fixtureUserID: String
+            let notebookProjectID: String
             if usesHTTPFixture {
 #if targetEnvironment(simulator)
                 let environment = ProcessInfo.processInfo.environment
@@ -594,18 +720,26 @@ private struct Phase3EntitledResearchConfiguration {
                 }
                 transport = PermitextBackendHTTPTransport(baseURL: url, name: "isolated-notebook-http-fixture", requestTimeout: 5)
                 fixtureToken = token
+                fixtureUserID = environment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_USER_ID"] ?? "apple:synthetic-native-notebook"
+                notebookProjectID = environment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_PROJECT_ID"] ?? "native-notebook-fixture"
+                guard fixtureUserID.hasPrefix("apple:synthetic-") else {
+                    fatalError("Native HTTP fixture requires a synthetic account.")
+                }
 #else
                 fatalError("Native HTTP recovery fixture is restricted to the Simulator.")
 #endif
             } else {
                 transport = localTransport
                 fixtureToken = nil
+                fixtureUserID = "guest:phase3-entitled-research"
+                notebookProjectID = "native-notebook-fixture"
             }
+            let fixtureSubject = String(fixtureUserID.split(separator: ":", maxSplits: 1).last ?? "")
             let account = SignedInAccount(
-                appUserID: usesHTTPFixture ? "apple:synthetic-native-notebook" : "guest:phase3-entitled-research",
+                appUserID: fixtureUserID,
                 authProvider: usesHTTPFixture ? .apple : .guest,
-                authProviderUserID: usesHTTPFixture ? "synthetic-native-notebook" : "phase3-entitled-research",
-                appleUserID: usesHTTPFixture ? "synthetic-native-notebook" : "",
+                authProviderUserID: fixtureSubject,
+                appleUserID: usesHTTPFixture ? fixtureSubject : "",
                 displayName: "Phase 3 Fixture",
                 signedInAt: Date(timeIntervalSince1970: 1_787_220_000),
                 migrationState: .localDataAttached,
@@ -671,7 +805,8 @@ private struct Phase3EntitledResearchConfiguration {
                     ),
                     seedsReaderSelection: ProcessInfo.processInfo.arguments.contains(
                         seededSelectionLaunchArgument
-                    )
+                    ),
+                    notebookProjectID: notebookProjectID
                 ),
                 library: library
             )
@@ -1326,8 +1461,9 @@ private struct NativeReaderPhysicalStressHarness: View {
             initialSectionNumber = "102.2.1"
         case .plumbingChapter:
             codeSectionName = "PLUMBING CODE"
-            chapterNumber = "1"
-            initialSectionNumber = nil
+            let opensFootnote = ProcessInfo.processInfo.arguments.contains("--native-reader-plumbing-footnote")
+            chapterNumber = opensFootnote ? "4" : "1"
+            initialSectionNumber = opensFootnote ? "403.1" : nil
         case .legacy2014BuildingChapter7:
             codeSectionName = "BUILDING CODE"
             chapterNumber = "7"

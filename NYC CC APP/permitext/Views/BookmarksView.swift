@@ -1737,7 +1737,7 @@ struct ProjectView: View {
                                 .font(.caption2.weight(.bold))
                                 .foregroundStyle(accentColor)
                             Spacer(minLength: 8)
-                            Text(projectHubDate(report.createdAt))
+                            Text(ListTimestamp.date(from: report.createdAt)?.formatted(date: .abbreviated, time: .shortened) ?? "")
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
@@ -1776,6 +1776,14 @@ struct ProjectView: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(isProjectReportBuilding)
+                        if let url = SavedProjectReportLink(projectID: report.projectID, manifestID: report.id).url {
+                            Button("Copy link", systemImage: "link") {
+                                UIPasteboard.general.url = url
+                                UIAccessibility.post(notification: .announcement, argument: "Link copied for version \(report.reportVersion)")
+                            }
+                            .font(.footnote.weight(.semibold))
+                            .accessibilityIdentifier("reports-copy-version-link")
+                        }
                     }
                     .padding(12)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -1953,6 +1961,7 @@ struct ProjectView: View {
         VStack(alignment: .leading, spacing: compact ? 8 : CodeScreenMetrics.contentSpacingBelowTitle) {
             projectHeader
                 .fixedSize(horizontal: false, vertical: true)
+            projectDeviceSyncStatus
             projectSectionCards(compact: compact, expandsCards: expandsCards)
         }
         .padding(.horizontal, contentHorizontalInset)
@@ -2228,6 +2237,7 @@ struct ProjectView: View {
     private var evidenceScreen: some View {
         ProjectSectionScreen(title: isProjectFolder ? "Evidence" : folder?.name ?? "Reference", accentColor: accentColor) {
             if !isProjectFolder { projectHeader }
+            if isProjectFolder { projectDeviceSyncStatus }
             if projectBookmarks.isEmpty {
                 projectHubEmpty("No Saved Evidence yet.")
             } else if visibleProjectBookmarks.isEmpty {
@@ -2287,6 +2297,17 @@ struct ProjectView: View {
             Text("Assistant can take up to 24 passages at once, with 12,000 characters per passage.")
         }
         .refreshable { library.refreshBookmarks() }
+    }
+
+    @ViewBuilder
+    private var projectDeviceSyncStatus: some View {
+        if let status = library.projectDeviceSyncStatus {
+            Label(status, systemImage: "arrow.triangle.2.circlepath")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .accessibilityLabel("Device sync: \(status)")
+                .accessibilityIdentifier("project-device-sync-status")
+        }
     }
 
     @ViewBuilder

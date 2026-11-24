@@ -4415,7 +4415,7 @@ final class CodeLibraryViewModel: ObservableObject {
         return url
     }
 
-    func projectReportPDF(manifestID: String) async throws -> URL {
+    func projectReportPDF(manifestID: String, expectedProjectID: String? = nil) async throws -> URL {
         guard let signedInAccount else {
             throw ProjectHubLoadError.signInRequired
         }
@@ -4426,11 +4426,15 @@ final class CodeLibraryViewModel: ObservableObject {
         )
         guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
         let manifest = snapshot.manifest
-        guard manifest.id == manifestID else { throw URLError(.cannotDecodeContentData) }
+        guard manifest.id == manifestID,
+              expectedProjectID == nil || manifest.project.id == expectedProjectID else {
+            throw ProjectHubLoadError.projectUnavailable
+        }
         // An issued web PDF is already the fixed, richly formatted report.
         // Export its verified bytes instead of rebuilding a text-only copy on
         // the phone and losing its tables, figures, links and Note formatting.
-        if let file = snapshot.files?.first(where: { $0.format == "web-pdf" && $0.contentType == "application/pdf" }) {
+        let storedPDFs = (snapshot.files ?? []).filter { $0.contentType == "application/pdf" }
+        if let file = storedPDFs.first(where: { $0.format == "web-pdf" }) ?? storedPDFs.first {
             let url = try await organizationProjectReportURL(
                 projectID: manifest.project.id, projectName: manifest.title, file: file)
             guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
@@ -5940,6 +5944,17 @@ final class CodeLibraryViewModel: ObservableObject {
         if userContentSyncCheckpoint?.lastErrorMessage != nil { return "Sync failed" }
         if pendingUserContentSyncCount > 0 { return "\(pendingUserContentSyncCount) change\(pendingUserContentSyncCount == 1 ? "" : "s") waiting" }
         return "Synced"
+    }
+
+    var projectDeviceSyncStatus: String? {
+        guard signedInAccount != nil else { return nil }
+        if !userContentSyncConflicts.isEmpty { return "Needs attention · Sync conflicts" }
+        if pendingUserContentSyncCount > 0 { return "Saved on this device · Waiting to sync" }
+        if userContentSyncCheckpoint?.lastErrorMessage != nil { return "Needs attention · Sync paused" }
+        if isAccountBusy { return "Syncing" }
+        if userContentSyncCheckpoint?.lastSuccessfulPushAt != nil ||
+            userContentSyncCheckpoint?.lastSuccessfulPullAt != nil { return "Synced" }
+        return nil
     }
 
     var syncStatusDetail: String {

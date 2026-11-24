@@ -1,4 +1,4 @@
-export const webAppVersion = "20261124-save-report-pdf-v2632";
+export const webAppVersion = "20261124-workspace-handoff-v2633";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";

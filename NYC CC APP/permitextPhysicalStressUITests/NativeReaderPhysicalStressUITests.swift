@@ -2627,6 +2627,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         cachedDraft.tap()
         let review = app.buttons["native-notebook-review-conflict"]
         XCTAssertTrue(review.waitForExistence(timeout: 30))
+        XCTAssertEqual(app.staticTexts["native-notebook-sync-status"].label, "Needs attention")
         XCTAssertTrue(nativeNotebookBody(in: app).waitForExistence(timeout: 15))
         let back = app.buttons["native-notebook-back"]
         XCTAssertTrue(back.exists && back.isHittable)
@@ -2647,6 +2648,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(screenshot)
         app.buttons["native-notebook-confirm-conflict"].tap()
         XCTAssertTrue(waitForValue("saved", on: element(in: app, identifier: "native-notebook-save-status"), timeout: 10))
+        XCTAssertEqual(app.staticTexts["native-notebook-sync-status"].label, "Synced")
         let title = app.textFields["Note title"]
         title.tap()
         title.typeText(" updated")
@@ -4473,6 +4475,115 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         attachment.name = "Fuel Gas Chapter 1 link opened Title 28"
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+
+    func testPlumbingFixtureFootnoteOpens2022BuildingCodeProvision() {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "--native-reader-universal-plumbing-test", "--native-reader-plumbing-footnote",
+            "--native-reader-rollout-stage", "isolated-table-fallback"
+        ]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45),
+                      launchFailureDescription(in: app))
+        app.buttons["Search this chapter"].tap()
+        let field = app.textFields["Find in this chapter"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        field.typeText("Exception 2 of the")
+        let next = app.buttons["Next match"]
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"),
+                                                                  object: next)], timeout: 15), .completed)
+        app.keyboards.buttons["Search"].tap()
+        next.tap()
+        app.buttons["Close chapter find"].tap()
+        let footnote = app.textViews.matching(NSPredicate(format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@",
+                                                          "Exception 2 of the", "Exception 2 of the")).firstMatch
+        XCTAssertTrue(footnote.waitForExistence(timeout: 10) && footnote.isHittable)
+        keepScreenshot(named: "2022 Plumbing Code Table 403.1 footnote j", from: app)
+        let link = app.links.matching(NSPredicate(format: "label CONTAINS[c] %@", "Section 303.1")).firstMatch
+        if link.isHittable {
+            link.tap()
+        } else {
+            // The attributed citation follows "with" on the fifth line.
+            footnote.coordinate(withNormalizedOffset: CGVector(dx: 0.24, dy: 0.56)).tap()
+        }
+        XCTAssertTrue(passageHeading(for: "303.1.2", in: app).waitForExistence(timeout: 10))
+        keepScreenshot(named: "2022 Building Code 303.1.2 from Plumbing footnote", from: app)
+    }
+
+    func testSavedReportLinkOpensExactVersionForSeededAccount() throws {
+        #if targetEnvironment(simulator)
+        let environment = ProcessInfo.processInfo.environment
+        guard let rawURL = environment["PERMITEXT_TEST_SAVED_REPORT_LINK"], let url = URL(string: rawURL) else {
+            throw XCTSkip("Requires a disposable Simulator signed into the loopback report fixture.")
+        }
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk"]
+        app.open(url)
+        if let expectedAccount = environment["PERMITEXT_TEST_REPORT_DENIED_ACCOUNT"] {
+            XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", expectedAccount))
+                .firstMatch.waitForExistence(timeout: 30))
+            XCTAssertFalse(element(in: app, identifier: "native-report-pdf-preview").exists)
+            app.buttons["Switch account"].tap()
+            XCTAssertTrue(app.buttons.containing(NSPredicate(format: "label ==[c] %@", "Sign Out"))
+                .firstMatch.waitForExistence(timeout: 15))
+        } else {
+            XCTAssertTrue(element(in: app, identifier: "native-report-pdf-preview").waitForExistence(timeout: 45))
+            keepScreenshot(named: "Exact saved PDF opened from a private link", from: app)
+        }
+        #else
+        throw XCTSkip("Requires a disposable Simulator.")
+        #endif
+    }
+
+    @MainActor
+    func testNotebookRetainsOfflinePhoneEditAlongsideDesktopEdit() async throws {
+        #if targetEnvironment(simulator)
+        let environment = ProcessInfo.processInfo.environment
+        guard let rawURL = environment["PERMITEXT_TEST_NATIVE_SYNC_PROXY"],
+              let proxy = URL(string: rawURL), proxy.host == "127.0.0.1",
+              let token = environment["PERMITEXT_TEST_NATIVE_SYNC_TOKEN"],
+              let userID = environment["PERMITEXT_TEST_NATIVE_SYNC_USER_ID"],
+              let projectID = environment["PERMITEXT_TEST_NATIVE_SYNC_PROJECT_ID"] else {
+            throw XCTSkip("Requires the isolated desktop and Simulator sync fixture.")
+        }
+        func control(_ action: String) async throws {
+            let (_, response) = try await URLSession.shared.data(from: proxy.appendingPathComponent("qa/\(action)"))
+            XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
+        }
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
+                               "--native-notebook-http-fixture", "--native-notebook-http-list-fixture"]
+        app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_URL"] = rawURL
+        app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_TOKEN"] = token
+        app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_USER_ID"] = userID
+        app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_PROJECT_ID"] = projectID
+        app.launch()
+        let note = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Synthetic Note 1")).firstMatch
+        XCTAssertTrue(note.waitForExistence(timeout: 20))
+        note.tap()
+        let title = app.textFields["Note title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 10))
+        try await control("offline")
+        title.tap()
+        title.typeText(" iPhone offline edit")
+        let status = app.staticTexts["native-notebook-sync-status"]
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Saved on this device"))
+            .firstMatch.waitForExistence(timeout: 20))
+        try await control("desktop-edit")
+        try await control("online")
+        let review = app.buttons["native-notebook-review-conflict"]
+        XCTAssertTrue(review.waitForExistence(timeout: 40))
+        XCTAssertEqual(status.label, "Needs attention")
+        XCTAssertTrue((title.value as? String)?.contains("iPhone offline edit") == true)
+        review.tap()
+        XCTAssertTrue(app.staticTexts["Your draft"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "DesktopSyncFromPairedTest"))
+            .firstMatch.waitForExistence(timeout: 10))
+        keepScreenshot(named: "Simulator preserves its offline Note edit and the desktop saved edit", from: app)
+        #else
+        throw XCTSkip("Requires a disposable Simulator.")
+        #endif
     }
 
     func testFuelGasArticle103LinkOpensTitle28() {

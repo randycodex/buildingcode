@@ -7667,6 +7667,7 @@ function sendHTML(response, html, { scriptNonce = null, extraHeaders = {} } = {}
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' blob: data:",
       "connect-src 'self' https://*.clerk.accounts.dev https://clerk.permitext.com https://clerk.per.codes",
+      "frame-src 'self' blob:",
       "object-src 'none'",
       "base-uri 'none'",
       "frame-ancestors 'none'",
@@ -31244,7 +31245,7 @@ function handleAppleAppSiteAssociation(_request, response) {
     applinks: {
       apps: [],
       details: [
-        { appID, paths: ["/open/section/*"] },
+        { appID, paths: ["/open/section/*", "/open/report/*"] },
         {
           appID,
           components: [{
@@ -35436,7 +35437,8 @@ async function handleRequestUnlocked(request, response) {
       (
         path === "workspace" || /^workspace\/[^/]+\/?$/.test(path) ||
         path === "index.html" ||
-        path.startsWith("open/section/")
+        path.startsWith("open/section/") ||
+        path.startsWith("open/report/")
       )
     ) {
       await handleWebIndex(request, response);

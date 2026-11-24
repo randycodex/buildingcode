@@ -953,6 +953,12 @@ private struct NotebookCardEditorView: View {
                             .font(.title3.weight(.semibold))
                             .disabled(editingReadOnly)
 
+                        if !editingReadOnly, let noteSyncStatus {
+                            Text(noteSyncStatus)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .accessibilityIdentifier("native-notebook-sync-status")
+                        }
                         if let errorMessage {
                             Text(errorMessage)
                                 .font(.footnote)
@@ -1877,6 +1883,14 @@ private struct NotebookCardEditorView: View {
         }
     }
 
+    private var noteSyncStatus: String? {
+        if requiresConflictReview || errorMessage != nil && !retryAfterReconnect { return "Needs attention" }
+        if isSaving && !retryAfterReconnect { return "Syncing" }
+        if hasLocalDraft { return "Saved on this device · Waiting to sync" }
+        if lastSyncedContent != nil && currentCardID != nil { return "Synced" }
+        return nil
+    }
+
     private var currentDraft: NativeNotebookDraft {
         NativeNotebookDraft(cardID: currentCardID, version: version, title: title, document: document,
             evidenceLinks: evidenceLinks, openQuestions: editableContent.openQuestions, editedAt: lastLocalEditAt, clientMutationID: draftMutationID, pendingSave: pendingSave, baseContent: lastSyncedContent,
@@ -1890,7 +1904,6 @@ private struct NotebookCardEditorView: View {
             draftMutationID = UUID().uuidString.lowercased()
             mutationContent = editableContent
         }
-        hasLocalDraft = editableContent != lastSyncedContent || pendingSave != nil
         do {
             // Questions are no longer editable here. Retain unsent legacy metadata
             // separately before a normal note save restores the server metadata.
@@ -1902,6 +1915,7 @@ private struct NotebookCardEditorView: View {
                     scope: "native-notebook-legacy-metadata:\(routeID):\(recoveryID)")
             }
             try cache.store(currentDraft, accountID: accountID, projectID: projectID, scope: "native-notebook-draft:\(routeID)")
+            hasLocalDraft = editableContent != lastSyncedContent || pendingSave != nil
             return true
         } catch {
             errorMessage = "Could not save the local draft. Keep this Note open and try again after freeing space. \(error.localizedDescription)"

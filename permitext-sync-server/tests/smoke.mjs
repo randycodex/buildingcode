@@ -1564,7 +1564,7 @@ async function main() {
         workspaceScript.text.includes("referenceSourceReaderID: sourceReader.id") &&
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
-        workspaceScript.text.includes('./code-references.js?v=20261027-code-reference-links-v19') &&
+        workspaceScript.text.includes('./code-references.js?v=20261124-code-reference-links-v20') &&
         /from\s+["']\.\/sync-state\.js\?v=[^"']+["']/.test(workspaceScript.text) &&
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&

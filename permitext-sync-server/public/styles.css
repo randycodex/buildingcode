@@ -22467,3 +22467,73 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
   letter-spacing: normal;
 }
 .settings-theme-radio { width: 14px; height: 14px; margin: 0; accent-color: var(--text-link); cursor: inherit; }
+
+.report-saved-pdfs {
+  position: relative;
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+.report-saved-pdfs > summary {
+  border: 1px solid var(--workspace-border, #8886);
+  border-radius: 6px;
+  padding: 6px 9px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.report-saved-pdfs-list {
+  position: absolute;
+  z-index: 8;
+  inset: calc(100% + 6px) 0 auto auto;
+  width: min(310px, 70vw);
+  max-height: min(55vh, 380px);
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--workspace-border, #8886);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px #0003;
+  padding: 12px;
+}
+
+.report-saved-pdfs-list > div {
+  display: grid;
+  gap: 4px;
+  padding-block: 7px;
+}
+
+.report-saved-pdfs-list > div + div {
+  border-top: 1px solid var(--workspace-border, #8886);
+}
+
+.report-saved-pdfs-list p { margin: 0; }
+.report-saved-pdfs-list p:empty { display: none; }
+.report-saved-pdfs-list time { font-size: 0.85em; }
+.report-saved-pdfs-list button + button { margin-inline-start: 8px; }
+
+.saved-project-pdf-preview {
+  width: min(920px, 92vw);
+  height: 88vh;
+  padding: 0;
+  border: 1px solid var(--workspace-border, #8886);
+  border-radius: 10px;
+  background: var(--surface);
+  color: inherit;
+}
+
+.saved-project-pdf-preview::backdrop { background: #0009; }
+
+.saved-project-pdf-preview[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.saved-project-pdf-preview header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+}
+
+.saved-project-pdf-preview h2 { margin: 0 auto 0 0; font-size: 1rem; }
+.saved-project-pdf-preview iframe { width: 100%; height: 100%; border: 0; }

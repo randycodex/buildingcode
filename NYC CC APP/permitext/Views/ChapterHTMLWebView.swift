@@ -196,6 +196,7 @@ struct ChapterHTMLSectionTarget: Hashable {
     let anchorID: String
     let sectionNumber: String?
     let codePrefix: String?
+    let referenceSuffix: String?
     let blockID: String?
     let blockLabel: String?
     let action: String?
@@ -204,6 +205,7 @@ struct ChapterHTMLSectionTarget: Hashable {
         anchorID: String,
         sectionNumber: String?,
         codePrefix: String? = nil,
+        referenceSuffix: String? = nil,
         blockID: String? = nil,
         blockLabel: String? = nil,
         action: String? = nil
@@ -211,6 +213,7 @@ struct ChapterHTMLSectionTarget: Hashable {
         self.anchorID = anchorID
         self.sectionNumber = sectionNumber
         self.codePrefix = codePrefix
+        self.referenceSuffix = referenceSuffix
         self.blockID = blockID
         self.blockLabel = blockLabel
         self.action = action
@@ -943,14 +946,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 } catch (error) {}
               }
 
-              function openInlineReference(sectionNumber, codePrefix) {
+              function openInlineReference(sectionNumber, codePrefix, referenceSuffix) {
                 if (!sectionNumber) { return; }
                 try {
                   window.webkit.messageHandlers.\(Coordinator.openSectionMessageName).postMessage({
                     action: 'openReference',
                     anchorID: '',
                     sectionNumber: String(sectionNumber).toUpperCase(),
-                    codePrefix: codePrefix ? String(codePrefix).toUpperCase() : ''
+                    codePrefix: codePrefix ? String(codePrefix).toUpperCase() : '',
+                    referenceSuffix: referenceSuffix || ''
                   });
                 } catch (error) {}
               }
@@ -992,11 +996,20 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                     link.textContent = match[0];
                     link.dataset.sectionNumber = match[3].toUpperCase();
                     link.dataset.codePrefix = (match[2] || '').toUpperCase();
+                    if (!match[2]) {
+                      var block = textNode.parentElement.closest('p, li, td, th, caption, figcaption, div');
+                      if (block) {
+                        var suffix = document.createRange();
+                        suffix.selectNodeContents(block);
+                        suffix.setStart(textNode, pattern.lastIndex);
+                        link.dataset.referenceSuffix = suffix.toString().slice(0, 140);
+                      }
+                    }
                     link.setAttribute('aria-label', 'Open ' + match[0]);
                     link.addEventListener('click', function(event) {
                       event.preventDefault();
                       event.stopPropagation();
-                      openInlineReference(link.dataset.sectionNumber, link.dataset.codePrefix);
+                      openInlineReference(link.dataset.sectionNumber, link.dataset.codePrefix, link.dataset.referenceSuffix);
                     });
                     fragment.appendChild(link);
                     lastIndex = pattern.lastIndex;
@@ -1572,6 +1585,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 anchorID: anchorID,
                 sectionNumber: sectionNumber?.isEmpty == false ? sectionNumber : nil,
                 codePrefix: codePrefix?.isEmpty == false ? codePrefix : nil,
+                referenceSuffix: (payload["referenceSuffix"] as? String).map { String($0.prefix(140)) },
                 blockID: blockID?.isEmpty == false ? blockID : nil,
                 blockLabel: blockLabel?.isEmpty == false ? blockLabel : nil,
                 action: action?.isEmpty == false ? action : nil

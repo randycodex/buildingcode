@@ -1146,6 +1146,7 @@ struct NativeChapterTextReaderView: View {
         NativeReaderReferenceDestinationResolver.destination(
             for: reference,
             sourceCodeSectionID: chapter.codeSectionID,
+            is2022Edition: library.selectedVersion?.authoredHTMLBundlePath?.hasSuffix("/2022-construction-codes") == true,
             codeSections: library.codeSections,
             chapters: { library.chapters(for: $0) },
             sections: { library.sections(for: $0) },
@@ -1716,6 +1717,7 @@ struct NativeReaderReference: Hashable {
     let kind: NativeReaderReferenceKind
     let codePrefix: String?
     let token: String
+    var exceptionNumber: String? = nil
 
     var sectionNumberCandidates: [String] {
         guard kind == .section else { return [] }
@@ -1736,6 +1738,40 @@ enum NativeReaderLinkResolver {
     private static let hashExpression = try! NSRegularExpression(
         pattern: #"(?i)hash\s*:\s*['\"]#([^'\"]+)"#
     )
+    private static let namedSectionPattern = try! NSRegularExpression(
+        pattern: #"(?i)\b(?:(BC|PC|MC|FGC|AC|FC|ZR)\s+)?section\s+([A-Z]?\d{2,}(?:[.-][0-9A-Za-z]+)*)"#
+    )
+    private static let namedCodePattern = try! NSRegularExpression(
+        pattern: #"(?i)^\s*(?:,\s*exception\s+(\d+))?\s+of\s+the\s+(?:(?:new\s+york\s+city|nyc)\s+)?(building\s+code|plumbing\s+code|mechanical\s+code|fuel\s+gas\s+code|fire\s+code)\b"#
+    )
+
+    static func qualifiedSection(in suffix: String) -> (prefix: String, exceptionNumber: String?)? {
+        let excerpt = String(suffix.prefix(140))
+        guard let match = namedCodePattern.firstMatch(in: excerpt, range: NSRange(excerpt.startIndex..., in: excerpt)),
+              let name = Range(match.range(at: 2), in: excerpt) else { return nil }
+        let names = ["building code": "BC", "plumbing code": "PC", "mechanical code": "MC",
+                     "fuel gas code": "FGC", "fire code": "FC"]
+        let key = excerpt[name].lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        guard let prefix = names[key] else { return nil }
+        return (prefix, Range(match.range(at: 1), in: excerpt).map { String(excerpt[$0]) })
+    }
+
+    static func namedSectionLinks(in text: String) -> [(NSRange, URL)] {
+        guard text.range(of: "section", options: .caseInsensitive) != nil else { return [] }
+        return namedSectionPattern.matches(in: text, range: NSRange(text.startIndex..., in: text)).compactMap { match in
+            guard match.range(at: 1).location == NSNotFound,
+                  let span = Range(match.range, in: text),
+                  let token = Range(match.range(at: 2), in: text),
+                  let qualified = qualifiedSection(in: String(text[span.upperBound...].prefix(140))) else { return nil }
+            var destination = URLComponents()
+            destination.fragment = "JD_\(qualified.prefix)\(text[token])"
+            if let exceptionNumber = qualified.exceptionNumber {
+                destination.queryItems = [URLQueryItem(name: "exception", value: exceptionNumber)]
+            }
+            guard let url = destination.url else { return nil }
+            return (match.range, url)
+        }
+    }
 
     static func linkURL(for rawTarget: String) -> URL? {
         let target = rawTarget
@@ -1830,7 +1866,9 @@ enum NativeReaderLinkResolver {
         return NativeReaderReference(
             kind: .section,
             codePrefix: codePrefix,
-            token: token.uppercased()
+            token: token.uppercased(),
+            exceptionNumber: URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?.first(where: { $0.name == "exception" })?.value
         )
     }
 
@@ -1911,6 +1949,7 @@ enum NativeReaderReferenceDestinationResolver {
     static func destination(
         for reference: NativeReaderReference,
         sourceCodeSectionID: Int64?,
+        is2022Edition: Bool = false,
         codeSections: [CodeSectionCategory],
         chapters: (Int64) -> [CodeChapter],
         sections: (CodeChapter) -> [CodeSectionSummary],
@@ -1924,6 +1963,13 @@ enum NativeReaderReferenceDestinationResolver {
 
         switch reference.kind {
         case .section:
+            // NYC PC Table 403.1 retains the exception's former number.
+            if is2022Edition, reference.codePrefix == "BC", reference.token == "303.1",
+               reference.exceptionNumber == "2",
+               let plumbing = NativeReaderCodeSectionResolver.codeSectionID(for: "PC", in: codeSections),
+               sourceCodeSectionID == plumbing {
+                return sectionSummary("303.1.2", targetCodeSectionID)
+            }
             for candidate in reference.sectionNumberCandidates {
                 if let destination = sectionSummary(candidate, targetCodeSectionID) {
                     return destination
@@ -3258,6 +3304,16 @@ enum NativeReaderAttributedTextBuilder {
                     )
                 )
             )
+        }
+        for (range, url) in NativeReaderLinkResolver.namedSectionLinks(in: result.string) {
+            var hasAuthoredLink = false
+            result.enumerateAttribute(.link, in: range) { value, _, stop in
+                if value != nil { hasAuthoredLink = true; stop.pointee = true }
+            }
+            if !hasAuthoredLink {
+                result.addAttributes([.link: url, .foregroundColor: accentColor,
+                                      .underlineStyle: NSUnderlineStyle.single.rawValue], range: range)
+            }
         }
         for range in highlightRanges where NSMaxRange(range) <= result.length {
             result.addAttribute(

@@ -816,28 +816,22 @@ struct ChapterHTMLReaderView: View {
     }
 
     private func openInlineReference(_ target: ChapterHTMLSectionTarget) {
-        let targetCodeSectionID = target.codePrefix.flatMap(codeSectionID(for:)) ?? chapter.codeSectionID
-        guard let sectionNumber = target.sectionNumber,
-              let section = library.sectionSummary(
-                sectionNumber: sectionNumber,
-                codeSectionID: targetCodeSectionID
-              ) else { return }
-        inlineReferenceDestination = section
-    }
-
-    private func codeSectionID(for prefix: String) -> Int64? {
-        let normalizedPrefix = prefix.uppercased()
-        return library.codeSections.first { codeSection in
-            let name = codeSection.name.lowercased()
-            switch normalizedPrefix {
-            case "BC": return name.contains("building")
-            case "PC": return name.contains("plumbing")
-            case "MC": return name.contains("mechanical")
-            case "FGC": return name.contains("fuel gas")
-            case "AC": return name.contains("administrative")
-            default: return false
-            }
-        }?.id
+        guard let sectionNumber = target.sectionNumber else { return }
+        let qualifier = target.codePrefix == nil
+            ? NativeReaderLinkResolver.qualifiedSection(in: target.referenceSuffix ?? "") : nil
+        let reference = NativeReaderReference(
+            kind: .section, codePrefix: target.codePrefix ?? qualifier?.prefix,
+            token: sectionNumber, exceptionNumber: qualifier?.exceptionNumber
+        )
+        inlineReferenceDestination = NativeReaderReferenceDestinationResolver.destination(
+            for: reference,
+            sourceCodeSectionID: chapter.codeSectionID,
+            is2022Edition: library.selectedVersion?.authoredHTMLBundlePath?.hasSuffix("/2022-construction-codes") == true,
+            codeSections: library.codeSections,
+            chapters: { library.chapters(for: $0) },
+            sections: { library.sections(for: $0) },
+            sectionSummary: { library.sectionSummary(sectionNumber: $0, codeSectionID: $1) }
+        )
     }
 
     private func sectionNumber(from headerLine: String) -> String {

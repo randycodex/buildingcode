@@ -1,6 +1,8 @@
 import {
   inlineCodeReferencePhrases,
   parseCodeJumpAnchor,
+  qualifiedReaderReference,
+  renumberedReaderException,
   rewriteStructuredCodeLinks
 } from "../public/code-references.js";
 
@@ -26,6 +28,12 @@ assert(list?.references.length === 3, "Section lists must expose every cited sec
 
 const prefixed = inlineCodeReferencePhrases("MC Sections 501.2 and 501.3")[0];
 assert(prefixed?.codePrefix === "MC", "Text references must preserve an explicit code prefix.");
+const footnoteCode = qualifiedReaderReference(", Exception 2 of the New York City\n Building Code and further text");
+assert(footnoteCode?.codePrefix === "BC" && footnoteCode.exceptionNumber === "2");
+const footnote = {...footnoteCode, sourceCode:"PC", sectionNumber:"303.1"};
+assert(renumberedReaderException({...footnote, is2022Edition:true}) === "303.1.2");
+assert(!renumberedReaderException({...footnote, is2022Edition:false}));
+assert(!qualifiedReaderReference(" applies here. Consult the Building Code."));
 
 const zoningPrefixed = inlineCodeReferencePhrases("ZR Sections 25-23 through 25-26")[0];
 assert(zoningPrefixed?.codePrefix === "ZR", "Zoning references must preserve the ZR prefix.");

@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261124-save-report-pdf-v2632";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261124-workspace-handoff-v2633";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -96,10 +96,12 @@ import {
 } from "./private-workspace-state.js?v=20260912-account-recovery-v8";
 import {
   inlineCodeReferencePhrases,
+  qualifiedReaderReference,
+  renumberedReaderException,
   parseCodeJumpAnchor,
   rewriteStructuredCodeLinks,
   readerCodeReferenceTarget
-} from "./code-references.js?v=20261027-code-reference-links-v19";
+} from "./code-references.js?v=20261124-code-reference-links-v20";
 import {
   settingsAccountSummary,
   settingsPlanCopy,
@@ -177,7 +179,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261124-save-report-pdf-v2632";
+} from "./offline-storage.js?v=20261124-workspace-handoff-v2633";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -10576,6 +10578,7 @@ async function requireAccountLinkWorkSaved(account, identity) {
 }
 
 function replaceActiveAccount(nextAccount, options = {}) {
+  document.querySelector(".saved-project-pdf-preview")?.close();
   clearWorkspaceNotice();
   flushSearchQueryPersistence();
   flushResearchDraftPersistence();
@@ -10724,16 +10727,17 @@ function updateConnectionStatus() {
   connectionStatus.dataset.state = statusKind;
   connectionStatus.hidden = false;
   const statusLabel = connectionStatus.querySelector(".connection-status-label") || connectionStatus;
+  const projectSyncVisible = Boolean(account && workspaceProject() && workspacePrivatePresentationAllowed());
   statusLabel.textContent = offline
-    ? conflicts > 0 ? `Offline · ${conflictLabel}`
-      : pending > 0 ? `Offline · ${pendingLabel}`
+    ? conflicts > 0 ? `Needs attention · ${conflictLabel}`
+      : pending > 0 ? "Saved on this device · Offline"
         : "Offline"
-    : conflicts > 0 ? conflictLabel
-      : pending > 0 ? `Changes pending · ${pending}`
+    : conflicts > 0 ? `Needs attention · ${conflictLabel}`
+      : pending > 0 ? `Saved on this device · ${pendingLabel}`
         : syncFlushPromise || foregroundSyncPromise ? "Syncing"
-          : account ? "Synced" : "Online";
+          : account && syncedContent?.workspacePresentationAccess === "verified" ? "Synced" : "Online";
   const pendingUsesSyncButton = statusKind === "pending" && projectUpdateAutoApplyReady && !detachedProjectWindow;
-  const showConnectionStatus = statusKind !== "clean" && !pendingUsesSyncButton;
+  const showConnectionStatus = projectSyncVisible || statusKind !== "clean" && !pendingUsesSyncButton;
   connectionStatus.style.width = showConnectionStatus ? `${statusLabel.scrollWidth}px` : "0px";
   connectionStatus.setAttribute("aria-hidden", String(!showConnectionStatus));
   const statusActionAvailable = showConnectionStatus && (statusKind === "conflict" || statusKind === "pending");
@@ -11481,8 +11485,18 @@ function setCodeQuestionWorkspaceState(next, options = {}) {
 let projectURLStartupReady = false;
 let projectURLLoadPromise = null;
 let projectURLNavigationGeneration = 0;
+let switchingAccountForProjectLink = false;
+
+function savedProjectPDFPath(projectID, reportID) {
+  return `/open/report/${encodeURIComponent(projectID)}/${encodeURIComponent(reportID)}`;
+}
 
 function projectWorkspaceLinkFromLocation() {
+  const savedPDF = location.pathname.match(/^\/open\/report\/([^/]+)\/([^/]+)\/?$/);
+  if (savedPDF) {
+    try { return {projectID: decodeURIComponent(savedPDF[1]), reportID: decodeURIComponent(savedPDF[2])}; }
+    catch { return null; }
+  }
   const legacy = parseCodeQuestionDeepLink(location.hash);
   if (legacy) return legacy;
   const project = parseProjectWorkspaceURL(location);
@@ -11551,7 +11565,22 @@ async function refreshProjectURLCatalog() {
 
 async function applyProjectWorkspaceURL({initial = false} = {}) {
   const incoming = pendingProjectWorkspaceLink;
-  if (!incoming || !activeAccount() || !isProAccount()) return false;
+  if (!incoming) return false;
+  const account = activeAccount();
+  const linkLabel = incoming.reportID ? "Saved PDF" : "Project";
+  const showUnavailable = () => presentWorkspaceIssue(
+    account
+      ? `${linkLabel} link is unavailable to ${account.email || account.displayName || "your current account"}. Switch to the account that has access and we’ll reopen this link.`
+      : `Sign in to open this ${linkLabel} link.`,
+    {actionLabel: account ? "Switch account" : "Sign in", onAction: () => {
+      switchingAccountForProjectLink = Boolean(account);
+      toggleAccountDialog({signIn: !account});
+    }}
+  );
+  if (!account || !isProAccount()) {
+    showUnavailable();
+    return false;
+  }
   const identity = captureAccountRequest(), generation = ++projectURLNavigationGeneration;
   await refreshProjectURLCatalog();
   if (!isCurrentAccountRequest(identity) || generation !== projectURLNavigationGeneration || incoming !== pendingProjectWorkspaceLink) return false;
@@ -11562,8 +11591,29 @@ async function applyProjectWorkspaceURL({initial = false} = {}) {
     projectDetailKey(project) === targetID && !project.deletedAt && !projectIsArchived(project));
   const workspace = project && workspaceRegistry.workspaces.find(workspace => workspace.projectID === projectRecordID(project));
   if (!workspace) {
-    presentWorkspaceIssue('This Project link is unavailable in this account. Choose a Project from the Workspace menu.');
+    showUnavailable();
     return false;
+  }
+  if (incoming.reportID) {
+    try {
+      const {reports = []} = await postResearch("/reports/history/list", {projectID:targetID});
+      if (!isCurrentAccountRequest(identity) || generation !== projectURLNavigationGeneration) return false;
+      const report = reports.find(version => version.id === incoming.reportID);
+      if (!report?.files?.length) { showUnavailable(); return false; }
+      const packet = await readSavedProjectPDF(targetID, report);
+      if (!isCurrentAccountRequest(identity) || generation !== projectURLNavigationGeneration ||
+          incoming !== pendingProjectWorkspaceLink) return false;
+      pendingProjectWorkspaceLink = null;
+      dismissWorkspaceIssue();
+      showSavedProjectPDF(report, packet);
+      return true;
+    } catch {
+      if (isCurrentAccountRequest(identity) && generation === projectURLNavigationGeneration) {
+        presentWorkspaceIssue("Could not open the saved PDF. Check your connection and try again.",
+          {actionLabel: "Retry", onAction: () => void applyProjectWorkspaceURL()});
+      }
+      return false;
+    }
   }
   if (initial && workspace.id !== activeWorkspaceID) {
     const layout = loadWorkspaceSnapshot(workspace.id);
@@ -11576,6 +11626,7 @@ async function applyProjectWorkspaceURL({initial = false} = {}) {
   } else if (!initial && !(await switchWorkspace(workspace.id, {focus:false, fromProjectURL:true}))) return false;
   if (!isCurrentAccountRequest(identity) || generation !== projectURLNavigationGeneration || incoming !== pendingProjectWorkspaceLink) return false;
   pendingProjectWorkspaceLink = null;
+  dismissWorkspaceIssue();
   if (incoming.questionID && codeQuestionWorkspaceEnabled()) {
     setCodeQuestionWorkspaceState(incoming.stage
       ? switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {projectID:targetID, questionID:incoming.questionID, stage:incoming.stage})
@@ -20699,9 +20750,25 @@ function linkInlineCodeReferences(root, panel, reader) {
       if (phrase.start > cursor) fragment.append(document.createTextNode(text.slice(cursor, phrase.start)));
       let phraseCursor = phrase.start;
 
+      let qualifier = null;
+      if (!phrase.codePrefix && phrase.kind === "section") {
+        const paragraph = textNode.parentElement?.closest("p, li, td, th, caption, figcaption, div");
+        if (paragraph) {
+          const remainder = document.createRange();
+          remainder.selectNodeContents(paragraph);
+          remainder.setStart(textNode, phrase.end);
+          qualifier = qualifiedReaderReference(remainder.toString());
+        }
+      }
       phrase.references.forEach((target) => {
-        const codePrefix = phrase.codePrefix || (reader.codePrefix !== "ZR" && /^28-/.test(target.sectionNumber)
+        const codePrefix = phrase.codePrefix || qualifier?.codePrefix || (reader.codePrefix !== "ZR" && /^28-/.test(target.sectionNumber)
           ? "AC" : reader.codePrefix || "BC");
+        const exceptionNumber = phrase.references.length === 1 ? qualifier?.exceptionNumber : undefined;
+        const renumberedSection = exceptionNumber && renumberedReaderException({
+          sourceCode: reader.codePrefix, codePrefix, sectionNumber: target.sectionNumber, exceptionNumber,
+          is2022Edition: readerReferenceCodeVersion(reader, codePrefix) === defaultSyncCodeVersion
+        });
+        const sectionNumber = renumberedSection || target.sectionNumber;
         if (target.start > phraseCursor) {
           fragment.append(document.createTextNode(text.slice(phraseCursor, target.start)));
         }
@@ -20709,9 +20776,13 @@ function linkInlineCodeReferences(root, panel, reader) {
         reference.type = "button";
         reference.className = "inline-code-reference";
         reference.textContent = text.slice(target.start, target.end);
-        reference.setAttribute("aria-label", `Open ${codePrefix} Section ${target.sectionNumber}`);
+        reference.setAttribute("aria-label", `Open ${codePrefix} Section ${sectionNumber}`);
+        if (renumberedSection) reference.title = `Open 2022 ${codePrefix} §${sectionNumber} (cited here as §${target.sectionNumber}, Exception ${exceptionNumber})`;
         reference.addEventListener("click", (event) => {
-          openInlineCodeReference(reader, codePrefix, target.sectionNumber, reference, { restoreFocus: event.detail === 0, target });
+          openInlineCodeReference(reader, codePrefix, sectionNumber, reference, {
+            restoreFocus: event.detail === 0,
+            target: renumberedSection ? {...target, sectionNumber, referenceNumber: sectionNumber} : target
+          });
         });
         fragment.append(reference);
         phraseCursor = target.end;
@@ -25581,6 +25652,43 @@ async function downloadProjectReportFile(projectID, file, title = "per codes Pro
   anchor.download = packet.filename;
   anchor.click();
   window.setTimeout(() => URL.revokeObjectURL(url), 2_000);
+}
+
+function readSavedProjectPDF(projectID, report) {
+  const file = report.files?.find(file => file.format === "web-pdf") || report.files?.[0];
+  if (!file) throw new Error("This version has no stored PDF.");
+  return readProjectReportFile(projectID, file, report.title);
+}
+
+function showSavedProjectPDF(report, {pdfBlob, filename}) {
+  document.querySelector(".saved-project-pdf-preview")?.close();
+  const dialog = document.createElement("dialog");
+  dialog.className = "saved-project-pdf-preview";
+  const title = `${report.title || "Project Report"} · v${report.reportVersion}`;
+  dialog.setAttribute("aria-label", title);
+  const header = document.createElement("header");
+  const heading = document.createElement("h2");
+  heading.textContent = title;
+  const url = URL.createObjectURL(pdfBlob);
+  const download = document.createElement("a");
+  download.href = url;
+  download.download = filename;
+  download.textContent = "Download PDF";
+  const close = document.createElement("button");
+  close.type = "button";
+  close.textContent = "Close";
+  close.addEventListener("click", () => dialog.close());
+  const frame = document.createElement("iframe");
+  frame.title = title;
+  frame.src = url;
+  header.append(heading, download, close);
+  dialog.append(header, frame);
+  dialog.addEventListener("close", () => {
+    dialog.remove();
+    URL.revokeObjectURL(url);
+  }, {once:true});
+  document.body.append(dialog);
+  dialog.showModal();
 }
 
 // Share reads within an account, but let explicit refreshes supersede older
@@ -32073,8 +32181,7 @@ async function renderProjectNotebook(project, options = {}) {
   panel.append(draftStatus);
   const showDraftStatus = (message) => {
     if (!isCurrentAccountRequest(requestIdentity)) return;
-    const statusMessage = ["Synced", "Saved", "Saved on this device · waiting to sync",
-      "Saved on this device · newer edits waiting to sync"].includes(message) ? "" : String(message || "").trim();
+    const statusMessage = String(message || "").trim();
     draftStatus.replaceChildren();
     draftStatus.title = statusMessage;
     if (!statusMessage) return;
@@ -32087,7 +32194,7 @@ async function renderProjectNotebook(project, options = {}) {
     if (!draft?.recoveryConflict) return false;
     saveConflict = true;
     if (!isCurrentAccountRequest(requestIdentity)) return true;
-    showDraftStatus("Device draft conflict · different versions are preserved. Compare them before continuing. Automatic saving is paused.");
+    showDraftStatus("Needs attention · Different versions are preserved. Compare them before continuing.");
     const download = document.createElement("button");
     download.type = "button";
     download.className = "notebook-recovery-download";
@@ -32509,7 +32616,7 @@ async function renderProjectNotebook(project, options = {}) {
             catch (checkpointError) { showDraftStatus(`Device save failed: ${checkpointError.message}. Keep this Note open and copy your work.`); }
           } else if (error.payload?.code === "NOTEBOOK_VERSION_CONFLICT") {
             saveConflict = true;
-            showDraftStatus("Save conflict · your device draft is preserved. Compare it with the latest Note before saving another version.");
+            showDraftStatus("Needs attention · Your device draft is preserved. Compare it with the latest Note before saving.");
             const latest = error.payload.card;
             if (latest) {
               const review = document.createElement("button");
@@ -34336,6 +34443,8 @@ async function renderProjectReportDraft(project, resume = null) {
           });
           if (isCurrent() && activeDraft === draft) {
             showReportStatus("PDF saved to project. Open it in Reports on iPhone.");
+            const savedPDFs = panel.querySelector(".report-saved-pdfs[open]");
+            if (savedPDFs) void savedPDFs.refresh();
           }
           return;
         }
@@ -35658,8 +35767,73 @@ async function renderProjectReportDraft(project, resume = null) {
     versionsToggle.hidden = !showSavedVersions || history.length === 0;
     versionsToggle.title = "Compare saved PDF versions beside the current Report";
     versionsToggle.addEventListener("click", () => comparison.toggle());
+    const savedPDFs = document.createElement("details");
+    savedPDFs.className = "report-saved-pdfs";
+    const savedPDFsLabel = document.createElement("summary");
+    savedPDFsLabel.textContent = "Saved PDFs";
+    const savedPDFList = document.createElement("section");
+    savedPDFList.className = "report-saved-pdfs-list";
+    savedPDFList.setAttribute("aria-label", "Saved PDFs for this project");
+    savedPDFs.append(savedPDFsLabel, savedPDFList);
+    let savedPDFLoad = 0;
+    savedPDFs.refresh = async () => {
+      const generation = ++savedPDFLoad;
+      const current = () => generation === savedPDFLoad && savedPDFs.open && savedPDFs.isConnected &&
+        !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID;
+      const status = document.createElement("p");
+      status.setAttribute("role", "status");
+      status.textContent = "Loading saved PDFs…";
+      savedPDFList.replaceChildren(status);
+      try {
+        const {reports = []} = await reportRequest("/reports/history/list", {projectID});
+        if (!current()) return;
+        const versions = reports.filter(report => report.files?.length);
+        status.textContent = versions.length ? "" : "No saved PDFs for this project yet.";
+        for (const report of versions) {
+          const row = document.createElement("div");
+          const heading = document.createElement("strong");
+          heading.textContent = `${report.title || "Report"} · v${report.reportVersion}`;
+          const time = document.createElement("time");
+          const timestamp = new Date(report.createdAt);
+          if (Number.isFinite(timestamp.getTime())) {
+            time.dateTime = report.createdAt;
+            time.textContent = timestamp.toLocaleString(undefined, {dateStyle:"medium", timeStyle:"short"});
+          }
+          const open = document.createElement("button");
+          open.type = "button";
+          open.textContent = "Open PDF";
+          open.addEventListener("click", async () => {
+            open.disabled = true;
+            try {
+              const packet = await readSavedProjectPDF(projectID, report);
+              if (current()) showSavedProjectPDF(report, packet);
+            } catch {
+              if (current()) status.textContent = "Could not open this PDF. Try again.";
+            } finally { open.disabled = false; }
+          });
+          const copy = document.createElement("button");
+          copy.type = "button";
+          copy.textContent = "Copy link";
+          copy.addEventListener("click", async () => {
+            try {
+              await navigator.clipboard.writeText(new URL(savedProjectPDFPath(projectID, report.id), location.origin).href);
+              if (current()) status.textContent = `Link copied for version ${report.reportVersion}.`;
+            } catch {
+              if (current()) status.textContent = "Could not copy the link. Try again.";
+            }
+          });
+          const actions = document.createElement("div");
+          actions.append(open, copy);
+          row.append(heading, time, actions);
+          savedPDFList.append(row);
+        }
+      } catch {
+        if (current()) status.textContent = "Could not load saved PDFs. Close and reopen to try again.";
+      }
+    };
+    savedPDFs.addEventListener("toggle", () => { if (savedPDFs.open) void savedPDFs.refresh(); });
     retainReportChildren(primaryActions, save, saveCopy, coordinate, ...(showSavedVersions ? [versionsToggle] : []),
-      pageTheme, generate, savePDF, closeReport);
+      pageTheme, generate, savePDF, savedPDFs, closeReport);
     paintExportState();
     const columns = oldColumns || document.createElement("div");
     columns.className = "report-workspace-columns";
@@ -45704,6 +45878,10 @@ function renderSettings({ upgrade = false } = {}) {
       panel.closest(".account-dialog")?.close();
       await disableOfflineFeature().catch(() => {});
       await renderWorkspace();
+      if (switchingAccountForProjectLink && pendingProjectWorkspaceLink) {
+        switchingAccountForProjectLink = false;
+        toggleAccountDialog({signIn:true});
+      }
     } catch (error) {
       if (isCurrentAccountRequest(requestIdentity)) {
         setStatus(`Sign-out paused: ${error.message || "the local draft could not be saved"}`, true);
@@ -53183,6 +53361,7 @@ async function start() {
   document.querySelector("#collapse-all-columns").addEventListener("click", () => setAllColumnsCollapsed(true));
   document.querySelector("#expand-all-columns").addEventListener("click", () => setAllColumnsCollapsed(false));
   const deepLinkedSectionID = deepLinkedSectionIDFromLocation();
+  const opensSavedPDFLink = Boolean(pendingProjectWorkspaceLink?.reportID);
   // A shared section also needs the restored Project in a signed-in Pro tab.
   // Opening before access settles can discard the citation during startup.
   await restoreInitialProWorkspace();
@@ -53215,7 +53394,8 @@ async function start() {
       window.history.replaceState({}, "", "/");
     }
   }
-  await restoreWorkspaceAfterRefresh(Boolean(deepLinkedSectionID || organizationInvitationTokenFromURL()));
+  await restoreWorkspaceAfterRefresh(Boolean(deepLinkedSectionID || opensSavedPDFLink ||
+    pendingProjectWorkspaceLink || organizationInvitationTokenFromURL()));
   void flushPendingSyncAndRender().catch(() => {});
   void flushCodeQuestionOutbox().catch(() => {});
   startForegroundSyncLoop();
