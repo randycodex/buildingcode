@@ -2091,6 +2091,8 @@ private struct AppLaunchLoadingView: View {
 private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Research: View>: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.openPermitextSearch) private var openSearch
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.layoutDirection) private var layoutDirection
     @State private var hasOpenedSecondary = false
     @State private var summaries: [BrowserContextID: ReaderSessionSummary] = [:]
     @State private var chapterFindOwners: [BrowserContextID: UUID] = [:]
@@ -2187,7 +2189,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     }
 
     private var readingSwitcher: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 0) {
             ForEach(BrowserContextID.allCases) { context in
                 let selected = library.selectedReaderContext == context
                 let summary = summaries[context]
@@ -2205,11 +2207,10 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     Text(summary?.source ?? remembered?.source ?? (context == .primary ? "Reader 1" : "Reader 2"))
                         .font(.caption.weight(.semibold))
                         .lineLimit(2)
+                        .multilineTextAlignment(.center)
                         .padding(.horizontal, 14)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity)
                         .frame(height: CodeScreenMetrics.bottomControlHeight)
-                        .background(selected ? Color.primary.opacity(0.12) : Color.clear, in: Capsule())
-                        .codeLiquidGlassCapsule()
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -2218,6 +2219,22 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
+        .background {
+            GeometryReader { geometry in
+                let segmentWidth = geometry.size.width / 2
+                let isPrimary = library.selectedReaderContext == .primary
+                let isLeft = isPrimary == (layoutDirection == .leftToRight)
+                Capsule()
+                    .fill(Color.primary.opacity(0.15))
+                    .padding(3)
+                    .frame(width: segmentWidth, height: geometry.size.height)
+                    .position(x: segmentWidth * (isLeft ? 0.5 : 1.5), y: geometry.size.height / 2)
+                    .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: library.selectedReaderContext)
+            }
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+        }
+        .codeLiquidGlassCapsule()
         .codeTabAlignedHorizontalPadding()
         .padding(.vertical, CodeScreenMetrics.readerControlsVerticalPadding)
     }

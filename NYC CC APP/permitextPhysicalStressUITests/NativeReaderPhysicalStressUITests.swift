@@ -354,6 +354,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Reader provision spacing", from: app)
 
         let selectorFrame = primary.frame
+        XCTAssertTrue(primary.isSelected)
+        XCTAssertFalse(secondary.isSelected)
+        XCTAssertEqual(selectorFrame.maxX, secondary.frame.minX, accuracy: 1)
+        XCTAssertEqual(selectorFrame.width, secondary.frame.width, accuracy: 1)
+        assertFloatingMenuWidth(selectorFrame.union(secondary.frame), in: app)
+        keepScreenshot(named: "Continuous glass Reader picker over the chapter", from: app)
         let chapterSearch = app.buttons["Search this chapter"]
         let sections = app.buttons["chapter-sections-toolbar"]
         XCTAssertTrue(sections.isHittable)
@@ -418,6 +424,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label BEGINSWITH %@", "reader-code-", "Mechanical Code")).firstMatch.tap()
         XCTAssertTrue(browser.waitForExistence(timeout: 15))
         assertSource("Mechanical Code", in: secondary)
+        XCTAssertTrue(secondary.isSelected)
+        XCTAssertFalse(primary.isSelected)
         XCTAssertTrue(chapter.waitForExistence(timeout: 20))
         chapter.tap()
         XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
@@ -2785,7 +2793,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             (chapterTitle.value as? String)?.contains("101.2") == true
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [jumped], timeout: 10), .completed)
-        keepScreenshot(named: "Bottom reading pills after selecting a section", from: app)
+        keepScreenshot(named: "Reader picker after selecting a section", from: app)
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
             .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.4)))
         let blocks = app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-block-"))
