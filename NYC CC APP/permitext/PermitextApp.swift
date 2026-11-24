@@ -2110,6 +2110,10 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
         secondaryIsReady ? library.selectedReaderContext : .primary
     }
 
+    private var highlightedReaderContext: BrowserContextID {
+        isOpeningSecondaryReader ? .secondary : library.selectedReaderContext
+    }
+
     private var selection: Binding<String> {
         Binding(
             get: { library.selectedTab == .browseSecondary ? AppTab.browse.rawValue : library.selectedTab.rawValue },
@@ -2179,8 +2183,8 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
             .onPreferenceChange(SecondaryReaderReadyKey.self) { ready in
                 isSecondaryReaderReady = ready
                 guard ready, isOpeningSecondaryReader, library.selectedTab == .browse else { return }
-                isOpeningSecondaryReader = false
                 library.selectedTab = .browseSecondary
+                isOpeningSecondaryReader = false
             }
             .onPreferenceChange(ReaderSessionSummaryKey.self) { updated in
                 summaries = updated
@@ -2207,9 +2211,16 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     private var readingSwitcher: some View {
         HStack(spacing: 0) {
             ForEach(BrowserContextID.allCases) { context in
-                let selected = visibleReaderContext == context
+                let selected = highlightedReaderContext == context
                 let preparing = context == .secondary && !secondaryIsReady &&
                     (isOpeningSecondaryReader || library.selectedReaderContext == .secondary)
+                let hint = if preparing {
+                    ""
+                } else if context == .primary, isOpeningSecondaryReader {
+                    "Cancel switching Readers"
+                } else {
+                    selected ? "Return to Chapters, then choose a code on the next tap" : "Switch to this Reader"
+                }
                 let summary = summaries[context]
                 let remembered = rememberedSources[context].flatMap { source in
                     library.availableVersions.contains(where: { $0.fileName == source.versionFileName }) ? source : nil
@@ -2247,21 +2258,21 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("reader-session-\(context.rawValue)")
                 .accessibilityValue(preparing ? "Preparing" : "")
-                .accessibilityHint(selected ? "Return to Chapters, then choose a code on the next tap" : "Switch to this Reader")
+                .accessibilityHint(hint)
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
         .background {
             GeometryReader { geometry in
                 let segmentWidth = geometry.size.width / 2
-                let isPrimary = visibleReaderContext == .primary
+                let isPrimary = highlightedReaderContext == .primary
                 let isLeft = isPrimary == (layoutDirection == .leftToRight)
                 Capsule()
                     .fill(Color.primary.opacity(0.15))
                     .padding(3)
                     .frame(width: segmentWidth, height: geometry.size.height)
                     .position(x: segmentWidth * (isLeft ? 0.5 : 1.5), y: geometry.size.height / 2)
-                    .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: visibleReaderContext)
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.08), value: highlightedReaderContext)
             }
             .allowsHitTesting(false)
             .accessibilityHidden(true)
