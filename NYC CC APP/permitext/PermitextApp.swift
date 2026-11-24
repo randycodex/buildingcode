@@ -520,7 +520,7 @@ private struct NativeDelayedEntitlementHarness: View {
                     .accessibilityIdentifier("native-entitlement-fixture-release")
                 }.font(.caption).padding(8)
             }
-            .sheet(isPresented: $presentsPlan) {
+            .permitextAccountSheet(isPresented: $presentsPlan) {
                 PermitextAccountEntryView(initialSection: .plan).environmentObject(library)
             }
             .task { await library.retryInitialEntitlementCheck() }
@@ -1420,10 +1420,9 @@ private struct NativeReaderPhysicalStressHarness: View {
 }
 #endif
 
-/// The visible Reader owns its account sheets so a gated save never dismisses Search.
-struct PermitextAccountFlowPresentation: ViewModifier {
+struct PermitextClerkAuthenticationPresentation: ViewModifier {
     @ObservedObject var library: CodeLibraryViewModel
-    let ownerID: UUID?
+    let isOwner: () -> Bool
     @Environment(\.permitextClerk) private var clerk
 
     @State private var authenticationTheme = ClerkTheme(
@@ -1441,6 +1440,41 @@ struct PermitextAccountFlowPresentation: ViewModifier {
         ),
         design: .init(borderRadius: 24)
     )
+
+    func body(content: Content) -> some View {
+        content.sheet(
+            isPresented: Binding(
+                get: { isOwner() && library.isClerkAuthenticationPresented },
+                set: { if isOwner() { library.isClerkAuthenticationPresented = $0 } }
+            ),
+            onDismiss: {
+                guard isOwner() else { return }
+                Task {
+                    await library.handleClerkAuthenticationFinished(clerk: clerk)
+                }
+            }
+        ) {
+            Group {
+                if let clerk {
+                    if library.isResumingClerkAuthenticationCallback {
+                        AuthView()
+                            .environment(clerk)
+                    } else {
+                        PermitextClerkAuthenticationView(createsAccount: library.clerkCreatesAccount)
+                            .environment(clerk)
+                    }
+                }
+            }
+            .environment(\.clerkTheme, authenticationTheme)
+        }
+    }
+}
+
+/// The visible Reader owns its account sheets so a gated save never dismisses Search.
+struct PermitextAccountFlowPresentation: ViewModifier {
+    @ObservedObject var library: CodeLibraryViewModel
+    let ownerID: UUID?
+    @Environment(\.permitextClerk) private var clerk
 
     private var isOwner: Bool { library.accountPresentationOwnerID == ownerID }
 
@@ -1479,31 +1513,9 @@ struct PermitextAccountFlowPresentation: ViewModifier {
             } message: { requirement in
                 Text(requirement.message)
             }
-            .sheet(
-                isPresented: Binding(
-                    get: { isOwner && library.isClerkAuthenticationPresented },
-                    set: { if isOwner { library.isClerkAuthenticationPresented = $0 } }
-                ),
-                onDismiss: {
-                    guard isOwner else { return }
-                    Task {
-                        await library.handleClerkAuthenticationFinished(clerk: clerk)
-                    }
-                }
-            ) {
-                Group {
-                    if let clerk {
-                        if library.isResumingClerkAuthenticationCallback {
-                            AuthView()
-                                .environment(clerk)
-                        } else {
-                            PermitextClerkAuthenticationView(createsAccount: library.clerkCreatesAccount)
-                                .environment(clerk)
-                        }
-                    }
-                }
-                .environment(\.clerkTheme, authenticationTheme)
-            }
+            .modifier(PermitextClerkAuthenticationPresentation(library: library) {
+                isOwner && library.clerkAuthenticationPresentationOwnerID == nil
+            })
             .sheet(
                 isPresented: Binding(
                     get: { isOwner && library.isProSubscriptionStorePresented },
@@ -1688,7 +1700,7 @@ private struct PermitextTabNavigation: View {
             library.selectedTab = library.selectedReaderContext == .secondary ? .browseSecondary : .browse
             presentsLibraryAccount = true
         }
-        .sheet(isPresented: $presentsLibraryAccount) {
+        .permitextAccountSheet(isPresented: $presentsLibraryAccount) {
             PermitextAccountEntryView(initialSection: library.signedInAccount == nil ? .account : .plan)
                 .environmentObject(library)
         }

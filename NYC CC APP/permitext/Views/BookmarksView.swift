@@ -240,7 +240,7 @@ struct BookmarksView: View {
                     .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                     .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
             }
-            .sheet(isPresented: $showingAccessSettings) {
+            .permitextAccountSheet(isPresented: $showingAccessSettings) {
                 PermitextAccountEntryView(initialSection: library.signedInAccount == nil ? .account : .plan)
                     .environmentObject(library)
             }
@@ -356,7 +356,7 @@ struct BookmarksView: View {
                 }
             }
         }
-        .sheet(isPresented: $showingSettings) {
+        .permitextAccountSheet(isPresented: $showingSettings) {
             NavigationStack { SettingsView() }
                 .environmentObject(library)
         }
@@ -1708,7 +1708,7 @@ struct ProjectView: View {
         let reports = projectHubSnapshot?.reports ?? []
         VStack(alignment: .leading, spacing: 8) {
             if reports.isEmpty {
-                projectHubEmpty("No reports yet. Create a report in the desktop workspace to see it here.")
+                projectHubEmpty("No saved PDFs yet. Open Report on desktop and choose Save PDF to Project.")
                 if let projectID = library.backendProjectID(for: folderID) {
                     Button {
                         var link = URLComponents()
@@ -2171,7 +2171,7 @@ struct ProjectView: View {
                     }
                 }
             }
-            .task { if projectHubSnapshot == nil { await loadProjectHub() } }
+            .task { await loadProjectHub() }
             .refreshable { await loadProjectHub() }
         }
     }

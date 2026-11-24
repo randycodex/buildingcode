@@ -698,7 +698,8 @@ assert.match(functionSource(clientSource, "notebookCanonicalReferenceLabel"), /l
 assert.match(clientSource, /const canonicalGroups = new Map\(\)[\s\S]*?notebook-reference-code-group[\s\S]*?notebook-reference-chapter-group[\s\S]*?`Chapter \$\{chapterNumber\}`/, "Notebook evidence choices are not grouped by code and chapter.");
 assert.doesNotMatch(clientSource, /applyReportStatus/, "Notebook should not expose the retired Report status control.");
 assert.match(functionSource(clientSource, "promoteNotebookCardToReport"), /addProjectSourcesToReport[\s\S]*?kind === "notebookCard"[\s\S]*?id === card.id/, "Report inclusion must resolve the exact saved Note source.");
-assert.match(clientSource, /generate\.textContent = generatingReport \? "Exporting PDF…" : "Export PDF"/, "Report exposes a versioned PDF export action and indicates an export in progress.");
+assert.match(clientSource, /exportButton\.textContent = generatingReport === "export" \? "Exporting PDF…" : "Export PDF"/, "Report shows the download action and its progress.");
+assert.match(clientSource, /saveButton\.textContent = generatingReport === "save" \? "Saving PDF…" : "Save PDF to Project"/, "Report shows the versioned save action and its progress.");
 assert.match(clientSource, /createReportAutosave/, "Report drafts autosave without a redundant manual save step.");
 assert.doesNotMatch(clientSource, /Professional document/, "Report still repeats Project context beneath its title.");
 assert.match(clientSource, /async function activateProjectStudio[\s\S]*?confirmNotebookDiscard\(current\)[\s\S]*?confirmReportDraftDiscard\(current\)[\s\S]*?replaceCurrentProjectOwner[\s\S]*?remapProjectPane\(paneIDForProjectNotebook\(current\), paneIDForProjectNotebook\(identity\)\)[\s\S]*?state\.notebooks = options\.openNotebook[\s\S]*?state\.reportDrafts = options\.openReportDraft/, "Project switching does not transfer open Notebook and Report panes to the newly selected Project.");

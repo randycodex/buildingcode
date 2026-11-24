@@ -10,10 +10,60 @@ enum SettingsSection: Hashable {
     case sources
 }
 
+private struct AccountClerkAuthenticationRequestKey: EnvironmentKey {
+    static let defaultValue: ((Bool) -> Void)? = nil
+}
+
+private extension EnvironmentValues {
+    var requestAccountClerkAuthentication: ((Bool) -> Void)? {
+        get { self[AccountClerkAuthenticationRequestKey.self] }
+        set { self[AccountClerkAuthenticationRequestKey.self] = newValue }
+    }
+}
+
+extension View {
+    func permitextAccountSheet<SheetContent: View>(
+        isPresented: Binding<Bool>,
+        @ViewBuilder content: @escaping () -> SheetContent
+    ) -> some View {
+        modifier(PermitextAccountSheet(isPresented: isPresented, sheetContent: content))
+    }
+}
+
+private struct PermitextAccountSheet<SheetContent: View>: ViewModifier {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Binding var isPresented: Bool
+    @State private var pendingCreateAccount: Bool?
+    @State private var authenticationOwnerID = UUID()
+    let sheetContent: () -> SheetContent
+
+    func body(content: Content) -> some View {
+        content
+            .sheet(isPresented: $isPresented, onDismiss: presentPendingAuthentication) {
+                sheetContent()
+                    .environment(\.requestAccountClerkAuthentication) { createAccount in
+                        guard !library.isAccountBusy, !library.isStoreKitBusy else { return }
+                        pendingCreateAccount = createAccount
+                        isPresented = false
+                    }
+            }
+            .modifier(PermitextClerkAuthenticationPresentation(library: library) {
+                library.clerkAuthenticationPresentationOwnerID == authenticationOwnerID
+            })
+    }
+
+    private func presentPendingAuthentication() {
+        guard let pendingCreateAccount else { return }
+        self.pendingCreateAccount = nil
+        library.requestClerkAuthentication(createAccount: pendingCreateAccount, presentationOwnerID: authenticationOwnerID)
+    }
+}
+
 struct PermitextAccountEntryView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(\.permitextClerk) private var clerk
+    @Environment(\.requestAccountClerkAuthentication) private var requestAuthentication
     @Environment(\.colorScheme) private var colorScheme
     var initialSection: SettingsSection = .account
 
@@ -50,7 +100,7 @@ struct PermitextAccountEntryView: View {
                 .padding(.top, 12)
             Spacer(minLength: 40)
             if clerk != nil {
-                Button { library.requestClerkAuthentication(createAccount: true) } label: {
+                Button { beginAuthentication(createAccount: true) } label: {
                     Text("Create account")
                         .font(.headline)
                         .frame(maxWidth: .infinity, minHeight: 50)
@@ -58,7 +108,7 @@ struct PermitextAccountEntryView: View {
                         .background(Color.primary, in: Capsule())
                 }
                 .accessibilityIdentifier("account-welcome-create")
-                Button("Sign in") { library.requestClerkAuthentication() }
+                Button("Sign in") { beginAuthentication(createAccount: false) }
                     .font(.headline)
                     .frame(maxWidth: .infinity, minHeight: 50)
                     .accessibilityIdentifier("account-welcome-sign-in")
@@ -98,6 +148,13 @@ struct PermitextAccountEntryView: View {
         .accessibilityIdentifier("account-welcome")
     }
 
+    private func beginAuthentication(createAccount: Bool) {
+        if let requestAuthentication {
+            requestAuthentication(createAccount)
+        } else {
+            library.requestClerkAuthentication(createAccount: createAccount)
+        }
+    }
 }
 
 private enum AccountDeletionStageStatus: String {
@@ -138,6 +195,7 @@ struct SettingsView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.purchase) private var purchase
     @Environment(\.permitextClerk) private var clerk
+    @Environment(\.requestAccountClerkAuthentication) private var requestAuthentication
     @State private var sourceOptions: [CodeLibraryViewModel.ActiveCodeSourceOption] = []
     @State private var sourceOptionsContext: CodeLibraryViewModel.CodeSourceNavigationContext?
     @State private var sourceOptionsLoading = true
@@ -681,6 +739,14 @@ struct SettingsView: View {
         }
     }
 
+    private func beginClerkAuthentication() {
+        if let requestAuthentication {
+            requestAuthentication(false)
+        } else {
+            library.requestClerkAuthentication()
+        }
+    }
+
     private var accountCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             CodeEyebrow(text: "Account", accent: settingsChromeColor)
@@ -705,7 +771,7 @@ struct SettingsView: View {
 
             if library.signedInAccount == nil, clerk != nil {
                 Button {
-                    library.requestClerkAuthentication()
+                    beginClerkAuthentication()
                 } label: {
                     Label("Sign in or create an account", systemImage: "person.crop.circle.badge.checkmark")
                         .font(.subheadline.weight(.semibold))
@@ -738,7 +804,7 @@ struct SettingsView: View {
 
                     if clerk != nil, account.authProvider != .clerk {
                         Button {
-                            library.requestClerkAuthentication()
+                            beginClerkAuthentication()
                         } label: {
                             Label("Connect email, Apple, Google, or Microsoft", systemImage: "person.crop.circle.badge.plus")
                                 .font(.subheadline.weight(.semibold))

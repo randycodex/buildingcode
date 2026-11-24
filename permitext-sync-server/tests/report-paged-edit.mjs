@@ -47,7 +47,7 @@ assert.equal(bodyPages.scroll.top,14,'An unpainted paragraph starts editing on t
 editor.dispose();delete globalThis.document;delete globalThis.ResizeObserver;
 
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
-const start=source.indexOf('  const generateReport = async () => {');
+const start=source.indexOf('  const generateReport = async (destination = "export") => {');
 const end=source.indexOf('\n  const deleteReport = ',start);
 assert(start>0 && end>start);
 const downloaded=[],calls=[];
@@ -65,5 +65,32 @@ vm.runInContext(source.slice(start,end)+'\nglobalThis.exportReport=generateRepor
 await context.exportReport();
 assert.deepEqual(downloaded, [[{type:'application/pdf'},'Actual pages.pdf']]);
 assert.deepEqual(calls,['finish','pdf:draft']);
-assert.equal(context.generatingReport,false);
+assert.equal(context.generatingReport,null);
+
+const saves=[];
+context.showReportStatus=message=>calls.push(message);
+context.dirty=true;
+context.saveDraft=async()=>{
+  context.activeDraft.version=5;
+  context.dirty=false;
+  return true;
+};
+let finishIssuing;
+context.reportRequest=(path, body)=>{
+  saves.push({path,body:structuredClone(body)});
+  return new Promise(resolve=>{finishIssuing=resolve;});
+};
+const issuing=context.exportReport('save');
+await new Promise(resolve=>setImmediate(resolve));
+assert.equal(context.generatingReport,'save');
+await context.exportReport('save');
+await context.exportReport();
+assert.deepEqual(saves,[{path:'/reports/generate',body:{
+  projectID:'project',draftID:'draft',expectedVersion:5,reportTemplateID:'standard'
+}}]);
+assert.equal(downloaded.length,1,'Saving to the project does not trigger a download.');
+finishIssuing();
+await issuing;
+assert.equal(context.generatingReport,null);
+assert.equal(calls.at(-1),'PDF saved to project. Open it in Reports on iPhone.');
 console.log('Paged editing passed: measured page targets, direct text editing, external item controls, live editor retention across reflow, and PDF download without preview or navigation.');

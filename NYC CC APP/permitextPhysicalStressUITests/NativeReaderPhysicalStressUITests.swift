@@ -4588,6 +4588,31 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "First save reopened from new project", from: app)
     }
 
+    func testSignInFromAccountPresentsClerkAfterDismissingSettings() throws {
+        let app = XCUIApplication()
+        app.launch()
+        let explore = app.buttons["phase5-first-use-explore"]
+        if explore.waitForExistence(timeout: 8) { explore.tap() }
+
+        let account = app.buttons["Open Account"]
+        XCTAssertTrue(account.waitForExistence(timeout: 45))
+        account.tap()
+        let closeAccount = app.buttons["account-close"]
+        XCTAssertTrue(closeAccount.waitForExistence(timeout: 10))
+        let signIn = app.buttons["Sign in or create an account"]
+        guard signIn.exists else {
+            throw XCTSkip("Requires a signed-out simulator with Clerk configured.")
+        }
+        reveal(signIn, in: app)
+        signIn.tap()
+
+        let switchMode = app.buttons["authentication-switch-mode"]
+        XCTAssertTrue(switchMode.waitForExistence(timeout: 20))
+        XCTAssertTrue(switchMode.isHittable, "The sign-in sheet must accept input after one tap.")
+        XCTAssertFalse(closeAccount.exists, "The Account sheet must be dismissed before presenting sign-in.")
+        XCTAssertEqual(switchMode.label, "New to per codes? Create account")
+    }
+
     func testAccountEntryAtAccessibilitySizeCanReturnToExploration() {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",

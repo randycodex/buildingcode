@@ -300,6 +300,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var accountAuthenticationMessage: String?
     @Published private(set) var accountAuthenticationCompletionID: UUID?
     @Published var isClerkAuthenticationPresented = false
+    @Published private(set) var clerkAuthenticationPresentationOwnerID: UUID?
     @Published private(set) var clerkCreatesAccount = false
     @Published private(set) var isResumingClerkAuthenticationCallback = false
     @Published var isProSubscriptionStorePresented = false
@@ -5201,12 +5202,15 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func requestClerkAuthentication(createAccount: Bool = false) {
-        requestClerkAuthentication(then: .none)
-        clerkCreatesAccount = createAccount
+    func requestClerkAuthentication(createAccount: Bool = false, presentationOwnerID: UUID? = nil) {
+        requestClerkAuthentication(then: .none, createAccount: createAccount, presentationOwnerID: presentationOwnerID)
     }
 
-    private func requestClerkAuthentication(then action: PostClerkAuthenticationAction) {
+    private func requestClerkAuthentication(
+        then action: PostClerkAuthenticationAction,
+        createAccount: Bool = false,
+        presentationOwnerID: UUID? = nil
+    ) {
         guard !isAccountBusy, !isStoreKitBusy else {
             statusMessage = "Finish the current account or App Store operation before changing accounts."
             return
@@ -5214,9 +5218,10 @@ final class CodeLibraryViewModel: ObservableObject {
         accountMutationGeneration &+= 1
         clerkAuthenticationAttemptID = UUID()
         postClerkAuthenticationAction = action
-        clerkCreatesAccount = false
+        clerkCreatesAccount = createAccount
         isResumingClerkAuthenticationCallback = false
         accountAuthenticationMessage = nil
+        clerkAuthenticationPresentationOwnerID = presentationOwnerID
         isClerkAuthenticationPresented = true
     }
 
@@ -5275,6 +5280,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func handleClerkAuthenticationFinished(clerk: Clerk?) async {
+        clerkAuthenticationPresentationOwnerID = nil
         guard let authenticationAttemptID = clerkAuthenticationAttemptID else { return }
         defer { isResumingClerkAuthenticationCallback = false }
         guard let clerk, let session = clerk.session else {
@@ -6095,6 +6101,7 @@ final class CodeLibraryViewModel: ObservableObject {
         clerkAuthenticationAttemptID = nil
         postClerkAuthenticationAction = .none
         isClerkAuthenticationPresented = false
+        clerkAuthenticationPresentationOwnerID = nil
         isResumingClerkAuthenticationCallback = false
         completeLocalSignOut()
 
@@ -6128,6 +6135,7 @@ final class CodeLibraryViewModel: ObservableObject {
         clerkAuthenticationAttemptID = nil
         postClerkAuthenticationAction = .none
         isClerkAuthenticationPresented = false
+        clerkAuthenticationPresentationOwnerID = nil
         isResumingClerkAuthenticationCallback = false
         completeLocalSignOut()
     }

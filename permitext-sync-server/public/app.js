@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261123-web-audit-fixes-v2631";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261124-save-report-pdf-v2632";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -177,7 +177,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261123-web-audit-fixes-v2631";
+} from "./offline-storage.js?v=20261124-save-report-pdf-v2632";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -33993,7 +33993,7 @@ async function renderProjectReportDraft(project, resume = null) {
     panel.addEventListener(event, () => { reportPresentationInteraction += 1; }, {passive: true});
   }
   let autosave = null;
-  let generatingReport = false;
+  let generatingReport = null;
   let deletingReport = false;
   let recoveryEditorID = crypto.randomUUID();
   let recoveredDrafts = [];
@@ -34136,10 +34136,11 @@ async function renderProjectReportDraft(project, resume = null) {
     status.hidden = true;
   };
 
-  const showStatusError = (message) => {
+  const showReportStatus = (message) => {
     status.textContent = message;
     status.hidden = false;
   };
+  const showStatusError = showReportStatus;
 
   if (!activeAccount()) {
     showStatusError("Sign in from Account to use private Project Reports.");
@@ -34282,63 +34283,82 @@ async function renderProjectReportDraft(project, resume = null) {
   let historyMutationGeneration = 0;
   const paintExportState = () => {
     reportFormatting?.refreshHistory();
-    panel.querySelectorAll(".report-history-delete").forEach((button) => { button.disabled = generatingReport; });
-    const button = panel.querySelector('[data-report-export]');
-    if (!button) return;
-    button.disabled = generatingReport;
-    button.textContent = generatingReport ? "Exporting PDF…" : "Export PDF";
+    const busy = Boolean(generatingReport);
+    panel.querySelectorAll(".report-history-delete").forEach((button) => { button.disabled = busy; });
+    const exportButton = panel.querySelector("[data-report-export]");
+    if (exportButton) {
+      exportButton.disabled = busy;
+      exportButton.textContent = generatingReport === "export" ? "Exporting PDF…" : "Export PDF";
+    }
+    const saveButton = panel.querySelector("[data-report-save-pdf]");
+    if (saveButton) {
+      saveButton.disabled = busy;
+      saveButton.textContent = generatingReport === "save" ? "Saving PDF…" : "Save PDF to Project";
+    }
   };
-  const generateReport = async () => {
+  const generateReport = async (destination = "export") => {
     if (generatingReport || deletingReport) return;
     pageEditor.finish();
-    generatingReport = true;
+    const draft = activeDraft;
+    const isCurrent = () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID;
+    generatingReport = destination;
     paintExportState();
     try {
       // Source changes may still be preparing a Note or saving the draft.
-      // Export their completed version, never an earlier one.
-      if (sourceMutationDraft === activeDraft) await sourceMutation;
-      if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
-      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
-      if (activeDraft.blocks.some(block => block.kind === 'calculation')) {
+      // Generate the PDF from their completed version.
+      if (sourceMutationDraft === draft) await sourceMutation;
+      if (!isCurrent() || activeDraft !== draft) return;
+      if ((dirty || !draft.id) && !(await saveDraft())) return;
+      if (!isCurrent() || activeDraft !== draft) return;
+      if (draft.blocks.some(block => block.kind === 'calculation')) {
         await syncedProjectCalculations(projectID).flush();
-        if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
-        const linked = new Set(activeDraft.blocks.filter(block => block.kind === 'calculation').map(block => block.sourceID));
+        if (!isCurrent() || activeDraft !== draft) return;
+        const linked = new Set(draft.blocks.filter(block => block.kind === 'calculation').map(block => block.sourceID));
         if (projectCalculationStore(requestIdentity).pending(projectID).some(record => linked.has(record.id))) {
           showStatusError('The latest calculation edits have not synced yet. Reconnect and finish saving them before creating a PDF.');
           return;
         }
       }
       if (dirty) {
-        showStatusError("Your latest changes are still saving. Wait for Saved before exporting.");
+        showStatusError("Your latest changes are still saving. Wait for them to finish before creating a PDF.");
         return;
       }
-      if (!activeDraft.blocks.length && !activeDraft.introduction) {
+      if (!draft.blocks.length && !draft.introduction) {
         showStatusError("Add at least one Report item before generating a PDF.");
         return;
       }
       clearStatus();
       try {
-        const draft = activeDraft;
+        if (destination === "save") {
+          await reportRequest("/reports/generate", {
+            projectID, draftID: draft.id, expectedVersion: draft.version,
+            reportTemplateID: selectedReportTemplateID
+          });
+          if (isCurrent() && activeDraft === draft) {
+            showReportStatus("PDF saved to project. Open it in Reports on iPhone.");
+          }
+          return;
+        }
         const response = await requestDraftPDF(draft);
         const pdf = await response.blob();
-        if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+        if (!isCurrent() || activeDraft !== draft) return;
         const title = (draft.title || "Project Report").trim().replace(/[\\/:*?"<>|]/g, "-") || "Project Report";
         downloadCodeMemoBlob(pdf, `${title}.pdf`);
       } catch (error) {
-        if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
+        if (!isCurrent() || activeDraft !== draft) return;
         if (error.payload?.code === "REPORT_DRAFT_VERSION_CONFLICT" && !dirty) {
           await refreshReportArtifacts();
-          if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
+          if (!isCurrent()) return;
         }
         showStatusError(error.message === "Report text is too long."
           ? "A Report item exceeds the supported text length. Shorten that item and try again."
           : error.message || "The Report could not be generated.");
       }
     } catch (error) {
-      if (!disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID) {
-        showStatusError(`The requested source could not be included. Add it again before exporting. ${error.message || ""}`);
+      if (isCurrent() && activeDraft === draft) {
+        showStatusError(`The requested source could not be included. Add it again before creating a PDF. ${error.message || ""}`);
       }
-    } finally { generatingReport = false; paintExportState(); }
+    } finally { generatingReport = null; paintExportState(); }
   };
 
   const deleteReport = async (trigger) => {
@@ -35471,11 +35491,17 @@ async function renderProjectReportDraft(project, resume = null) {
     generate.type = "button";
     generate.className = "workflow-action workflow-action-primary";
     generate.dataset.reportExport = "true";
-    generate.disabled = generatingReport;
-    generate.textContent = generatingReport ? "Exporting PDF…" : "Export PDF";
     generate.title = "Save current edits and download PDF";
     generate.addEventListener("click", () => {
       void generateReport();
+    });
+    const savePDF = document.createElement("button");
+    savePDF.type = "button";
+    savePDF.className = "workflow-action";
+    savePDF.dataset.reportSavePdf = "true";
+    savePDF.title = "Save a versioned PDF to this project";
+    savePDF.addEventListener("click", () => {
+      void generateReport("save");
     });
     const coordinate = document.createElement("button");
     coordinate.type = "button";
@@ -35633,7 +35659,8 @@ async function renderProjectReportDraft(project, resume = null) {
     versionsToggle.title = "Compare saved PDF versions beside the current Report";
     versionsToggle.addEventListener("click", () => comparison.toggle());
     retainReportChildren(primaryActions, save, saveCopy, coordinate, ...(showSavedVersions ? [versionsToggle] : []),
-      pageTheme, generate, closeReport);
+      pageTheme, generate, savePDF, closeReport);
+    paintExportState();
     const columns = oldColumns || document.createElement("div");
     columns.className = "report-workspace-columns";
     columns.setAttribute("role", "region");

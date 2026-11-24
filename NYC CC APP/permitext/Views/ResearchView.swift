@@ -686,7 +686,7 @@ private struct ResearchSessionView: View {
                     }
                 )
             }
-            .sheet(isPresented: $showingSettings) {
+            .permitextAccountSheet(isPresented: $showingSettings) {
                 PermitextAccountEntryView(initialSection: recoverySettingsSection)
                     .environmentObject(library)
             }
