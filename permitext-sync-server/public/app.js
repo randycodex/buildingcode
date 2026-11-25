@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261124-quiet-sync-status-v2634";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261124-quiet-note-save-v2635";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -179,7 +179,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261124-quiet-sync-status-v2634";
+} from "./offline-storage.js?v=20261124-quiet-note-save-v2635";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -32332,7 +32332,7 @@ async function renderProjectNotebook(project, options = {}) {
       persistedRevision = revision;
       persistedCardID = snapshot.cardID;
       persistedDraft = saved;
-      if (!showNotebookRecoveryConflict(saved)) showDraftStatus("Saved on this device · waiting to sync");
+      if (!showNotebookRecoveryConflict(saved)) showDraftStatus("");
       if (isCurrentAccountRequest(requestIdentity)) void refreshNotebookPendingStatus(requestIdentity).catch(() => {});
       return saved;
     });
@@ -32671,7 +32671,7 @@ async function renderProjectNotebook(project, options = {}) {
             cardPayload: { cards, access: { readOnly: notebookReadOnly } } });
           requireCurrentAccountRequest(requestIdentity);
           if (disposed) return true;
-          showDraftStatus(dirty ? "Saved on this device · newer edits waiting to sync" : "");
+          showDraftStatus("");
           renderCardList();
           void refreshNotebookReportStatus().catch(() => false);
           if (dirty) scheduleNotebookAutosave(180);
@@ -48380,7 +48380,7 @@ function readerShortcutItems() {
         : isProjectNotebookPaneID(id) ? 'notes'
         : isProjectReportDraftPaneID(id) ? 'report' : '';
       if (id.startsWith('project:notes-index:')) return null;
-      const label = {search:'Search results', saved:'Evidence', analysis:'Assistant', calculator:'Calculator', notes:'Notes', report:'Report'}[toolKey] || columnPaneLabel(panel);
+      const label = {search:'Search', saved:'Evidence', analysis:'Assistant', calculator:'Calculator', notes:'Notes', report:'Report'}[toolKey] || columnPaneLabel(panel);
       const query = toolKey === 'search' ? panel.querySelector('.search-input')?.value?.trim() : '';
       return {id, name:label, label, location:query || '', column:true, theme:'current-consolidation', toolKey,
         iconName:{search:'search', saved:'bookmark', analysis:'astroid', calculator:'calculator', notes:'notepad-text', report:'summary'}[toolKey] || ''};

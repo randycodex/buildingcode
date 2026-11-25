@@ -1,7 +1,7 @@
 /* Column shortcuts share the workspace navigation's active and hover states. */
 .reader-toolbar-tools,.reader-shortcuts{display:flex;align-items:center;gap:var(--workspace-menu-gap,6px)}
 .reader-shortcuts[hidden]{display:none}
-.workflow-toolbar #add-reader{--workspace-menu-weight:300;flex:0 0 auto;color:var(--text-secondary)}
+.workflow-toolbar #add-reader{flex:0 0 auto;color:var(--text-secondary)}
 .workflow-toolbar #add-reader:not(:disabled):hover{color:light-dark(var(--text-primary),#fff)}
 .workflow-toolbar .toolbar-button.has-open-column{display:none}
 .workflow-toolbar .reader-shortcut[data-reorderable=true]{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -9,7 +9,7 @@
 .workflow-toolbar .reader-shortcuts.is-reordering{cursor:grabbing}
 .pane-header-drag-area{touch-action:none}
 /* Every open column stays active, independently of which one has focus. */
-.workflow-toolbar .reader-shortcut{--workspace-menu-weight:500;appearance:none;flex:0 0 auto;height:var(--workspace-menu-height);min-height:var(--workspace-menu-height);line-height:1;outline:0;border:1px solid transparent;padding-inline:10px;color:var(--workspace-menu-active);font-family:var(--ui-font-family);white-space:nowrap;cursor:pointer;transition:background 160ms}
+.workflow-toolbar .reader-shortcut{appearance:none;flex:0 0 auto;height:var(--workspace-menu-height);min-height:var(--workspace-menu-height);line-height:1;outline:0;border:1px solid transparent;padding-inline:10px;color:var(--workspace-menu-active);font-family:var(--ui-font-family);white-space:nowrap;cursor:pointer;transition:background 160ms}
 .workflow-toolbar .reader-shortcut:not(:disabled):hover{color:var(--workspace-menu-active)}
 .workflow-toolbar .reader-shortcut[data-reader-pane-id^="utility:search"]{gap:6px}
 .workflow-toolbar .reader-shortcut:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
@@ -51,7 +51,7 @@
   border-radius: 8px;
   background: transparent;
   color: var(--text-primary);
-  font: 500 14px/1.4 var(--ui-font-family);
+  font: var(--workspace-menu-weight) 14px/1.4 var(--ui-font-family);
   text-align: start;
   cursor: pointer;
 }

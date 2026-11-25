@@ -189,7 +189,13 @@ const navigation=createReaderShortcuts({host:allHost,track:allTrack,readers:()=>
 appContext.readerShortcuts=navigation;
 const order=()=>allHost.children.map(button=>button.dataset.readerPaneId);
 assert.deepEqual(order(),allIDs);
-assert.deepEqual(allHost.children.map(button=>button.textContent),['BC’22','Search results','PC’14','Assistant','Calculator'],'Restored Readers show code editions without the internal source keys.');
+assert.deepEqual(allHost.children.map(button=>button.textContent),['BC’22','Search','PC’14','Assistant','Calculator'],'Restored Readers show code editions without the internal source keys.');
+const searchInput=doc.createElement('input');
+searchInput.className='search-input';
+searchInput.value='distance windows lot lines';
+allPanels[1].append(searchInput);
+navigation.refresh();
+assert.equal(allHost.children[1].textContent,'Search','A populated search keeps the same shortcut label.');
 assert.match(allHost.children[0].getAttribute('aria-label'),/Building Code \(2022\)/);
 assert.match(allHost.children[2].getAttribute('aria-label'),/Plumbing Code \(2014\)/);
 assert(toolButtons.every(({button})=>button.classList.contains('has-open-column')),'Open tools use bubbles instead of duplicate launchers.');
@@ -256,7 +262,7 @@ moving.dispatch('keydown',{altKey:true,shiftKey:true,key:'ArrowRight',preventDef
 assert.equal(saves,2);
 const duplicate=doc.createElement('article');duplicate.className='workspace-panel';duplicate.dataset.paneId='utility:search:second';allTrack.append(duplicate);
 navigation.refresh();
-assert.deepEqual(allHost.children.filter(button=>button.textContent.startsWith('Search')).map(button=>button.textContent),['Search results 1','Search results 2']);
+assert.deepEqual(allHost.children.filter(button=>button.textContent.startsWith('Search')).map(button=>button.textContent),['Search 1','Search 2']);
 allPanels[1].remove();duplicate.remove();navigation.refresh();
 assert.equal(toolButtons[0].button.classList.contains('has-open-column'),false,'Closing the last Search restores its launcher.');
 allContext='A:notebook';navigation.refresh();
