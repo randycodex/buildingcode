@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { blockNoteBlocksFromNotebookDocument } from '../src/notebook-schema.js';
 import { validateNotebookDocument, renderNotebookDocumentHTML } from '../notebook-contract.mjs';
-import { notebookFontSize, notebookFontSizes, notebookLineSpacings } from '../public/notebook-styles.js';
+import { notebookFontSize, notebookFontSizes, notebookLineSpacings, notebookTextColor, notebookTextColors } from '../public/notebook-styles.js';
 
 // Reusing the editor must preserve authored structure and reference identity.
 const fixture = {schema:'permitext-notebook-card',schemaVersion:2,format:'blocknote-json',document:[
@@ -50,6 +50,7 @@ for(const render of ['render','toExternalHTML']) {
   assert.deepEqual(output.dom.style.applied,['line-height','2','important']);
 }
 const toolbarSource = editorSource.slice(editorSource.indexOf('export function notebookTableActions('),editorSource.indexOf('function normalizedReference(')).replace(/^export /gm,'');
+const colorPropertiesSource = editorSource.slice(editorSource.indexOf('function notebookTextColorProperties('), editorSource.indexOf('const notebookTextColorStyle'));
 const selected = structuredClone(fixture.document);
 const updates = []; let focusCount = 0, transactions = 0;
 const styleState = {};
@@ -68,7 +69,7 @@ const editor = {
 const hookState = [], hookRefs = [];
 let stateIndex = 0, refIndex = 0;
 const context = vm.createContext({
-  notebookFontSize,notebookFontSizes,notebookLineSpacings,
+  notebookFontSize,notebookFontSizes,notebookLineSpacings,notebookTextColor,notebookTextColors,
   getComputedStyle:()=>({fontSize:'13.3333px'}),
   URL, Menu:{Target:'menu-target',Dropdown:'menu-dropdown',Item:'menu-item'},
   useState:initial=>{const index=stateIndex++; if(!(index in hookState)) hookState[index]=initial; return [hookState[index],value=>{hookState[index]=value;}];},
@@ -77,7 +78,7 @@ const context = vm.createContext({
   useEditorState:({editor,selector})=>selector({editor}),
   BasicTextStyleButton:'style-button', CreateLinkButton:'link-button'
 });
-vm.runInContext(toolbarSource,context);
+vm.runInContext(colorPropertiesSource + toolbarSource,context);
 const renderToolbar = () => {stateIndex=0;refIndex=0;return context.PermitextFormattingToolbar({editor,options:{}});};
 const toolbar = renderToolbar();
 const menuItems = node => node && typeof node === 'object' ? [node,...(node.children || []).flatMap(menuItems)] : [];
@@ -128,13 +129,21 @@ console.log('Persistent formatting passed: bold toggles, selection link preserve
 
 const choose=(control,label)=>{
   const tree=renderToolbar();named(tree,control).props.onClick();
-  const item=descendants(tree).find(node=>node.type==='menu-item'&&node.children[0]===label);
+  const menu=descendants(tree).find(node=>node.type==='menu-dropdown'&&node.props['aria-label']===control);
+  const item=descendants(menu).find(node=>node.type==='menu-item'&&
+    (node.children[0]===label || node.children[0]?.children?.at(-1)===label));
   assert.ok(item,`${control}: ${label}`);assert.ok(!item.props.disabled);item.props.onClick();
 };
 editor.addStyles=value=>Object.assign(styleState,value);
 editor.removeStyles=value=>Object.keys(value).forEach(key=>delete styleState[key]);
 styleState.bold=true;choose('Font size','18 pt');
 assert.equal(styleState.fontSize,'18');assert.equal(styleState.bold,true,'Font size preserves other selected marks.');
+choose('Text color','Blue');
+assert.equal(styleState.textColor,'blue');
+choose('Text color','Default');
+assert.equal(styleState.textColor,undefined);
+assert.equal(styleState.bold,true);
+assert.equal(styleState.fontSize,'18');
 choose('Font size','Default');assert.equal(styleState.fontSize,undefined);assert.equal(styleState.bold,true);
 const beforeSpacing=updates.length;choose('Line spacing','2 · Double');
 assert.deepEqual(updates.slice(beforeSpacing).map(update=>update.id),['heading','list']);

@@ -43,7 +43,7 @@ const context = vm.createContext({
   applyPaneWeight() {}, closeActiveCustomSelect() {}, notifyWorkspaceLayoutChange() {},
   saveWorkspaceState: () => saves++
 });
-vm.runInContext(['activePinnedPaneID', 'paneCanCollapse', 'columnGroupCanCollapse', 'columnGroupIsCollapsed', 'paneIsCollapsed', 'applyPaneCollapsedState', 'updateCollapsedPaneDividers', 'setPaneCollapsed'].map(actual).join('\n'), context);
+vm.runInContext(['sourceResultReaderOwner', 'activePinnedPaneID', 'paneCanCollapse', 'columnGroupCanCollapse', 'columnGroupIsCollapsed', 'paneIsCollapsed', 'applyPaneCollapsedState', 'updateCollapsedPaneDividers', 'setPaneCollapsed'].map(actual).join('\n'), context);
 context.setPaneCollapsed(panel, true);
 assert.equal(context.paneIsCollapsed(panel.dataset.paneId), true);
 assert.equal(rail.hidden, false);
@@ -127,24 +127,26 @@ console.log('Collapsed and expanded drag handles support the first slot and keep
 
 const tabRow = eventNode(), readerHeader = eventNode(), readerPane = eventNode();
 readerPane.dataset.paneId = 'reader:tabs';
-const headerClasses = new Set(['pane-header-drag-area']);
-readerHeader.classList = {remove: name => headerClasses.delete(name)};
-readerHeader.draggable = true;
-readerHeader.removeAttribute = name => { delete readerHeader[name]; };
+readerHeader.classList = new Set();
+tabRow.classList = new Set();
 readerPane.classList = {add() {}, remove() {}, contains: name => name === 'reader-panel'};
 readerPane.querySelector = selector => selector.includes('reader-column-tabs') ? tabRow : readerHeader;
 readerPane.querySelectorAll = () => [];
 readerPane.isConnected = true;
-tabRow.classList = {add(){}};
+readerPane.getBoundingClientRect = dragPane.getBoundingClientRect;
+dragContext.visibleWorkspaceColumns = () => [targetPane, readerPane];
 dragContext.bindPaneDragging([readerPane]); dragContext.bindPaneDragging([readerPane]);
-assert.equal(headerClasses.has('pane-header-drag-area'), false);
-assert.equal(readerHeader.draggable, undefined);
-assert.equal(tabRow.listeners.pointerdown.length, 1);
-pointerStart(tabRow,true); pointer('pointermove',12); pointer('pointerup',12);
-assert.equal(dragState.paneOrder[0],'reader:drag','Code tabs keep their interaction.');
-pointerStart(tabRow); pointer('pointermove',12); pointer('pointerup',12);
-assert.equal(dragState.paneOrder[0],'reader:tabs','Empty tab-row space drags the Reader column.');
-console.log('Reader tab rows reorder entire columns while code tabs remain interactive.');
+for (const area of [readerHeader, tabRow]) {
+  assert.ok(area.classList.has('pane-header-drag-area'));
+  assert.equal(area.draggable, false);
+  assert.equal(area.listeners.pointerdown.length, 1);
+  dragState.paneOrder = ['reader:target', 'reader:tabs'];
+  pointerStart(area,true); pointer('pointermove',12); pointer('pointerup',12);
+  assert.equal(dragState.paneOrder[0],'reader:target','Header and tab controls do not start a drag.');
+  pointerStart(area); pointer('pointermove',12); pointer('pointerup',12);
+  assert.equal(dragState.paneOrder[0],'reader:tabs','Empty header and tab-row space drag the Reader column.');
+}
+console.log('Blank Reader header and tab-row space reorder entire columns, with interactive controls excluded.');
 
 // Evidence, Notebook and Report move independently; only Evidence detail follows its list.
 const savedID = 'utility:saved:one', notebookID = 'project:notebook:p', reportID = 'project:report-draft:p';
@@ -163,7 +165,7 @@ const orderContext = vm.createContext({
   isProjectDetailPaneID: () => false, isProjectToolPaneID: () => false,
   searchIDForLinkedReaderPane: () => '', paneIDForResearchConversation: () => ''
 });
-vm.runInContext(['savedEvidenceColumnGroup', 'pairSavedEvidenceDetails', 'pinCriticalWorkflowPanesToLeft', 'workspaceColumnRank', 'orderedWorkspaceColumnIDs', 'isProjectReportDraftPaneID', 'activePaneIDs', 'columnGroupForPane', 'reconcileColumnGroups', 'basePaneGroupForMove', 'paneGroupForMove', 'orderWithPaneMoved'].map(actual).join('\n'), orderContext);
+vm.runInContext(['paneIDForReader', 'sourceResultReaderOwner', 'includeSourceResultReaders', 'orderSourceResultReaders', 'savedEvidenceColumnGroup', 'pairSavedEvidenceDetails', 'pinCriticalWorkflowPanesToLeft', 'workspaceColumnRank', 'orderedWorkspaceColumnIDs', 'isProjectReportDraftPaneID', 'activePaneIDs', 'columnGroupForPane', 'reconcileColumnGroups', 'basePaneGroupForMove', 'paneGroupForMove', 'orderWithPaneMoved'].map(actual).join('\n'), orderContext);
 assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', notebookID, savedID, reportID]);
 for (const member of [savedID, notebookID, reportID]) {
   orderState.paneOrder = ['reader:one', notebookID, savedID, reportID];
@@ -359,11 +361,11 @@ const menuContext=vm.createContext({state:menuState,columnGroupingEnabled:true,p
   appendReaderMenuControls(){},paneIsCollapsed:()=>false,
   setPaneCollapsed:(...args)=>{collapsedCall=args;menuRail.focus();}
 });
-vm.runInContext(['paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','canGroupWorkspaceColumn','activePinnedPaneID','togglePinnedPane','orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
+vm.runInContext(['paneIDForReader','sourceResultReaderOwner','paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','canGroupWorkspaceColumn','activePinnedPaneID','togglePinnedPane','orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
 menuState.pinnedPaneID='reader:one';
 menuReader=true;
 menuContext.openColumnGroupMenu(menuPanel,anchor);
-assert.deepEqual(menuItems().map(x=>x.textContent),[], 'Free Reader menus omit layout and Change Code actions, even with a stored Pro pin.');
+assert.deepEqual(menuItems().map(x=>x.textContent),[], 'Free Reader menus omit Pro actions, even with a stored Pro pin.');
 menuReader=false;
 assert.equal(menuContext.activePinnedPaneID(),'','A stored Pro pin is inactive on Free.');
 menuContext.togglePinnedPane(menuPanel);
@@ -409,12 +411,17 @@ menuContext.currentColumnWorkflowView=()=> 'notebook';
 menuPanel.dataset.paneId='utility:saved:one'; menuContext.openColumnGroupMenu(menuPanel,anchor);
 assert(!menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Evidence menus do not offer collapse.');
 assert(menu.children.some(item=>item.textContent==='Expand'), 'Notebook Evidence retains the shared expansion control.');
-menuPanel.dataset.paneId='reader:one'; menuContext.openColumnGroupMenu(menuPanel,anchor);
-assert(!menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Reader menus do not offer collapse.');
-menuContext.currentColumnWorkflowView=()=> 'research';
 menuReader=true;
+menuPanel.dataset.paneId='reader:one';
+menuPanel.dataset.readerId='one';
+menuState.readers=[{id:'one',tabs:[{id:'first'},{id:'second'}]}];
 menuContext.openColumnGroupMenu(menuPanel,anchor);
-assert(menuItems().some(item=>item.textContent==='Change Code'), 'Pro Reader menus retain Change Code.');
+assert.deepEqual(menuItems().map(item=>item.textContent), ['Expand','Move Left','Move Right'],
+  'Notebook Reader column actions exclude collapse and tab actions.');
+menuContext.currentColumnWorkflowView=()=> 'research';
+menuContext.openColumnGroupMenu(menuPanel,anchor);
+assert.deepEqual(menuItems().map(item=>item.textContent), ['Expand','Collapse','Pin','Move Left','Move Right'],
+  'Research Reader column actions exclude tab actions even with multiple code tabs.');
 menuReader=false;
 // Named-group focus restoration selects the first visible member, never hidden siblings.
 const groupRail=menuNode(),groupAnchor=menuNode();
@@ -462,11 +469,30 @@ assert.equal(menuContext.orderWithPaneStepped('reader:one',-1),null,'Cannot move
 assert.ok(menuContext.orderWithPaneStepped('reader:one',1),'Unrelated neighboring columns remain movable');
 console.log('Code Decisions legacy anchors disable only affected move units/targets; unrelated columns remain movable.');
 
-const notebookCollapseContext=vm.createContext({currentColumnWorkflowView:()=> 'notebook',isProAccount:()=>true});
-vm.runInContext(actual('paneCanCollapse'),notebookCollapseContext);
+const notebookCollapseContext=vm.createContext({state:{},currentColumnWorkflowView:()=> 'notebook',isProAccount:()=>true});
+vm.runInContext(['sourceResultReaderOwner','paneCanCollapse'].map(actual).join('\n'),notebookCollapseContext);
 assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project:note:a'),false);
 assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project'),false);
 assert.equal(notebookCollapseContext.paneCanCollapse('project:notes-index:project'),false);
 assert.equal(notebookCollapseContext.paneCanCollapse('reader:a'),false);
 assert.equal(notebookCollapseContext.paneCanCollapse('utility:saved:a'),false,'Notebook Evidence stays expanded.');
 console.log('All Notebook columns stay expanded, including Evidence, Readers, the Notes list and editor.');
+
+const searchOwner='utility:search:paired';
+const searchReader='reader:search-result', evidenceReader='reader:evidence-result', independent='reader:independent';
+orderState.utilityInstances=[];
+orderState.utilities={};
+orderState.columnGroups=[];
+orderState.readers=[{id:'search-result',sourceOwnerPaneID:searchOwner},{id:'evidence-result',sourceOwnerPaneID:savedID},{id:'independent'}];
+orderState.paneOrder=[searchReader,savedID,independent,searchOwner,evidenceReader];
+orderContext.openCodeQuestionPaneIDs=()=>[];
+orderContext.openResearchConversationPaneIDs=()=>[];
+orderContext.savedItemDetailIDsForPane=()=>[];
+orderContext.defaultActivePaneIDs=()=>orderState.paneOrder;
+assert.deepEqual(Array.from(orderContext.activePaneIDs()),[savedID,evidenceReader,independent,searchOwner,searchReader],
+  'Restoring a layout places each Reader immediately after its own list.');
+assert.deepEqual(Array.from(orderContext.orderWithPaneMoved(searchReader,evidenceReader,'before')),
+  [searchOwner,searchReader,savedID,evidenceReader,independent],'Dragging either half moves the list and Reader together.');
+assert.deepEqual(Array.from(orderContext.paneGroupForMove(independent)),[independent],'An explicit new Reader moves on its own.');
+orderState.pinnedPaneID=searchReader;
+assert.equal(orderContext.activePinnedPaneID(),searchOwner,'A stored pin on an attached Reader applies to its list.');

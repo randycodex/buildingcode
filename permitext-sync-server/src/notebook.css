@@ -60,6 +60,20 @@
   color: inherit;
 }
 .permitext-notebook-editor .notebook-format-highlight { color: var(--highlight-tool-color, #826700); }
+.permitext-notebook-editor :is([data-style-type="textColor"], .notebook-format-color-icon, .notebook-format-color-swatch) {
+  color: var(--notebook-text-color-light, inherit);
+}
+.permitext-notebook-editor[data-color-scheme="dark"] :is([data-style-type="textColor"], .notebook-format-color-icon, .notebook-format-color-swatch) {
+  color: var(--notebook-text-color-dark, inherit);
+}
+.notebook-format-color-icon {
+  min-width: 12px;
+  border-bottom: 2px solid currentColor;
+  font-weight: 650;
+  line-height: 1;
+}
+.notebook-format-color-option { display: flex; align-items: center; gap: 9px; }
+.notebook-format-color-swatch { width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
 .permitext-notebook-editor .notebook-format-save-status { margin-inline-start: auto; font-size: 11px; color: var(--text-secondary, #777); }
 .permitext-notebook-editor .notebook-format-toolbar .notebook-format-style { display: inline-flex; align-items: center; justify-content: center; gap: 0; width: auto; flex: 0 0 auto; white-space: nowrap; }
 .permitext-notebook-editor .notebook-format-toolbar .notebook-format-style svg { width: 14px; height: 14px; }

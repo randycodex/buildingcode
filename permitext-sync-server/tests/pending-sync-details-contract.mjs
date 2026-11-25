@@ -80,11 +80,19 @@ Object.assign(context, { projectUpdateAutoApplyReady:false, detachedProjectWindo
   window: { setTimeout(callback, delay) { scheduledAttention = { callback, delay }; return 1; } },
   clearTimeout() { scheduledAttention = null; },
   navigator: { onLine: true }, serverReachable: true,
+  workspaceProject: () => ({ id: "older-project" }), workspacePrivatePresentationAllowed: () => true,
+  syncedContent: { workspacePresentationAccess: "verified" },
   syncFlushPromise: null, foregroundSyncPromise: null, updateReaderPlanControls() {} });
 vm.runInContext(["pendingSyncAttentionAt", "updateConnectionStatus", "refreshNotebookPendingStatus"].map(actual).join("\n"), context);
+state.syncOutbox = [];
+context.updateConnectionStatus();
+assert.equal(badge.dataset.state, "clean");
+assert.equal(badge.attributes["aria-hidden"], "true", "A synced project keeps the toolbar quiet.");
+assert.equal(label.textContent, "");
+state.syncOutbox = structuredClone(before.state.syncOutbox);
 context.updateConnectionStatus();
 assert.equal(badge.attributes.role, "button");
-assert.equal(label.textContent, "Changes pending · 1");
+assert.equal(label.textContent, "Saved on this device · 1 pending");
 assert.match(badge.attributes['aria-label'], /Review pending changes/);
 context.projectUpdateAutoApplyReady = true;
 context.updateConnectionStatus();
@@ -95,6 +103,7 @@ context.navigator.onLine = false;
 context.updateConnectionStatus();
 assert.equal(badge.attributes.role, "status", "The offline badge must not imply that review itself restores connectivity.");
 assert.equal(badge.dataset.state, "offline");
+assert.equal(badge.attributes["aria-hidden"], "false");
 context.navigator.onLine = true;
 state.syncOutbox = [{ accountUserID: "owner", queuedAt: new Date(now).toISOString() },
   { accountUserID: "other", lastError: "Foreign failure" }];
@@ -122,12 +131,13 @@ state.syncOutbox = [{ accountUserID: "owner", queuedAt: new Date(now).toISOStrin
 context.syncFlushPromise = {};
 context.updateConnectionStatus();
 assert.equal(badge.dataset.state, "pending", "A failed attempt stays visible during retry.");
-assert.equal(label.textContent, "Changes pending · 1");
+assert.equal(label.textContent, "Saved on this device · 1 pending");
 context.syncFlushPromise = null;
 state.syncOutbox = [];
 state.syncConflicts = [{accountUserID:"owner"}];
 context.updateConnectionStatus();
 assert.equal(badge.dataset.state,"conflict");
+assert.equal(badge.attributes["aria-hidden"], "false");
 state.syncConflicts = [];
 draftRead = async () => [{accountUserID:"owner",scope:"notebook-card",projectID:"p",title:"Authored Note",baseVersion:0,updatedAt:new Date(now).toISOString()}];
 await context.refreshNotebookPendingStatus();

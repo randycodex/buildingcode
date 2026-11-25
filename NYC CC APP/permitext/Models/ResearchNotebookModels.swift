@@ -1226,6 +1226,7 @@ struct NotebookEvidenceSource: Codable, Hashable, Sendable {
     let sectionNumber: String
     let sectionTitle: String
     let sourceLibraryVersion: String
+    var scope: String? = nil
 }
 
 struct NotebookEvidencePassage: Codable, Hashable, Sendable {

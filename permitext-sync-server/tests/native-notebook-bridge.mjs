@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import { nativeNotebookDocumentSnapshot } from "../src/native-notebook-state.js";
+import { notebookTextColor } from "../public/notebook-styles.js";
 import { validateNotebookDocument } from "../notebook-contract.mjs";
 
 // Execute the production bridge with a controlled editor adapter. The separate
@@ -40,6 +41,8 @@ const instance = {
   focus() { focused = true; },
   blur() { focused = false; onBlur?.(); },
   toggleStyles(styles) { activeStyles = { ...activeStyles, ...styles }; },
+  addStyles(styles) { Object.assign(activeStyles, styles); },
+  removeStyles(styles) { Object.keys(styles).forEach(key => delete activeStyles[key]); },
   transact(operation) { transactionCount += 1; operation(); },
   updateBlock(block, changes) { Object.assign(block, changes); options.onChange(); },
   createLink(url, text) {
@@ -63,6 +66,7 @@ const controller = {
 };
 const environment = {
   nativeNotebookDocumentSnapshot,
+  notebookTextColor,
   notebookTableActions: () => [],
   window: {
     webkit: { messageHandlers: { permitextNotebook: { postMessage: (message) => messages.push(structuredClone(message)) } } },
@@ -72,6 +76,7 @@ const environment = {
   document: {
     documentElement: { dataset: {}, style: { setProperty: (name, value) => cssVariables.set(name, value) } },
     getElementById: id => id === "notebook" ? ({
+      style: { setProperty: (name, value) => cssVariables.set(name, value) },
       getBoundingClientRect: () => ({ height: 300 }),
       addEventListener(name, callback, options) {
         const handlers = mountEvents.get(name) ?? [];
@@ -105,8 +110,10 @@ const document = {
   { id: "i1", type: "image", props: { url: "permitext-notebook-asset:asset1", caption: "Caption" }, children: [] }]
 };
 assert.equal(messages[0].type, "loaded");
-const configured = await dispatch({ type: "configure", readOnly: false, bodyFontSize: 17, availableWidth: 366, document });
+const configured = await dispatch({ type: "configure", readOnly: false, bodyFontSize: 17, availableWidth: 366, document,
+  referenceColors: {bc: {light: "#C96410", dark: "#FFB067"}} });
 assert.deepEqual(structuredClone(configured.document), document, "mount must retain rich runs, nesting, references and images");
+assert.equal(cssVariables.get("--notebook-reference-bc"), "light-dark(#C96410, #FFB067)");
 
 // WebKit can report a character in the tapped cell even when ProseMirror's
 // coordinate mapper normalizes that same point to the start of the note.
@@ -214,6 +221,12 @@ assert.equal(note.document[0].children[0].content[0].text, "Nested");
 selectionListener();
 assert.equal(messages.at(-1).type, "formatting");
 await dispatch({ type: "format", style: "strike" });
+await dispatch({ type: "textColor", value: "blue" });
+assert.equal(activeStyles.textColor, "blue");
+assert.equal(activeStyles.bold, true);
+await dispatch({ type: "textColor", value: "default" });
+assert.equal(activeStyles.textColor, undefined);
+await assert.rejects(dispatch({ type: "textColor", value: "inherit" }), /Unsupported text color/);
 assert.equal((await dispatch({ type: "snapshot" })).formatting.strike, true);
 await assert.rejects(dispatch({ type: "format", style: "arbitrary" }), /Unsupported text style/);
 await assert.rejects(dispatch({ type: "link", url: "javascript:alert(1)" }), /Links must/);

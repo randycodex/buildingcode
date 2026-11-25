@@ -3,7 +3,7 @@ import {buildProjectWorkspaceURL, createProjectURLCatalog, mergeProjectURLNames,
 import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=22";
 import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, openRecentReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=5";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
-import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
+import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=9";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=63";
 import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=9";
@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261124-workspace-handoff-v2633";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261124-quiet-sync-status-v2634";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -28,7 +28,7 @@ import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, ac
 import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=17';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=6";
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=8";
-import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
+import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=2";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261111-selective-menus-v3";
@@ -179,7 +179,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261124-workspace-handoff-v2633";
+} from "./offline-storage.js?v=20261124-quiet-sync-status-v2634";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -387,7 +387,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261121-notebook-dependencies-v8";
+const notebookClientVersion = "20261124-notebook-text-color-v10";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 let pendingProjectWorkspaceLink = projectWorkspaceLinkFromLocation();
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
@@ -3592,7 +3592,7 @@ function openNotebookListMenu(panel, anchor) {
       if (!targets.length || selection.busy) return;
       selection.busy = true; syncNotebookLanding();
       try {
-        if (await mutateNotebookNotesFromMenu(project, targets, {trash:true}) && current()) {
+        if (await mutateNotebookNotesFromMenu(project, targets, {trash:true, container:panel}) && current()) {
           selection.enabled = false; selection.ids.clear();
         }
       } finally {
@@ -3778,7 +3778,7 @@ async function moveClosedNotebookNoteToTrash(project, card, {allowOpen = false, 
   }
 }
 
-async function mutateNotebookNotesFromMenu(project, cards, {trash = false, archived = false} = {}) {
+async function mutateNotebookNotesFromMenu(project, cards, {trash = false, archived = false, container = null} = {}) {
   const identity = captureAccountRequest(), workspaceID = activeWorkspaceID, projectID = projectDetailKey(project);
   const navigationGeneration = state.workflowNavigationGeneration || 0;
   const current = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
@@ -3787,7 +3787,8 @@ async function mutateNotebookNotesFromMenu(project, cards, {trash = false, archi
   try {
     if (!current()) return false;
     if (trash && !await confirmWebWarning('Move selected Notes to Trash?',
-      `${cards.length} ${cards.length === 1 ? 'Note' : 'Notes'} will move to Trash. You can restore ${cards.length === 1 ? 'it' : 'them'} from Settings for 30 days.`,{confirmLabel:'Move to Trash'})) return false;
+      `${cards.length} ${cards.length === 1 ? 'Note' : 'Notes'} will move to Trash. You can restore ${cards.length === 1 ? 'it' : 'them'} from Settings for 30 days.`,
+      {confirmLabel:'Move to Trash', container, scope:container})) return false;
     for (const card of cards) {
       if (!current()) return false;
       if (trash) {
@@ -6526,8 +6527,40 @@ function pairSavedEvidenceDetails(paneIDs) {
   return result;
 }
 
+function sourceResultReaderOwner(paneID, paneIDs = state.paneOrder || []) {
+  if (!paneID?.startsWith("reader:") || currentColumnWorkflowView() !== "research") return "";
+  const membership = state.workflowMembership?.[paneID];
+  if (membership?.includes("notebook") && !membership.includes("research")) return "";
+  const reader = (state.readers || []).find(candidate => paneIDForReader(candidate) === paneID);
+  const owner = reader?.sourceOwnerPaneID || reader?.searchPreviewPaneID || reader?.savedSourcePaneID || "";
+  return /^utility:(?:search|saved)(?::|$)/.test(owner) && paneIDs.includes(owner) ? owner : "";
+}
+
+function includeSourceResultReaders(paneIDs, orderedIDs) {
+  const readersByOwner = new Map();
+  for (const id of orderedIDs) {
+    const owner = sourceResultReaderOwner(id, orderedIDs);
+    if (!owner) continue;
+    if (!readersByOwner.has(owner)) readersByOwner.set(owner, []);
+    readersByOwner.get(owner).push(id);
+  }
+  return [...new Set(paneIDs.flatMap(id => [id, ...(readersByOwner.get(id) || [])]))];
+}
+
+function orderSourceResultReaders(paneIDs) {
+  const columns = paneIDs.filter(id => !sourceResultReaderOwner(id, paneIDs));
+  return includeSourceResultReaders(columns, paneIDs);
+}
+
+function researchColumnLayoutMembership() {
+  const ids = activePaneIDs().filter(workflowPaneIsVisible);
+  return ids.filter(id => !sourceResultReaderOwner(id, ids))
+    .map(id => `${id}:${!id.startsWith('project:notes-index:') && paneIsCollapsed(id)}`).sort().join('|');
+}
+
 function canGroupWorkspaceColumn(paneID) {
-  return columnGroupingEnabled && canGroupColumn(paneID) && !savedEvidenceColumnGroup(paneID, state.paneOrder || []).length;
+  return columnGroupingEnabled && canGroupColumn(paneID) &&
+    !sourceResultReaderOwner(paneID) && !savedEvidenceColumnGroup(paneID, state.paneOrder || []).length;
 }
 
 function pinCriticalWorkflowPanesToLeft(paneIDs) {
@@ -6635,7 +6668,7 @@ function activePaneIDs() {
     paired.splice(0, paired.length, ...orderColumnGroups(paired, state.columnGroups));
   }
   paired.splice(0, paired.length, ...pairSavedEvidenceDetails(paired));
-  const criticalWorkflowFirst = applyLinkedPanePlacements(pinCriticalWorkflowPanesToLeft(paired));
+  const criticalWorkflowFirst = orderSourceResultReaders(applyLinkedPanePlacements(pinCriticalWorkflowPanesToLeft(paired)));
   state.paneOrder = criticalWorkflowFirst;
   return criticalWorkflowFirst;
 }
@@ -7513,8 +7546,7 @@ function syncResearchColumnLayout({ reset = false } = {}) {
 
   // Refit for changes to whole columns or the workspace width. Internal rail
   // toggles freeze the current base widths and add only their own rail space.
-  const membership = activePaneIDs().filter(workflowPaneIsVisible)
-    .map(id => `${id}:${!id.startsWith('project:notes-index:') && paneIsCollapsed(id)}`).sort().join('|');
+  const membership = researchColumnLayoutMembership();
   const previous = track._researchColumnLayout?.workspaceID === activeWorkspaceID ? track._researchColumnLayout : null;
   // The saved Report mounts after the other panes during a refresh.
   const restoringReportWidth = !workspaceResumeReady && state.researchColumnWidthsManual &&
@@ -10727,17 +10759,12 @@ function updateConnectionStatus() {
   connectionStatus.dataset.state = statusKind;
   connectionStatus.hidden = false;
   const statusLabel = connectionStatus.querySelector(".connection-status-label") || connectionStatus;
-  const projectSyncVisible = Boolean(account && workspaceProject() && workspacePrivatePresentationAllowed());
-  statusLabel.textContent = offline
-    ? conflicts > 0 ? `Needs attention · ${conflictLabel}`
-      : pending > 0 ? "Saved on this device · Offline"
-        : "Offline"
-    : conflicts > 0 ? `Needs attention · ${conflictLabel}`
-      : pending > 0 ? `Saved on this device · ${pendingLabel}`
-        : syncFlushPromise || foregroundSyncPromise ? "Syncing"
-          : account && syncedContent?.workspacePresentationAccess === "verified" ? "Synced" : "Online";
+  statusLabel.textContent = statusKind === "conflict" ? `Needs attention · ${conflictLabel}`
+    : statusKind === "offline" ? (pending > 0 ? "Saved on this device · Offline" : "Offline")
+      : statusKind === "pending" ? `Saved on this device · ${pendingLabel}`
+        : "";
   const pendingUsesSyncButton = statusKind === "pending" && projectUpdateAutoApplyReady && !detachedProjectWindow;
-  const showConnectionStatus = projectSyncVisible || statusKind !== "clean" && !pendingUsesSyncButton;
+  const showConnectionStatus = statusKind !== "clean" && !pendingUsesSyncButton;
   connectionStatus.style.width = showConnectionStatus ? `${statusLabel.scrollWidth}px` : "0px";
   connectionStatus.setAttribute("aria-hidden", String(!showConnectionStatus));
   const statusActionAvailable = showConnectionStatus && (statusKind === "conflict" || statusKind === "pending");
@@ -18629,11 +18656,13 @@ function buildReaderChapterSection(panel, reader, section, groupLabelsByFirstSec
   const sectionControls = renderInlineCommentBox(section, reader, annotationTargetForSection(section, reader), {
     showBookmark: savedSection, bookmarkStateResolved: true, panel, accessGate: panel.__workspaceAccessGate, sectionMarker: true
   });
+  const noteMarker = sectionControls.querySelector(".inline-note-toggle");
+  noteMarker.classList.add("reader-section-note-marker");
   const savedMarker = sectionControls.querySelector(".inline-bookmark-toggle");
   savedMarker.classList.add('reader-section-saved-marker');
   savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Evidence' : 'Save whole section to Evidence');
   savedMarker.title = savedSection ? 'Remove section from Evidence' : 'Save whole section to Evidence';
-  headingRow.append(sectionHeading, savedMarker);
+  headingRow.append(sectionHeading, noteMarker, savedMarker);
   sectionWrapper.append(headingRow);
 
   if (privateContentAllowed) {
@@ -19766,10 +19795,22 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
   return card;
 }
 
+function captureCodeBlocksForNotebook(blocks) {
+  const capture = document.createElement("div");
+  blocks.forEach(block => capture.append(renderCodeBlock(block)));
+  return {
+    exact: notebookEvidenceTextMap(capture, { literalInline: true }).text,
+    blocks: notebookBlocksFromSourceElement(capture)
+  };
+}
+
 async function addPassageToNotebook(anchor, source, exact, sourceBlocks = null) {
   const project = workspaceProject();
   if (!project) throw new Error("Create a Project before adding a passage to a Note.");
   if (!String(exact || "").trim()) throw new Error("The passage is still loading. Try again.");
+  if (source.scope === "section" && exact.length > 50_000) {
+    throw new Error("This section exceeds the Note’s text limit. Add individual passages instead.");
+  }
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   const generation = state.workflowNavigationGeneration || 0;
@@ -19781,9 +19822,9 @@ async function addPassageToNotebook(anchor, source, exact, sourceBlocks = null) 
   const availableComments = evidenceComments(detailNoteValueForTarget(source)).filter(comment => comment.trim());
   let comments = [];
   if (availableComments.length) {
-    const choice = await openWebWarning({ title: "Include comments?", message: "Choose whether to copy the passage comments into the Note.",
+    const choice = await openWebWarning({ title: "Include comments?", message: "Choose whether to copy the source comments into the Note.",
       confirmLabel: "Add to note", choiceLabel: "Comments", container: anchor.closest(".workspace-panel"),
-      choices: [{ value: "include", label: "Include comments" }, { value: "omit", label: "Passage only" }] });
+      choices: [{ value: "include", label: "Include comments" }, { value: "omit", label: source.scope === "section" ? "Section only" : "Passage only" }] });
     if (!choice || !current()) return;
     if (choice === "include") comments = availableComments;
   }
@@ -19827,8 +19868,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   wrapper.dataset.commentBlockId = target.blockID || "";
   wrapper.dataset.researchSelectionExclude = "true";
 
-  // Keep stable control nodes even while pending: section headings extract the
-  // bookmark from this wrapper before their public text is mounted.
+  // Section headings move these same controls out of the paragraph wrapper.
   const bookmarkButton = document.createElement("button");
   bookmarkButton.type = "button";
   bookmarkButton.className = "inline-bookmark-toggle";
@@ -19836,29 +19876,40 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   noteButton.type = "button";
   noteButton.className = "inline-note-toggle";
   noteButton.innerHTML = noteAddIconSVG();
-  noteButton.setAttribute("aria-label", "Add to note");
-  noteButton.dataset.noteDestination = "icon";
-  noteButton.title = "Add to note";
+  noteButton.dataset.noteDestination = options.sectionMarker ? "section" : "icon";
+  let addingToNote = false;
   noteButton.addEventListener("click", async () => {
-    if (!allowed() || noteButton.disabled) return;
+    if (!allowed() || !hasCapability("notebook") || addingToNote) return;
+    addingToNote = true;
     noteButton.disabled = true;
     try {
-      const passage = noteButton.closest(".annotated-code-block") || noteButton.closest(".chapter-section");
+      const source = readerPassagePayload(section, reader, target);
+      if (options.sectionMarker) {
+        // The Reader may render only a window of this section's blocks.
+        const { exact, blocks } = captureCodeBlocksForNotebook(section.blocks || []);
+        if (!exact && !blocks.length) throw new Error("This section has no content to add to a Note.");
+        const sectionText = exact || sectionDisplayTitle(section.sectionNumber, section.title);
+        await addPassageToNotebook(noteButton, { ...source, scope: "section" }, sectionText, blocks.length ? blocks : null);
+        return;
+      }
+      const passage = noteButton.closest(".annotated-code-block");
       const copy = passage?.cloneNode(true);
       copy?.querySelectorAll("[data-research-selection-exclude], .inline-bookmark-toggle").forEach(node => node.remove());
-      await addPassageToNotebook(noteButton, readerPassagePayload(section, reader, target), copy?.textContent, copy ? notebookBlocksFromSourceElement(copy) : null);
+      await addPassageToNotebook(noteButton, source, copy?.textContent, copy ? notebookBlocksFromSourceElement(copy) : null);
     } catch (error) {
-      if (allowed()) await showWebNotice("Passage not added", error.message);
-    } finally { noteButton.disabled = !allowed(); }
+      if (allowed()) await showWebNotice(options.sectionMarker ? "Section not added" : "Passage not added", error.message);
+    } finally {
+      addingToNote = false;
+      noteButton.disabled = !allowed() || !hasCapability("notebook");
+    }
   });
   let subscribingToAccess = true;
   const updatePrivateControls = (initialRender = false) => {
     const permitted = allowed();
-    noteButton.hidden = !permitted || !hasCapability("notebook");
-    noteButton.disabled = !permitted;
-    const noteTitle = permitted && gate && hasCapability("notebook") ? workingResearchNote()?.title : "";
-    noteButton.title = noteTitle ? `Add to ${noteTitle}` : "Add to note";
-    noteButton.setAttribute("aria-label", noteButton.title);
+    const notebookAllowed = permitted && hasCapability("notebook");
+    noteButton.hidden = !notebookAllowed;
+    noteButton.disabled = !notebookAllowed || addingToNote;
+    setResearchNoteActionLabel(noteButton, notebookAllowed && gate ? workingResearchNote() : null);
     bookmarkButton.hidden = !permitted;
     bookmarkButton.disabled = !permitted;
     if (!permitted) return;
@@ -21756,38 +21807,7 @@ async function renderReader(reader, options = {}) {
     internalSearchInput.focus();
   });
 
-  closeButton.addEventListener("click", async () => {
-    if (currentColumnWorkflowView() === 'notebook' && state.workflowMembership?.[paneIDForReader(reader)]?.includes('notebook')) {
-      void setNotebookReaderHidden(reader, true);
-      return;
-    }
-    const returnFocus = panel.contains(document.activeElement) ? searchReaderFocusOrigins.get(reader) : null;
-    const identity = returnFocus && captureAccountRequest();
-    const workspaceID = activeWorkspaceID;
-    const generation = state.workflowNavigationGeneration || 0;
-    // Closing has no next chapter to render. Stop pending work and detach the
-    // source immediately instead of clearing it into a loading placeholder.
-    cancelReaderPanelRequests(panel);
-    panel.remove();
-    if (options.isSearchResult) {
-      state.searchResultReader = null;
-      state.sectionDetail = null;
-      state.sectionDetails = {};
-    } else {
-      state.readers = state.readers.filter((item) => item.id !== reader.id);
-      state.readers.forEach((item) => {
-        if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = "";
-      });
-      Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
-        if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
-      });
-    }
-    await transitionWorkspace("utility", { deferStateSave: true });
-    if (returnFocus && document.activeElement === document.body && isCurrentAccountRequest(identity) &&
-        activeWorkspaceID === workspaceID && (state.workflowNavigationGeneration || 0) === generation) {
-      restoreSearchReaderFocus(returnFocus);
-    }
-  });
+  closeButton.addEventListener("click", () => void closeWorkspaceReader(reader, panel, options));
 
   chapterSelect.addEventListener("change", async () => {
     await selectReaderNavigation(panel, reader, { chapterID: chapterSelect.value });
@@ -21824,15 +21844,64 @@ async function renderReader(reader, options = {}) {
   }
 }
 
+function removeWorkspaceReader(reader) {
+  state.readers = state.readers.filter(item => item.id !== reader.id);
+  for (const remaining of state.readers) {
+    if (remaining.referenceSourceReaderID === reader.id) remaining.referenceSourceReaderID = "";
+  }
+  for (const [searchID, readerID] of Object.entries(searchLinkedReadersBySearch())) {
+    if (readerID === reader.id) delete state.searchLinkedReaders[searchID];
+  }
+  delete state.paneWeights[paneIDForReader(reader)];
+}
+
+async function closeWorkspaceReader(reader, panel, options = {}) {
+  const paneID = paneIDForReader(reader, options);
+  if (currentColumnWorkflowView() === 'notebook' && state.workflowMembership?.[paneID]?.includes('notebook')) {
+    return setNotebookReaderHidden(reader, true);
+  }
+  const owner = sourceResultReaderOwner(paneID);
+  const hadFocus = panel?.contains(document.activeElement);
+  const returnFocus = hadFocus ? searchReaderFocusOrigins.get(reader) : null;
+  const identity = (owner || returnFocus) && captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const generation = state.workflowNavigationGeneration || 0;
+  if (owner && track._researchColumnLayout) capturePaneResizeWidths({ manual: false });
+  if (panel) {
+    // Close synchronously so pending Reader requests cannot repaint a removed passage.
+    cancelReaderPanelRequests(panel);
+    panel.remove();
+  }
+  if (options.isSearchResult) {
+    state.searchResultReader = null;
+    state.sectionDetail = null;
+    state.sectionDetails = {};
+  } else removeWorkspaceReader(reader);
+  await transitionWorkspace("utility", { deferStateSave: true });
+  if (!identity || !isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
+      (state.workflowNavigationGeneration || 0) !== generation) return;
+  if (returnFocus && document.activeElement === document.body) {
+    restoreSearchReaderFocus(returnFocus);
+  } else if (owner && (!hadFocus || document.activeElement === document.body)) {
+    const list = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(owner)}"]`);
+    if (list?.matches('.is-column-strip, .is-column-tab-hidden')) columnExpansionController().reveal(list);
+    scrollPaneIntoView(owner, "auto");
+    if (hadFocus) list?.querySelector(':scope > header')?.focus({ preventScroll: true });
+  }
+}
+
 function renderSearchPlaceholder(results, message) {
   clear(results);
   const wrapper = document.createElement("section");
   wrapper.className = "reader-empty";
   const heading = document.createElement("h3");
   heading.textContent = message.title;
-  const paragraph = document.createElement("p");
-  paragraph.textContent = message.body;
-  wrapper.append(heading, paragraph);
+  wrapper.append(heading);
+  if (message.body) {
+    const paragraph = document.createElement("p");
+    paragraph.textContent = message.body;
+    wrapper.append(paragraph);
+  }
   results.append(wrapper);
 }
 
@@ -21898,7 +21967,7 @@ function searchProgressLabel(count, options = {}) {
   if (options.status === "unavailable") return "Search unavailable";
   if (options.status === "typing") return "Keep typing";
   if (options.status === "idle") return "";
-  if (count === null || count === undefined || options.status === "searching") return "Searching…";
+  if (count === null || count === undefined || options.status === "searching") return "Searching";
   const loaded = Math.max(0, Number(count) || 0);
   const loadedLabel = loaded.toLocaleString();
   if (options.failed) return `${loadedLabel} loaded · more could not be loaded`;
@@ -22563,12 +22632,7 @@ async function renderSearch(instance, options = {}) {
     setSearchRecentPopoverOpen(panel, true);
   });
 
-  if (String(searchInstance.query || "").trim()) {
-    renderSearchPlaceholder(panel.querySelector(".search-results"), {
-      title: "Searching",
-      body: "Checking section titles and code text."
-    });
-  } else {
+  if (!String(searchInstance.query || "").trim()) {
     await renderSearchHistory(panel, searchInstance, { hydrate: false });
   }
   if (panel.__workspaceAccessGate) {
@@ -22753,7 +22817,7 @@ async function renderSearchResults(panel, instance) {
   results.dataset.restoringSearch = "true";
   results.searchLoadMore = null;
   results.searchGroupPages = null;
-  results.preferredExactMatch = null;
+  results.preferredResult = null;
   results.classList.remove("is-history");
   if (query.length < 2) {
     results.dataset.searchHasMore = "false";
@@ -22765,7 +22829,7 @@ async function renderSearchResults(panel, instance) {
   }
 
   updateSearchDock(panel, searchInstance, null, { status: "searching" });
-  renderSearchPlaceholder(results, { title: "Searching", body: "Checking section titles and code text." });
+  clear(results);
   const codeQuery = selectedPrefixes.length ? `&code=${encodeURIComponent(selectedPrefixes.join(","))}` : "";
   let payload;
   try {
@@ -22823,7 +22887,7 @@ async function renderSearchResults(panel, instance) {
       .slice(0, 4);
     renderSearchPlaceholder(results, {
       title: matchMode === "words" ? "No matches for all words" : "No exact match",
-      body: matchMode === "words" ? `No section containing all these words was found in ${scope}. Try fewer words or a section number.` : `Search looks for this phrase together in section titles or code text. It was not found in ${scope}. Try a shorter phrase or a section number${terms.length ? ", or search one term below." : "."}`
+      body: matchMode === "words" ? undefined : `Search looks for this phrase together in section titles or code text. It was not found in ${scope}. Try a shorter phrase or a section number${terms.length ? ", or search one term below." : "."}`
     });
     for (const suggestion of payload.suggestions || []) {
       const button = document.createElement('button');
@@ -22881,8 +22945,8 @@ async function renderSearchResults(panel, instance) {
     hasMore: Boolean(payload.hasMore),
     totalResults
   });
-  results.preferredExactMatch = bestExactSearchResult(filteredResults, query);
-  if (applyInitialSearchGroupExpansion(searchInstance, filteredResults, sourceScope, results.preferredExactMatch)) saveWorkspaceState();
+  results.preferredResult = bestExactSearchResult(filteredResults, query) || filteredResults[0];
+  if (applyInitialSearchGroupExpansion(searchInstance, filteredResults, sourceScope, results.preferredResult)) saveWorkspaceState();
   appendSearchResultGroups(results, filteredResults, query, searchInstance);
   if (Array.isArray(payload.groups)) {
     const options = { query, matchMode, searchInstance, panel, edition, controller, isCurrent, sourceScope };
@@ -22965,13 +23029,13 @@ function bestExactSearchResult(matches, query) {
 
 // Expose the preferred source for a new query, then respect manual choices
 // through pagination and reload. Chapter choices belong to this query/scope.
-function applyInitialSearchGroupExpansion(instance, matches, sourceScope, exactMatch = null) {
+function applyInitialSearchGroupExpansion(instance, matches, sourceScope, preferredResult = matches[0]) {
   const decisionKey = JSON.stringify(["chapter-groups-v6", String(instance.query || "").trim(),
     normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all",
     sourceScope?.querySuffix || "", instance.matchMode || "words"]);
   if (!matches.length || instance.searchExpansionDecisionKey === decisionKey) return false;
   instance.searchExpansionDecisionKey = decisionKey;
-  instance.defaultExpandedResultSource = searchResultSourceKey(exactMatch || matches[0]);
+  instance.defaultExpandedResultSource = searchResultSourceKey(preferredResult);
   const position = searchPositionState(instance);
   position.chapterExpansion = {};
   return true;
@@ -22991,7 +23055,7 @@ function searchResultChapter(result) {
   return { key: encodeURIComponent(identity), label };
 }
 
-function ensureSearchResultChapter(body, result, instance, sourceKey, exactChapterKey) {
+function ensureSearchResultChapter(body, result, instance, sourceKey, preferredChapterKey) {
   const presentation = searchResultChapter(result);
   let chapter = body.querySelector(`.search-chapter-group[data-chapter-key="${CSS.escape(presentation.key)}"]`);
   if (chapter) return chapter;
@@ -23003,7 +23067,7 @@ function ensureSearchResultChapter(body, result, instance, sourceKey, exactChapt
   const position = searchPositionState(instance);
   const choiceKey = `${sourceKey}|${presentation.key}`;
   const savedChoice = position.chapterExpansion?.[choiceKey];
-  const preferred = presentation.key === exactChapterKey;
+  const preferred = presentation.key === preferredChapterKey;
   chapter.open = savedChoice ?? preferred;
   const summary = document.createElement("summary");
   summary.className = "search-chapter-summary";
@@ -23038,17 +23102,20 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
   const savedKeys = privateContentAllowed ? workspaceSavedEvidenceKeys() : null;
   const groups = new Map();
   const resultGroupsAreCollapsible = true;
-  const exactMatch = results.preferredExactMatch;
-  const exactSourceKey = exactMatch ? searchResultSourceKey(exactMatch) : "";
-  const exactChapterKey = exactMatch ? searchResultChapter(exactMatch).key : "";
-  const exactFamilyKey = exactMatch?.codePrefix === "BC68" ? "BC" : exactMatch?.codePrefix || "BC";
+  const preferredResult = results.preferredResult;
+  const preferredSourceKey = preferredResult ? searchResultSourceKey(preferredResult) : "";
+  const preferredChapterKey = preferredResult ? searchResultChapter(preferredResult).key : "";
   searchResults.forEach((result) => {
     const key = searchResultSourceKey(result);
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(result);
   });
 
-  Array.from(groups.entries()).forEach(([sourceKey, groupResults]) => {
+  // First occurrence carries relevance across code families and editions.
+  // An exact citation can promote its preferred edition ahead of that order.
+  const rankedGroups = Array.from(groups).sort(([left], [right]) =>
+    Number(right === preferredSourceKey) - Number(left === preferredSourceKey));
+  rankedGroups.forEach(([sourceKey, groupResults]) => {
     const prefix = groupResults[0].codePrefix || "BC";
     const sourceVersion = groupResults[0].codeVersion || defaultSyncCodeVersion;
     const familyKey = prefix === "BC68" ? "BC" : prefix;
@@ -23188,25 +23255,12 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       header.append(citation, actions);
       row.append(header, mainButton);
       const chapter = ensureSearchResultChapter(groupBody, result, searchInstance, sourceKey,
-        sourceKey === exactSourceKey ? exactChapterKey : "");
+        sourceKey === preferredSourceKey ? preferredChapterKey : "");
       const chapterBody = chapter.querySelector(".search-chapter-body");
-      if (result === exactMatch) chapterBody.prepend(row);
+      if (result === preferredResult) chapterBody.prepend(row);
       else chapterBody.append(row);
     });
   });
-  // Keep the preferred exact source first as later pages arrive, then use the
-  // usual family and edition order.
-  const familyOrder = ["BC", "EBC", "FGC", "MC", "PC", "ECC", "EC", "FC", "ZR", "HMC", "AC", "T24", "T25", "T26", "T28", "LL"];
-  Array.from(results.querySelectorAll(".search-family-card"))
-    .sort((a, b) => (exactMatch ? Number(b.dataset.family === exactFamilyKey) - Number(a.dataset.family === exactFamilyKey) : 0) ||
-      familyOrder.indexOf(a.dataset.family) - familyOrder.indexOf(b.dataset.family))
-    .forEach((family) => {
-      Array.from(family.querySelectorAll(".search-result-group"))
-        .sort((a, b) => Number(b.dataset.sourceKey === exactSourceKey) - Number(a.dataset.sourceKey === exactSourceKey) ||
-          Number.parseInt(researchCodeEdition({codePrefix:b.dataset.codePrefix, codeVersion:b.dataset.sourceVersion}), 10) - Number.parseInt(researchCodeEdition({codePrefix:a.dataset.codePrefix, codeVersion:a.dataset.sourceVersion}), 10))
-        .forEach((group) => family.append(group));
-      results.append(family);
-    });
   refreshSearchChapterCounts(results);
 }
 
@@ -23340,8 +23394,10 @@ function appendSearchLoadMore(results, options) {
       searchPositionState(options.searchInstance).loadedPages = loadedPages;
       footer.remove();
       results.dataset.searchHasMore = payload.hasMore ? "true" : "false";
-      if (!results.querySelector(".result-row")) results.preferredExactMatch = bestExactSearchResult(nextResults, options.query);
-      if (applyInitialSearchGroupExpansion(options.searchInstance, nextResults, options.sourceScope, results.preferredExactMatch)) saveWorkspaceState();
+      if (!results.querySelector(".result-row")) {
+        results.preferredResult = bestExactSearchResult(nextResults, options.query) || nextResults[0];
+      }
+      if (applyInitialSearchGroupExpansion(options.searchInstance, nextResults, options.sourceScope, results.preferredResult)) saveWorkspaceState();
       appendSearchResultGroups(results, nextResults, options.query, options.searchInstance);
       const nextVisibleCount = results.querySelectorAll(".result-row").length;
       const pageTotal = Number(payload.totalResults);
@@ -24318,6 +24374,11 @@ async function closeUtilityInstance(instance) {
   }
   const paneID = paneIDForUtilityInstance(instance);
   const detailID = instance.key === "search" ? paneIDForSectionDetail(instance.id) : "";
+  if (instance.key === "search" || instance.key === "saved") {
+    for (const reader of state.readers || []) {
+      if (sourceResultReaderOwner(paneIDForReader(reader)) === paneID) removeWorkspaceReader(reader);
+    }
+  }
   const closingProjectHost = instance.key === "saved" && paneID === state.projectHostPaneID;
   const keepProjectTools = Boolean(workspaceProject());
   const successor = closingProjectHost
@@ -30017,7 +30078,8 @@ function rememberWorkingResearchNote(projectID, card, resume = null) {
 }
 
 function setResearchNoteActionLabel(button, note) {
-  const label = note ? `Add to ${note.title}` : 'Add to note';
+  const action = button.dataset.noteDestination === 'section' ? 'Add whole section to' : 'Add to';
+  const label = `${action} ${note?.title || 'note'}`;
   button.setAttribute('aria-label', label);
   button.title = label;
   if (button.dataset.noteDestination === 'text') button.textContent = note ? label : 'Add to note…';
@@ -31755,6 +31817,17 @@ function notebookReferenceCodeTitle(codePrefix = "BC") {
     .trim();
 }
 
+function notebookReferenceTheme(reference, evidenceLink) {
+  const { referenceKind, referenceLabel } = reference.dataset;
+  if (referenceKind !== "selectedPassage" && referenceKind !== "canonicalSection") return;
+  const sourcePrefix = String(evidenceLink?.source?.codePrefix || "").trim().toUpperCase();
+  if (sourcePrefix) return codeOptions.find(option => option.prefix === sourcePrefix)?.theme;
+  const citationCode = String(referenceLabel || "").split(/\s*·\s*|\s+§/, 1)[0].trim();
+  return codeOptions.find(option =>
+    option.prefix === citationCode.toUpperCase() || notebookReferenceCodeTitle(option.prefix) === citationCode
+  )?.theme;
+}
+
 function notebookCanonicalReferenceLabel(savedItem, chapter, resolvedSection = null) {
   const codePrefix = savedItem?.codePrefix || chapter?.codePrefix || "BC";
   const chapterNumber = String(savedItem?.chapterNumber || chapter?.chapterNumber || "").trim();
@@ -31936,7 +32009,7 @@ async function openNotebookReference(project, foundation, reference, selectCard,
     await openSourceInReader({
       ...evidenceLink.source,
       title: evidenceLink.source.sectionTitle
-    }, anchorPaneID, { projectID, evidenceAnchor: evidenceLink });
+    }, anchorPaneID, { projectID, evidenceAnchor: evidenceLink.source.scope === "section" ? null : evidenceLink });
     return;
   }
   if (reference.referenceKind === "canonicalSection") {
@@ -32598,7 +32671,7 @@ async function renderProjectNotebook(project, options = {}) {
             cardPayload: { cards, access: { readOnly: notebookReadOnly } } });
           requireCurrentAccountRequest(requestIdentity);
           if (disposed) return true;
-          showDraftStatus(dirty ? "Saved on this device · newer edits waiting to sync" : "Synced");
+          showDraftStatus(dirty ? "Saved on this device · newer edits waiting to sync" : "");
           renderCardList();
           void refreshNotebookReportStatus().catch(() => false);
           if (dirty) scheduleNotebookAutosave(180);
@@ -32773,7 +32846,7 @@ async function renderProjectNotebook(project, options = {}) {
       if (!showNotebookRecoveryConflict(localDraft)) {
         showDraftStatus(restoredWritable ? "Added saved passage text · waiting to sync" : currentCardLabels.changed
           ? "Updated linked reference · waiting to sync"
-          : useLocalDraft ? "Recovered device draft · waiting to sync" : "Synced");
+          : useLocalDraft ? "Recovered device draft · waiting to sync" : "");
       }
       renderCardList();
       await renderFocusedCard({module:preparedModule, candidates:preparedCandidates});
@@ -33387,7 +33460,8 @@ async function renderProjectNotebook(project, options = {}) {
       const focusedEditor = editorMount;
       focusedPassageDisclosure = createNotebookPassageDisclosure(editorElement, {
         getDocument: () => focusedEditor.getDocument(),
-        getEvidenceLinks: () => activeCard?.evidenceLinks || []
+        getEvidenceLinks: () => activeCard?.evidenceLinks || [],
+        getReferenceTheme: notebookReferenceTheme
       });
       passageDisclosure = focusedPassageDisclosure;
       if (!notebookReadOnly && !activeCard.id) {
@@ -42059,16 +42133,15 @@ async function addSavedEvidenceToNotebook(anchor, item, projectID = "") {
     ? annotatedBlocksForSection(section).filter(block => normalizeAnnotationBlockID(block.id || block.tableID || block.imageID) === blockID)
     : section.blocks || [];
   if (!blocks.length) throw new Error("This saved passage is unavailable. Open its source and try again.");
-  const capture = document.createElement("div");
-  blocks.forEach(block => capture.append(renderCodeBlock(block)));
-  const exact = notebookEvidenceTextMap(capture, { literalInline: true }).text;
+  const { exact, blocks: sourceBlocks } = captureCodeBlocksForNotebook(blocks);
   if (!String(exact || "").trim()) throw new Error("This saved passage has no text to add to a Note.");
   await addPassageToNotebook(anchor, {
     codeVersion: detail.codeVersion, codePrefix: detail.codePrefix || section.codePrefix || "BC",
     sectionID: section.sectionID || section.id, sectionNumber: section.sectionNumber || detail.sectionNumber,
     title: section.title || detail.title, chapterID: chapter?.id || detail.chapterID || "",
-    chapterNumber: chapter?.chapterNumber || detail.chapterNumber || "", blockID
-  }, exact, notebookBlocksFromSourceElement(capture));
+    chapterNumber: chapter?.chapterNumber || detail.chapterNumber || "", blockID,
+    ...(!blockID ? { scope: "section" } : {})
+  }, exact, sourceBlocks);
 }
 
 function openSavedEvidenceMenu(row, anchor, menu) {
@@ -42192,15 +42265,13 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
       openButton.append(unassigned);
     }
   }
+  const readerItem = item.annotationBlockID ? { ...item, blockID: item.annotationBlockID } : item;
   openButton.addEventListener("click", () => {
     if (window.getSelection && String(window.getSelection()).trim()) return;
     if (options.selectionController?.isActive()) {
       if (selectableSavedItem) options.selectionController.toggle(item);
     } else {
-      const openItem = item.annotationBlockID
-        ? { ...item, blockID: item.annotationBlockID }
-        : item;
-      void openSavedItemInReader(openItem, paneID);
+      void openSavedItemInReader(readerItem, paneID);
     }
   });
   row.append(openButton);
@@ -42229,6 +42300,13 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
     actions.setAttribute('role', 'menu');
     actions.setAttribute('aria-label', `Actions for ${sectionNumber} ${titleText}`);
     menuButton.addEventListener('click', () => openSavedEvidenceMenu(row, menuButton, actions));
+    if (currentColumnWorkflowView() === "research") {
+      const openNew = document.createElement("button");
+      openNew.type = "button";
+      openNew.textContent = "Open in new Reader";
+      openNew.addEventListener("click", () => void openSavedItemInReader(readerItem, paneID, { forceNewReader: true }));
+      actions.append(openNew);
+    }
     const researchButton = document.createElement("button");
     researchButton.type = "button";
     researchButton.textContent = "Ask Assistant";
@@ -42862,6 +42940,10 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   if (!reader) {
     if (isProAccount() || state.readers.length < 1) {
       if (notifyReaderColumnLimit()) return null;
+      if ((fromSearch || fromSaved) && !options.forceNewReader && currentColumnWorkflowView() === "research" && track._researchColumnLayout) {
+        // Opening the Reader adds width on the right and retains the list's scroll layout.
+        capturePaneResizeWidths({ manual: false });
+      }
       reader = newReaderState(sourceFields);
       state.readers.push(reader);
       createdReader = true;
@@ -42885,7 +42967,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   resolvedReaderSourceNavigations.set(reader, {chapterID: reader.chapterID, sectionID: reader.sectionID,
     sectionNumber: reader.sectionNumber, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion});
   if (ownedSource) {
-    if (!options.forceNewReader) reader.sourceOwnerPaneID = anchorPaneID;
+    if (!options.forceNewReader && !notebookOpening) reader.sourceOwnerPaneID = anchorPaneID;
     reader.searchPreviewPaneID = "";
   }
   const paneID = paneIDForReader(reader);
@@ -42927,7 +43009,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   if (destinationPanel && paneIsCollapsed(paneID)) setPaneCollapsed(destinationPanel, false);
   columnExpansionController().reveal(destinationPanel);
   if (!sourceNavigation?.positioned) revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, targetOptions);
-  scrollPaneIntoView(paneID, createdReader || options.forceNewReader ? "smooth" : "auto");
+  scrollPaneIntoView(paneID, createdReader || options.forceNewReader ? "smooth" : "auto", { includeSourceList: !options.forceNewReader });
   const note = workingResearchNote();
   if (note && currentWorkflowView() === 'research') rememberWorkingResearchNote(researchProjectID(workspaceProject()), note,
     {kind:'reader',source:{sectionID:String(navigationItem.sectionID || navigationItem.id),codeVersion:navigationItem.codeVersion,codePrefix:navigationItem.codePrefix,sectionNumber:navigationItem.sectionNumber,title:navigationItem.title,chapterID:reader.chapterID,blockID:navigationItem.blockID || ''},exact:options.evidenceAnchor?.passages?.[0]?.exact || ''});
@@ -42963,7 +43045,7 @@ function savedItemDetailIDsForPane(savedPaneID) {
 
 const savedItemOpeningAttempts = new Map();
 
-async function openSavedItemInReader(item, savedPaneID) {
+async function openSavedItemInReader(item, savedPaneID, { forceNewReader = false } = {}) {
   if (!String(item?.sectionID || item?.id || "").trim()) return null;
   const fromEvidence = /^utility:saved(?::|$)/.test(savedPaneID);
   const attempt = {};
@@ -42975,7 +43057,7 @@ async function openSavedItemInReader(item, savedPaneID) {
     generation === (state.workflowNavigationGeneration || 0);
   try {
     return await openSourceInReader(item, savedPaneID, { sourceSurface: "saved", isCurrent,
-      forceNewReader: !fromEvidence && currentColumnWorkflowView() !== 'notebook',
+      forceNewReader: forceNewReader || (!fromEvidence && currentColumnWorkflowView() !== 'notebook'),
       evidenceAnchor: item.evidenceAnchor || null });
   } finally {
     if (savedItemOpeningAttempts.get(savedPaneID) === attempt) savedItemOpeningAttempts.delete(savedPaneID);
@@ -46308,6 +46390,7 @@ function singleExpandedDividerEdge(previousPaneID, nextPaneID, divider = null) {
   }
   const previousOpen = previousPaneID && !paneIsCollapsed(previousPaneID) && !assistantHistoryOnlyPane(previousPaneID);
   const nextOpen = nextPaneID && !paneIsCollapsed(nextPaneID) && !assistantHistoryOnlyPane(nextPaneID);
+  if (previousOpen && nextOpen && divider?.classList.contains("source-result-divider")) return null;
   // The pinned boundary belongs only to the fixed column, not the scrolling
   // neighbor that happens to follow it in the mounted sequence.
   if (previousOpen && previousPaneID === activePinnedPaneID()) return { paneID: previousPaneID, side: "right" };
@@ -46336,8 +46419,7 @@ function capturePaneResizeWidths({manual = true} = {}) {
     track._researchColumnLayout.manual = manual || state.researchColumnWidthsManual === true;
     track._researchColumnLayout.frozen = !manual;
     if (manual) {
-      track._researchColumnLayout.membership = activePaneIDs().filter(workflowPaneIsVisible)
-        .map(id => `${id}:${!id.startsWith('project:notes-index:') && paneIsCollapsed(id)}`).sort().join('|');
+      track._researchColumnLayout.membership = researchColumnLayoutMembership();
       track._researchColumnLayout.availableWidth = track.clientWidth;
     }
     track.dataset.researchColumnSizing = track._researchColumnLayout.manual ? "manual" : "reserved";
@@ -46382,7 +46464,7 @@ function notebookReferenceResize(panes, previousPaneID, nextPaneID, delta) {
 }
 
 function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
-  if (currentColumnWorkflowView() === 'research') {
+  if (currentColumnWorkflowView() === 'research' && !divider?.classList.contains("source-result-divider")) {
     resizePaneEdgeBy(previousPaneID, delta, divider);
     return;
   }
@@ -46403,7 +46485,7 @@ function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
   ] : adjacentColumnWidths(previousWidth, nextWidth, delta,
     minimumPaneWidthForID(previousPaneID), minimumPaneWidthForID(nextPaneID),
     maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID),
-    { expandLeft: /^(?:reader:|utility:search(?::|$))/.test(previousPaneID), expandRight: /^(?:reader:|utility:search(?::|$))/.test(nextPaneID) });
+    { expandLeft: divider?.classList.contains("source-result-divider") || /^(?:reader:|utility:search(?::|$))/.test(previousPaneID), expandRight: /^(?:reader:|utility:search(?::|$))/.test(nextPaneID) });
   if (notebookResize) notebookResize.indices.forEach(index => {
     state.paneWeights[paneData[index].id] = notebookResize.widths[index];
     applyPaneWeight(paneData[index].pane, paneData[index].id);
@@ -46512,7 +46594,7 @@ function createDivider(previousPaneID, nextPaneID) {
     const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID, divider);
     if (edge) resetDividerPanes(edge.paneID, null);
     else if (isLeftEdge || isRightEdge) resetDividerPanes(edgePaneID, null);
-    else resetDividerPanes(previousPaneID, currentColumnWorkflowView() === "research" ? null : nextPaneID);
+    else resetDividerPanes(previousPaneID, currentColumnWorkflowView() === "research" && !divider.classList.contains("source-result-divider") ? null : nextPaneID);
   });
   return divider;
 }
@@ -46675,11 +46757,12 @@ function reconcileColumnGroups(paneIDs) {
     // move together by default. Reconciliation must not undo an edit.
     const members = new Set(group.paneIDs);
     // Evidence details belong to their saved list, outside custom column groups.
-    return { ...group, paneIDs: [...members].filter((id) => !savedEvidenceColumnGroup(id, paneIDs).length) };
+    return { ...group, paneIDs: [...members].filter((id) => !sourceResultReaderOwner(id, paneIDs) && !savedEvidenceColumnGroup(id, paneIDs).length) };
   }));
 }
 
 function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
+  paneID = sourceResultReaderOwner(paneID, orderedIDs) || paneID;
   if (/^project:(?:notes-index|notebook):/.test(paneID)) {
     const project = workspaceProject();
     const note = project && selectedNotebookColumn(project);
@@ -46688,7 +46771,8 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
     if (paneID === noteID || paneID === listID) return [listID, noteID].filter(id => orderedIDs.includes(id));
   }
   const group = columnGroupForPane(paneID);
-  return group ? group.paneIDs.filter((id) => orderedIDs.includes(id)) : basePaneGroupForMove(paneID, orderedIDs);
+  const members = group ? group.paneIDs.filter((id) => orderedIDs.includes(id)) : basePaneGroupForMove(paneID, orderedIDs);
+  return includeSourceResultReaders(members, orderedIDs);
 }
 
 function basePaneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
@@ -46814,15 +46898,16 @@ function applyDragPreviewOrder(order) {
   dragPreviewOrder = order;
   readerShortcuts?.previewOrder(order);
   const paneIndex = new Map(order.map((id, index) => [id, index]));
+  const pinStaysFirst = order[0] === activePinnedPaneID();
   track.querySelectorAll(":scope > :is(.workspace-panel, .shared-report-column)").forEach((pane) => {
     const index = paneIndex.get(pane.dataset.paneId);
-    if (index !== undefined) pane.style.order = String(index * 2);
+    if (index !== undefined) pane.style.order = pinStaysFirst && pane.matches('.is-pinned, .is-pinned-result-reader') ? "" : String(index * 2);
   });
   track.querySelectorAll(".pane-divider").forEach((divider) => {
     const previousIndex = paneIndex.get(divider.dataset.previousPaneId);
     const nextIndex = paneIndex.get(divider.dataset.nextPaneId);
     const index = Math.min(previousIndex ?? Number.MAX_SAFE_INTEGER, nextIndex ?? Number.MAX_SAFE_INTEGER);
-    divider.style.order = divider.classList.contains("is-pinned-divider") ? "-1" : String(index * 2 + 1);
+    divider.style.order = pinStaysFirst && divider.matches('.is-pinned-divider, .is-pinned-result-divider') ? "" : String(index * 2 + 1);
   });
   animateWorkspaceColumnMotion(before);
 }
@@ -46854,24 +46939,20 @@ function bindPaneDragging(panes) {
   for (const pane of panes) {
     const header = pane.querySelector(":scope > header") || (pane.classList.contains("shared-report-column") ? pane.querySelector(".report-draft-header") : null);
     const tabRow = pane.classList.contains("reader-panel") ? pane.querySelector(":scope > .reader-column-tabs") : null;
-    const dragArea = tabRow || header;
-    if (header && tabRow) {
-      header.classList.remove("pane-header-drag-area");
-      header.removeAttribute("draggable");
-      header.removeAttribute("title");
-    }
-    if (dragArea) {
-      dragArea.classList.add("pane-header-drag-area");
-      dragArea.title = !tabRow && paneCanCollapse(pane.dataset.paneId) ? "Drag to move · Click title to collapse" : "Drag to move column";
-    }
-    const handles = new Set([dragArea, ...pane.querySelectorAll(":scope > .pane-collapsed-tab, :scope > .pane-drag-handle")]);
+    const handles = new Set([header, tabRow, ...pane.querySelectorAll(":scope > .pane-collapsed-tab, :scope > .pane-drag-handle")]);
     for (const handle of handles) {
-      if (!handle || handle.dataset.dragBound === "true") continue;
+      if (!handle) continue;
+      const isDragArea = handle === header || handle === tabRow;
+      if (isDragArea) {
+        handle.classList.add("pane-header-drag-area");
+        handle.title = handle === header && paneCanCollapse(pane.dataset.paneId) ? "Drag to move · Click title to collapse" : "Drag to move column";
+      }
+      if (handle.dataset.dragBound === "true") continue;
       handle.dataset.dragBound = "true";
       handle.draggable = false;
       handle.addEventListener("pointerdown", start => {
         if (start.button !== 0 || start.isPrimary === false ||
-            handle === dragArea && start.target.closest("button, a, input, select, textarea, summary, [contenteditable]")) return;
+            isDragArea && start.target.closest("button, a, input, select, textarea, summary, [contenteditable]")) return;
         const workspaceID = activeWorkspaceID;
         const controller = new AbortController();
         const options = {signal:controller.signal};
@@ -46915,7 +46996,8 @@ function bindPaneDragging(panes) {
 }
 
 function startPaneResize(event, previousPaneID, nextPaneID) {
-  if (currentColumnWorkflowView() === 'research') {
+  const sourceDivider = event.currentTarget?.classList.contains("source-result-divider");
+  if (currentColumnWorkflowView() === 'research' && !sourceDivider) {
     startPaneEdgeResize(event, previousPaneID, 'right');
     return;
   }
@@ -46942,7 +47024,7 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   let previousFrameTime = null;
   let resizeFrame = null;
   let isDragging = true;
-  const expandLeft = /^(?:reader:|utility:search(?::|$))/.test(previousPaneID);
+  const expandLeft = sourceDivider || /^(?:reader:|utility:search(?::|$))/.test(previousPaneID);
   const expandRight = /^(?:reader:|utility:search(?::|$))/.test(nextPaneID);
 
   const applyResizeAt = (clientX) => {
@@ -47383,6 +47465,10 @@ function refreshColumnGroupPresentation({ preparePanels = true, refreshDividers 
     if (columnGroupIsCollapsed(group)) group.paneIDs.filter((id) => id !== activePinnedPaneID() &&
       workflowPaneIsVisible(id) && panels.some((panel) => panel.dataset.paneId === id)).slice(1).forEach((id) => hidden.add(id));
   }
+  for (const panel of panels) {
+    const owner = panel.dataset.resultReaderOwner;
+    if (owner && (hidden.has(owner) || paneIsCollapsed(owner) || !workflowPaneIsVisible(owner))) hidden.add(panel.dataset.paneId);
+  }
   panels.forEach((panel) => panel.classList.toggle('is-group-hidden', hidden.has(panel.dataset.paneId)));
   track.querySelectorAll(':scope > .pane-divider').forEach((divider) => {
     divider.classList.toggle('is-group-hidden', hidden.has(divider.dataset.nextPaneId));
@@ -47469,7 +47555,8 @@ function activePinnedPaneID() {
   // Notebook columns share one horizontal track. A sticky Evidence column
   // covers the Notes scrolling beneath it, so only Research uses pinning.
   if (view !== "research") return "";
-  const paneID = state.pinnedPaneID || "";
+  const stored = state.pinnedPaneID || "";
+  const paneID = sourceResultReaderOwner(stored) || stored;
   // Pin a saved detail through its Evidence anchor so the pair cannot split.
   return paneID.startsWith("section:detail:")
     ? savedEvidenceColumnGroup(paneID, state.paneOrder || [])[0] || paneID
@@ -47567,6 +47654,7 @@ function openColumnGroupMenu(panel, anchor) {
   document.querySelector('.column-group-menu')?._close?.();
   document.querySelector('.search-scope-dialog')?._close?.();
   const pro = isProAccount();
+  const isResultReader = Boolean(panel.dataset.resultReaderOwner);
   const group = workspacePrivatePresentationAllowed() && canGroupWorkspaceColumn(panel.dataset.paneId) ? columnGroupForPane(panel.dataset.paneId) : null;
   const menu = document.createElement('div');
   menu.className = 'column-group-menu';
@@ -47613,7 +47701,7 @@ function openColumnGroupMenu(panel, anchor) {
     button.addEventListener('click', () => { close(); action(); });
     menu.append(button);
   };
-  if (pro) {
+  if (pro && !isResultReader) {
     const expansion = columnExpansionController();
     add(expansion.isExpanded(panel) ? 'Restore width' : 'Expand', () => {
       if (expansion.isExpanded(panel)) expansion.restore();
@@ -47657,10 +47745,10 @@ function openColumnGroupMenu(panel, anchor) {
   const pinTarget = panel.dataset.paneId.startsWith("section:detail:")
     ? savedEvidenceColumnGroup(panel.dataset.paneId, activePaneIDs())[0] || panel.dataset.paneId
     : panel.dataset.paneId;
-  if (pro && currentColumnWorkflowView() === "research") {
+  if (pro && !isResultReader && currentColumnWorkflowView() === "research") {
     add(activePinnedPaneID() === pinTarget ? 'Unpin' : 'Pin', () => togglePinnedPane(panel));
   }
-  if (pro) {
+  if (pro && !isResultReader) {
     separate();
     add('Move Left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
     add('Move Right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
@@ -47675,24 +47763,8 @@ function openColumnGroupMenu(panel, anchor) {
     menu.append(...searchControls);
   }
   if (panel.classList.contains("reader-panel")) {
-    separate();
-    if (pro) {
-      const reader = state.readers.find(item => item.id === panel.dataset.readerId);
-      if (reader) {
-        add("Add code tab", () => openReaderTabPicker(reader, anchor), currentColumnWorkflowView() !== 'notebook' && !canAddReaderTab(reader));
-        if (currentColumnWorkflowView() !== 'notebook') {
-          add("Duplicate in new column", () => transferReaderTab(reader, reader.activeTabID, { duplicate: true }));
-          add("Move tab to new column", () => transferReaderTab(reader, reader.activeTabID), readerTabs(reader).length < 2);
-        }
-      }
-    }
-    if (pro) add("Change Code", () => {
-      const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
-      if (!reader || !panel.isConnected) return;
-      if (currentColumnWorkflowView() === 'notebook') openReaderTabPicker(reader, anchor);
-      else openReaderCodePicker(anchor, code => panel.isConnected && changeReaderCode(panel, reader, code));
-    });
     if (trust) {
+      separate();
       panel._readerTrust = trust;
       trust.open = false;
       trust.hidden = false;
@@ -47873,7 +47945,7 @@ function openColumnGroupEditor(panel, existing = null) {
 // Collapse keeps the live column DOM (including unsaved editors) in place.
 function paneCanCollapse(paneID) {
   if (paneID.startsWith('project:notes-index:')) return false;
-  if (paneID.startsWith("reader:") && !isProAccount()) return false;
+  if (paneID.startsWith("reader:") && (!isProAccount() || sourceResultReaderOwner(paneID))) return false;
   return currentColumnWorkflowView() !== "notebook";
 }
 
@@ -47941,7 +48013,10 @@ function setPaneCollapsed(panel, collapsed, { focus = false } = {}) {
   state.collapsedPaneIDs = [...ids];
   closeActiveCustomSelect();
   applyPaneCollapsedState(panel);
-  updateCollapsedPaneDividers();
+  if (panel.nextElementSibling?.nextElementSibling?.dataset.resultReaderOwner === paneID) {
+    refreshColumnGroupPresentation({ preparePanels: false });
+    refreshPinnedPaneDivider();
+  } else updateCollapsedPaneDividers();
   saveWorkspaceState();
   notifyWorkspaceLayoutChange();
   if (focus) panel.querySelector(collapsed ? ".pane-collapsed-tab" : ":scope > header, .report-draft-header")?.focus({ preventScroll: true });
@@ -48018,6 +48093,9 @@ function preparePaneCollapse(panel) {
   const notesList = panel.classList.contains('notebook-index-panel');
   const header = panel.querySelector(report ? ".report-draft-header" : ":scope > header");
   if (!header || detachedProjectWindow) return;
+  const resultOwner = sourceResultReaderOwner(panel.dataset.paneId);
+  if (resultOwner) panel.dataset.resultReaderOwner = resultOwner;
+  else delete panel.dataset.resultReaderOwner;
   if (panel.classList.contains("reader-panel")) {
     const reader = state.readers.find(item => paneIDForReader(item) === panel.dataset.paneId);
     if (reader && !panel.dataset.readerTabPending) updateReaderLocationTitle(panel, reader);
@@ -48140,15 +48218,35 @@ function refreshPinnedPaneDivider() {
   pinnedPaneResizeObserver?.disconnect();
   const pinned = track.querySelector(':scope > .workspace-panel.is-pinned:not(.is-workflow-hidden)');
   const divider = pinned?.nextElementSibling;
-  track.querySelectorAll(':scope > .pane-divider').forEach((node) => {
-    node.classList.toggle('is-pinned-divider', node === divider);
+  const result = divider?.classList.contains('source-result-divider') ? divider.nextElementSibling : null;
+  const afterResult = result?.nextElementSibling;
+  track.querySelectorAll(':scope > :is(.pane-divider.is-pinned-divider, .is-pinned-result-divider, .is-pinned-result-reader, .is-source-pin-overflow)').forEach(node => {
+    node.classList.remove('is-pinned-divider', 'is-pinned-result-divider', 'is-pinned-result-reader', 'is-source-pin-overflow');
   });
   if (!pinned) return;
-  const updateWidth = () => track.style.setProperty('--pinned-pane-width', `${pinned.getBoundingClientRect().width}px`);
+  const updateWidth = () => {
+    const mainWidth = pinned.getBoundingClientRect().width;
+    const resultWidth = result?.getBoundingClientRect().width || 0;
+    const joined = resultWidth > 0 && !result.matches('.is-column-strip, .is-column-tab-hidden');
+    const fullWidth = mainWidth + (joined ? divider.getBoundingClientRect().width + resultWidth : 0);
+    const overflow = joined && fullWidth + 48 > track.clientWidth;
+    track.style.setProperty('--pinned-pane-width', `${mainWidth}px`);
+    track.style.setProperty('--pinned-result-start', `${mainWidth + (joined ? divider.getBoundingClientRect().width : 0)}px`);
+    track.style.setProperty('--pinned-columns-width', `${fullWidth}px`);
+    pinned.classList.toggle('is-source-pin-overflow', overflow);
+    divider?.classList.toggle('is-pinned-divider', !result);
+    divider?.classList.toggle('is-pinned-result-divider', joined && !overflow);
+    result?.classList.toggle('is-pinned-result-reader', joined && !overflow);
+    afterResult?.classList.toggle('is-pinned-divider', !overflow);
+  };
   updateWidth();
   if ('ResizeObserver' in window) {
     pinnedPaneResizeObserver = new ResizeObserver(updateWidth);
     pinnedPaneResizeObserver.observe(pinned);
+    if (result) {
+      pinnedPaneResizeObserver.observe(result);
+      pinnedPaneResizeObserver.observe(track);
+    }
   }
 }
 
@@ -48173,7 +48271,8 @@ function appendPaneSequence(panes) {
   const pinnedIndex = orderedPanes.findIndex((pane) => pane.dataset.paneId === pinnedPaneID);
   if (pinnedIndex > 0) orderedPanes.unshift(...orderedPanes.splice(pinnedIndex, 1));
   const panesByID = new Map(orderedPanes.map((pane) => [pane.dataset.paneId, pane]));
-  orderedPanes.splice(0, orderedPanes.length, ...applyLinkedPanePlacements(pairSavedEvidenceDetails([...panesByID.keys()]), true).map((id) => panesByID.get(id)));
+  const linkedOrder = applyLinkedPanePlacements(pairSavedEvidenceDetails([...panesByID.keys()]), true);
+  orderedPanes.splice(0, orderedPanes.length, ...orderSourceResultReaders(linkedOrder).map(id => panesByID.get(id)));
   const project = workspaceProject();
   if (project && sharedNotesOpen()) {
     const list = panesByID.get(notebookIndexPaneID(project));
@@ -48213,7 +48312,14 @@ function appendPaneSequence(panes) {
     // Report owns its two resize handles. Give an adjoining pane its own edge.
     const previousPaneID = previous && previous !== report ? previous.dataset.paneId : "";
     const nextPaneID = next && next !== report ? next.dataset.paneId : "";
-    if (previousPaneID || nextPaneID) nodes.push(existingDividers.get(dividerKey(previousPaneID, nextPaneID)) || createDivider(previousPaneID, nextPaneID));
+    if (previousPaneID || nextPaneID) {
+      const divider = existingDividers.get(dividerKey(previousPaneID, nextPaneID)) || createDivider(previousPaneID, nextPaneID);
+      const insideResult = Boolean(previousPaneID && next?.dataset.resultReaderOwner === previousPaneID);
+      divider.classList.toggle("source-result-divider", insideResult);
+      if (insideResult) divider.setAttribute("aria-label", "Resize list and Reader");
+      else if (previousPaneID && nextPaneID) divider.setAttribute("aria-label", currentColumnWorkflowView() === "research" ? "Resize column" : "Resize adjacent columns");
+      nodes.push(divider);
+    }
     if (next) nodes.push(next);
   }
   if (!orderedPanes.length && workspaceColumnsRequireProject()) {
@@ -48265,6 +48371,7 @@ function readerShortcutItems() {
     .filter(panel => panel.dataset.paneId && workflowPaneIsVisible(panel.dataset.paneId)).map(panel => [panel.dataset.paneId, panel]));
   const items = [...panels.keys()].map(id => {
     const panel = panels.get(id), reader = byID.get(id);
+    if (reader && panels.has(panel.dataset.resultReaderOwner)) return null;
     if (!reader) {
       const toolKey = /^utility:search(?::|$)/.test(id) ? 'search'
         : /^utility:saved(?::|$)/.test(id) ? 'saved'
@@ -48319,7 +48426,7 @@ function commitWorkspaceColumnOrder(order) {
   const before = captureWorkspaceColumnMotion();
   clearDragPreviewOrder({animate:false});
   if (currentColumnWorkflowView() === 'research') capturePaneResizeWidths({manual:false});
-  const pinned = state.pinnedPaneID;
+  const pinned = activePinnedPaneID();
   if (pinned && order[0] !== pinned) state.pinnedPaneID = "";
   state.paneOrder = order;
   // Reuse the mounted columns, preserving editors, scroll and their controls.
@@ -48390,20 +48497,30 @@ async function waitForWorkspaceSidebarResize(element = track) {
   await Promise.allSettled(transitions.map(transition => transition.finished));
 }
 
-function scrollWorkspaceColumnIntoView(pane, behavior = "smooth", { includeCollapsedToRight = false, alignEndWhenOversized = false } = {}) {
+function scrollWorkspaceColumnIntoView(pane, behavior = "smooth", { includeCollapsedToRight = false, alignEndWhenOversized = false, includeSourceList = false } = {}) {
   const paneRect = pane.getBoundingClientRect();
   const trackRect = track.getBoundingClientRect();
   const pinned = window.matchMedia('(min-width: 761px)').matches
-    ? track.querySelector(':scope > .workspace-panel.is-pinned:not(.is-workflow-hidden)') : null;
-  if (pinned === pane) return;
-  const pinnedWidth = pinned?.getBoundingClientRect().width || 0;
+    ? track.querySelector(':scope > .workspace-panel.is-pinned:not(.is-workflow-hidden, .is-source-pin-overflow)') : null;
+  if (pinned === pane || pane.classList?.contains('is-pinned-result-reader')) return;
+  const pinnedResult = pinned?.nextElementSibling?.nextElementSibling;
+  const pinnedWidth = (pinned?.getBoundingClientRect().width || 0) + (pinnedResult?.classList.contains('is-pinned-result-reader')
+    ? pinned.nextElementSibling.getBoundingClientRect().width + pinnedResult.getBoundingClientRect().width : 0);
   const notesList = pane.classList?.contains('notebook-panel')
     ? track.querySelector(':scope > .notebook-index-panel:not(.is-workflow-hidden, .is-group-hidden)') : null;
   const listRect = notesList?.getBoundingClientRect();
-  const start = listRect?.width > 0 && Math.abs(paneRect.left - listRect.right) <= 2 ? listRect.left : paneRect.left;
   const railSpace = pane.classList?.contains('research-v2-panel') ? parseFloat(getComputedStyle(pane).marginInlineEnd) || 0 : 0;
   let right = paneRect.right + railSpace;
   const availableWidth = trackRect.width - pinnedWidth;
+  const source = includeSourceList && pane.dataset.resultReaderOwner ? pane.previousElementSibling?.previousElementSibling : null;
+  const sourceRect = source?.getBoundingClientRect();
+  const start = sourceRect?.width > 0 && right - sourceRect.left <= availableWidth ? sourceRect.left
+    : listRect?.width > 0 && Math.abs(paneRect.left - listRect.right) <= 2 ? listRect.left : paneRect.left;
+  const result = pane.nextElementSibling?.nextElementSibling;
+  if (result?.dataset.resultReaderOwner && result.dataset.resultReaderOwner === pane.dataset.paneId) {
+    const bounds = result.getBoundingClientRect();
+    if (bounds.width > 0 && bounds.right - start <= availableWidth) right = bounds.right;
+  }
   if (includeCollapsedToRight && right - start < availableWidth) {
     const rightLimit = start + availableWidth;
     for (let next = pane.nextElementSibling; next; next = next.nextElementSibling) {
@@ -52193,7 +52310,7 @@ function getWorkspacePaneHydrator() {
         if (shell.dataset.readerTabPending) disposeUnpublishedWorkspacePane(shell);
         // The new header is prepared above; retained editors and menus need no rebuild.
         refreshColumnGroupPresentation({ preparePanels: false });
-        if (job.id === activePinnedPaneID()) refreshPinnedPaneDivider();
+        if (job.id === activePinnedPaneID() || pane.dataset.resultReaderOwner) refreshPinnedPaneDivider();
         updateCollapsedPaneDividers();
         // Only the newly mounted Reader gets restoration listeners and frames.
         if (pane.classList.contains("reader-panel")) {
@@ -52383,18 +52500,8 @@ function workspacePaneDescriptors(options = {}) {
     const scrollPosition = options.readerTabSwitchPaneID === id ? reader.scrollPosition
       : options.readerScrollPositions?.get(id) || reader.scrollPosition;
     add(id, readerPositionLabel(reader), (signal) => renderReader(reader, { scrollPosition: sourceNavigation ? undefined : scrollPosition,
-      sourceNavigation, chapterNavigation: options.readerChapterSwitchPaneID === id, accessGate: options.accessGate, signal }), async () => {
-      if (currentColumnWorkflowView() === 'notebook' && state.workflowMembership?.[id]?.includes('notebook')) {
-        return setNotebookReaderHidden(reader, true);
-      }
-      return closeAndRender(() => {
-        state.readers = state.readers.filter((item) => item.id !== reader.id);
-        state.readers.forEach((item) => { if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = ""; });
-        Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
-          if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
-        });
-      })();
-    }, {
+      sourceNavigation, chapterNavigation: options.readerChapterSwitchPaneID === id, accessGate: options.accessGate, signal }),
+    () => closeWorkspaceReader(reader, track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(id)}"]`)), {
       publicContent: true,
       deferWhileHidden: state.workflowMembership?.[id]?.includes('notebook') === true,
       identity: workspaceReaderContentIdentity(reader),

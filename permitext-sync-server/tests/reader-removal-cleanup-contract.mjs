@@ -54,19 +54,23 @@ console.log('Reader removal passed: immediate navigation/search/progressive abor
 
 // Execute the actual close handler: cleanup and removal precede persistence or
 // pane reconciliation, and closing cannot construct another loading chapter.
-const closeStart=source.indexOf('  closeButton.addEventListener("click", () => {', source.indexOf('async function renderReader('));
-assert.ok(closeStart>=0);
-const closeBody=source.slice(closeStart,source.indexOf('\n  chapterSelect.addEventListener',closeStart));
+assert.match(actual('renderReader'), /closeButton\.addEventListener\("click", \(\) => void closeWorkspaceReader/);
 const order=[];
-const closed={id:'closed',referenceSourceReaderID:''},neighbor={id:'neighbor',referenceSourceReaderID:'closed'};
-const closing=vm.createContext({currentColumnWorkflowView:()=>'research',closeButton:{addEventListener(_event,handler){this.close=handler;}},
- panel:{remove(){order.push('remove');}},reader:closed,options:{},
- state:{readers:[closed,neighbor],searchLinkedReaders:{search:'closed'}},
- currentColumnWorkflowView:()=> 'research',
+const owner='utility:search:list';
+const closed={id:'closed',sourceOwnerPaneID:owner},neighbor={id:'neighbor',referenceSourceReaderID:'closed'};
+const closing=vm.createContext({
+ panel:{contains:()=>false,remove(){order.push('remove');}},
+ state:{readers:[closed,neighbor],searchLinkedReaders:{search:'closed'},paneOrder:[owner,'reader:closed','reader:neighbor'],paneWeights:{[owner]:710,'reader:closed':630}},
+ currentColumnWorkflowView:()=> 'research', activeWorkspaceID:'test', document:{activeElement:null},
+ captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
+ track:{_researchColumnLayout:{},querySelector:()=>null},CSS:{escape:value=>value},capturePaneResizeWidths(){order.push('preserve-width');},
+ scrollPaneIntoView(id){assert.equal(id,owner);order.push('reveal-list');},
  cancelReaderPanelRequests(){order.push('cancel');},searchLinkedReadersBySearch(){return closing.state.searchLinkedReaders;},
  transitionWorkspace(mode,opts){assert.equal(mode,'utility');assert.equal(opts.deferStateSave,true);order.push('reconcile');}
 });
-vm.runInContext(closeBody,closing);closing.closeButton.close();
-assert.deepEqual(order,['cancel','remove','reconcile']);
+vm.runInContext(['paneIDForReader','sourceResultReaderOwner','removeWorkspaceReader','closeWorkspaceReader'].map(actual).join('\n'),closing);
+await closing.closeWorkspaceReader(closed,closing.panel);
+assert.deepEqual(order,['preserve-width','cancel','remove','reconcile','reveal-list']);
 assert.equal(closing.state.readers.length,1);assert.equal(neighbor.referenceSourceReaderID,'');
 assert.equal(closing.state.searchLinkedReaders.search,undefined);
+assert.deepEqual(closing.state.paneWeights,{[owner]:710});

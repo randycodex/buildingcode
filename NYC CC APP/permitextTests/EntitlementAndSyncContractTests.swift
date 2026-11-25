@@ -559,6 +559,23 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         print("PARITY_SEARCH_PROFILE matches=\(withSnippets.count) eager=\(eager) lazy=\(lazy)")
     }
 
+    func testGlobalWordSearchFindsTheZoningWindowRule() throws {
+        let version = try XCTUnwrap(BundleDatabaseLocator(defaults: isolatedEntitlementDefaults())
+            .availableCodeVersions().first {
+                UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYCZoning
+            })
+        let store = try AuthoredCodeStore(jsonURL: version.fileURL, codeID: version.authoredCodeID,
+            jurisdictionID: version.jurisdictionID)
+        let query = "distance windows lot lines"
+        let ranked = store.search(query: query, matchAllWords: true)
+        XCTAssertEqual(ranked.first?.sectionNumber, "23-372")
+        XCTAssertEqual(ranked.first?.title, "Distance between legally required windows and lot lines")
+        XCTAssertFalse(store.search(query: query).contains { $0.sectionNumber == "23-372" })
+        XCTAssertEqual(store.search(query: "ZR 23-372", matchAllWords: true).first?.sectionNumber, "23-372")
+        XCTAssertEqual(NativeSearchGroupExpansion.automaticGroup(groupIDs: ["ZR", "BC"],
+            isSearching: false, isPending: false), "ZR")
+    }
+
     @MainActor
     func testNativeReportPDFPreservesQualifiedProjectFacts() throws {
         let qualification = "Only the cellar is sprinklered. The building is not fully sprinklered. Upper-floor conversion remains an assumption, not established work."

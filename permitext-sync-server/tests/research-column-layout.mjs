@@ -53,7 +53,7 @@ const context = vm.createContext({notebookReferenceTransition:undefined, workspa
   workflowPaneIsVisible: id => !panels.find(panel => panel.dataset.paneId === id)?.classList.contains('is-workflow-hidden'),
   assistantHistoryOnlyPane: id => id === 'utility:analysis:history', paneIsCollapsed: id => collapsed.has(id), defaultPaneWidthForID: id => id.startsWith('reader:') ? 630 : 600,
   applyPaneWeight(panel, id) { panel.style.flex = `1 0 ${state.paneWeights[id] || 600}px`; } });
-vm.runInContext(['minimumPaneWidthForID', 'maximumPaneWidthForID', 'constrainPaneWidth', 'syncNotebookColumnLayout', 'syncResearchColumnLayout', 'capturePaneResizeWidths'].map(actual).join('\n'), context);
+vm.runInContext(['sourceResultReaderOwner', 'researchColumnLayoutMembership', 'minimumPaneWidthForID', 'maximumPaneWidthForID', 'constrainPaneWidth', 'syncNotebookColumnLayout', 'syncResearchColumnLayout', 'capturePaneResizeWidths'].map(actual).join('\n'), context);
 const sizes = () => panels.map(p=>p.getBoundingClientRect().width);
 context.syncResearchColumnLayout();
 assert.deepEqual(sizes(), [1200, 1200], 'Existing unequal widths share the available screen');
@@ -337,7 +337,7 @@ panels.forEach(p=>context.applyPaneWeight(p,p.dataset.paneId));
 track.querySelector=selector=>panels.find(p=>selector.includes(`"${p.dataset.paneId}"`));
 Object.assign(context,{CSS:{escape:id=>id},adjacentColumnWidths,notebookReferenceResize:()=>null,scheduleVisibleReaderScrollIndicatorUpdates(){},notifyWorkspaceLayoutChange(){}});
 vm.runInContext(actual('updateAdjacentDividerValue')+'\n'+actual('resizePaneEdgeBy')+'\n'+actual('resizeAdjacentPanesBy'),context);
-const dividerValues={};const searchDivider={setAttribute:(key,value)=>dividerValues[key]=value};
+const dividerValues={};const searchDivider={classList:{contains:()=>false},setAttribute:(key,value)=>dividerValues[key]=value};
 context.resizeAdjacentPanesBy('utility:search:resize','reader:one',-300,searchDivider);
 assert.deepEqual(sizes(),[920,600,630],'Search stops at 600px without squeezing the adjacent Reader');
 context.resizeAdjacentPanesBy('utility:search:resize','reader:one',500,searchDivider);

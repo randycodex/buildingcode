@@ -1,7 +1,6 @@
 import Foundation
 
-// A complete citation carries a code scope as well as search text. Ordinary
-// prose and quoted phrases keep the existing exact-phrase behavior.
+// A complete citation carries a code scope as well as search text.
 struct NativeSearchCitation: Equatable {
     let query: String
     let codePrefix: String?
@@ -119,7 +118,7 @@ struct NativeSearchResultPresentation: Equatable {
 
 enum NativeSearchGroupExpansion {
     static func automaticGroup(groupIDs: [String], isSearching: Bool, isPending: Bool) -> String? {
-        guard !isSearching, !isPending, groupIDs.count == 1 else { return nil }
-        return groupIDs[0]
+        guard !isSearching, !isPending else { return nil }
+        return groupIDs.first
     }
 }

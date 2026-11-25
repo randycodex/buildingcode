@@ -3,6 +3,7 @@ import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 import {reportsContainingSource} from '../public/project-workflow.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+const captureHelper=source.slice(source.indexOf('function captureCodeBlocksForNotebook('),source.indexOf('\nasync function addPassageToNotebook('));
 const helper=source.slice(source.indexOf('async function addSavedEvidenceToNotebook('),source.indexOf('\nfunction appendSavedEvidenceRow('));
 const exact='The full saved paragraph, including every condition. '+ 'Preserve the complete historical source. '.repeat(12);
 for(const mode of ['paragraph','section','no-note','missing','edition','workspace','project','account','view','closed','note','mount','acknowledged']) {
@@ -22,7 +23,7 @@ for(const mode of ['paragraph','section','no-note','missing','edition','workspac
   document:{createElement:()=>({children:[],append(child){this.children.push(child);}})},renderCodeBlock:block=>block,
   notebookEvidenceTextMap:(node,options)=>{assert.equal(options.literalInline,true);return {text:node.children.map(block=>block.text).join('\n')};},
   notebookBlocksFromSourceElement:()=>[],addPassageToNotebook:async(...args)=>calls.push(args)});
- vm.runInContext(helper,c);
+ vm.runInContext(captureHelper+helper,c);
  const pending=c.addSavedEvidenceToNotebook(anchor,{sectionID:'source',codeVersion:'2014',codePrefix:'BC',blockID:mode==='missing'?'missing':'selected',
   ...(mode==='section'?{scope:'section'}:{})},'project');
  if(mode==='workspace')c.activeWorkspaceID='other';
@@ -36,7 +37,7 @@ for(const mode of ['paragraph','section','no-note','missing','edition','workspac
  finish();
  if(['missing','edition'].includes(mode)){await assert.rejects(pending,/unavailable/);assert.equal(calls.length,0);}
  else {await pending;const expected=['paragraph','section','no-note','acknowledged'].includes(mode);assert.equal(calls.length,expected?1:0,mode);
-  if(expected){assert.equal(calls[0][1].codeVersion,'2014');assert.equal(calls[0][1].sectionID,'source');assert.equal(calls[0][2],mode==='section'?`${exact}\nAnother paragraph, not the selection.`:exact);}}
+  if(expected){assert.equal(calls[0][1].codeVersion,'2014');assert.equal(calls[0][1].sectionID,'source');assert.equal(calls[0][1].scope,mode==='section'?'section':undefined);assert.equal(calls[0][2],mode==='section'?`${exact}\nAnother paragraph, not the selection.`:exact);}}
 }
 
 const nodes=[],calls=[];
@@ -48,10 +49,10 @@ const body=element('section'),project={id:'project'};
 const c=vm.createContext({document:{createElement:element},window:{getSelection:()=>''},
  codeTheme:()=> 'building',savedEvidenceKey:()=> 'saved',normalizeAnnotationBlockID:value=>String(value||''),
  sectionTitleWithoutNumber:()=> 'Scope',savedEvidenceEdition:()=> '2014',annotationForTarget:()=>({}),evidenceCommentsText:v=>v,markResearchSelectable(){},
- projectIdentity:p=>p,projectDetailKey:p=>p.id,hasCapability:()=>true,
+ projectIdentity:p=>p,projectDetailKey:p=>p.id,hasCapability:()=>true,currentColumnWorkflowView:()=> 'research',
  reportMembershipIndicator:()=>Object.assign(element('button'),{textContent:'Add to Report'}),
  openIncludedSourceReport:async()=>{calls.push('report');return true;},
- openSavedItemInReader:async(_item,pane)=>{assert.equal(pane,'evidence');calls.push('reader');},
+ openSavedItemInReader:async(_item,pane,options)=>{assert.equal(pane,'evidence');calls.push(options?.forceNewReader?'new reader':'reader');},
  openSavedEvidenceMenu:(_row,anchor,menu)=>{assert.equal(anchor.attrs['aria-haspopup'],'menu');menu.hidden=false;},
  startFocusedResearchFromSavedItem:async()=>calls.push('research'),
  addSavedEvidenceToNotebook:async(_anchor,_item,id)=>{assert.equal(id,'project');calls.push('note');},
@@ -63,13 +64,13 @@ c.appendSavedEvidenceRow(body,{id:'bookmark',sectionID:'source',sectionNumber:'1
 const row=body.children[0],actions=row.children.find(node=>node.className==='saved-evidence-menu');
 const trigger=row.children.find(node=>node.className==='icon-button saved-evidence-menu-button');
 assert.equal(actions.hidden,true,'Secondary actions occupy no space until the menu opens');
-assert.deepEqual(actions.children.map(node=>node.textContent),['Add to note','Ask Assistant','Add to Report','Remove']);
+assert.deepEqual(actions.children.map(node=>node.textContent),['Add to note','Open in new Reader','Ask Assistant','Add to Report','Remove']);
 assert.ok(actions.children.every(button=>button.attrs.role==='menuitem'));
 assert.equal(row.children.some(node=>node.className==='saved-row-actions'),false,'No extra action rows remain');
 await row.children[0].click();assert.deepEqual(calls,['reader']);calls.length=0;
 trigger.click();assert.equal(actions.hidden,false);
 for(const button of actions.children)await button.click();
-assert.deepEqual(calls,['note','research','report','remove']);
+assert.deepEqual(calls,['note','new reader','research','report','remove']);
 const styles=await readFile(new URL('../public/styles.css',import.meta.url),'utf8');
 assert.match(styles,/\.saved-evidence-menu\[hidden\]\s*\{ display: none;/);
 console.log('Evidence actions passed: one menu, no action rows, passage opens Reader, retained Note/Assistant/Report/Remove actions, exact-edition capture and stale-context guards.');

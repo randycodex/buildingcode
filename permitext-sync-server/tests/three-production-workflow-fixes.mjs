@@ -50,11 +50,16 @@ for(const path of ['notebook/cards/list','notebook/cards/save','reports/sources/
 
 function batchHarness(failAt=Infinity) {
   const cards=Array.from({length:5},(_,i)=>({id:`n${i+1}`,title:`Note ${i+1}`}));
+  const notesColumn={};
   let attempts=0,refreshes=0,sourceRefreshes=0,trashRefreshes=0;const notices=[];
   const deleted=new Set();
   const c=vm.createContext({activeWorkspaceID:'w',state:{workflowNavigationGeneration:0,notebookColumns:[]},captureAccountRequest:()=>({userID:'owner'}),
     isCurrentAccountRequest:()=>true,projectDetailKey:()=> 'p',workspaceProject:()=>({id:'p'}),
-    confirmWebWarning:async()=>true,showWebNotice:async(...args)=>notices.push(args),refreshOpenSettingsTrash:()=>trashRefreshes++,
+    confirmWebWarning:async(_title,_message,options)=>{
+      assert.equal(options.container,notesColumn);
+      assert.equal(options.scope,notesColumn);
+      return true;
+    },showWebNotice:async(...args)=>notices.push(args),refreshOpenSettingsTrash:()=>trashRefreshes++,
     notebookColumnsForProject:()=>[],notebookColumnMounts:new Map(),notebookCatalogs:new Map([['p',cards]]),
     loadNotebookDraft:async()=>null,loadNotebookProjectSnapshot:async()=>null,
     deleteNotebookDraft:async()=>{},deleteNotebookCardSnapshot:async()=>{},requireCurrentAccountRequest(){},
@@ -67,15 +72,15 @@ function batchHarness(failAt=Infinity) {
     },notebookMounts:new Map([['p',{refreshCards:async()=>{refreshes++;}}]]),
     reportDraftMounts:new Map([['p',{refreshSources:async()=>{sourceRefreshes++;}}]])});
   vm.runInContext(actual('async function moveClosedNotebookNoteToTrash(','function syncNotebookLanding('),c);
-  return {c,cards,notices,deleted,stats:()=>({attempts,refreshes,sourceRefreshes,trashRefreshes})};
+  return {c,cards,notesColumn,notices,deleted,stats:()=>({attempts,refreshes,sourceRefreshes,trashRefreshes})};
 }
 for(let n=0;n<5;n++) {
-  const b=batchHarness();assert.equal(await b.c.mutateNotebookNotesFromMenu({id:'p'},b.cards,{trash:true}),true);
+  const b=batchHarness();assert.equal(await b.c.mutateNotebookNotesFromMenu({id:'p'},b.cards,{trash:true,container:b.notesColumn}),true);
   assert.deepEqual(b.stats(),{attempts:5,refreshes:1,sourceRefreshes:1,trashRefreshes:1});assert.equal(b.notices.length,0);
   assert.equal(b.deleted.size,5);
 }
 {
-  const b=batchHarness(4);assert.equal(await b.c.mutateNotebookNotesFromMenu({id:'p'},b.cards,{trash:true}),false);
+  const b=batchHarness(4);assert.equal(await b.c.mutateNotebookNotesFromMenu({id:'p'},b.cards,{trash:true,container:b.notesColumn}),false);
   assert.deepEqual(b.stats(),{attempts:4,refreshes:1,sourceRefreshes:1,trashRefreshes:1});
   assert.equal(b.deleted.size,3);assert.equal(b.c.notebookCatalogs.get('p').length,2,'Only successful deletions leave the live catalog');
   assert.equal(b.notices[0][0],'3 of 5 Notes moved to Trash');assert.match(b.notices[0][1],/2 Notes remain unchanged: Note 4, Note 5.*5 seconds/);

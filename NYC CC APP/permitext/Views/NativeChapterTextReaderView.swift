@@ -2232,10 +2232,18 @@ private struct NativeReaderTextBlockView: View, Equatable {
                     if hasSelection { passageSwipe.close() }
                 }
             )
+            .padding(.trailing, isBookmarked ? 24 : 0)
             .offset(x: passageSwipe.offset)
             .clipped()
             .overlay(alignment: .trailing) {
-                if passageSwipe.isOpen {
+                if isBookmarked && passageSwipe.offset == 0 {
+                    Image(systemName: "bookmark.fill")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(Color(uiColor: accentColor))
+                        .frame(width: 24)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                } else if passageSwipe.isOpen {
                     // Keep the save confirmation and its Project action outside the tray bounds.
                     passageActions(sectionID: bookmarkSectionID)
                 } else {

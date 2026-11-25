@@ -20,6 +20,7 @@ class Node {
       toggle:(name,value)=>{const list=new Set(this.className.split(/\s+/).filter(Boolean)); if(value)list.add(name);else list.delete(name);this.className=[...list].join(" ");} };
   }
   append(...nodes) { for(const node of nodes) { if(node.parentNode)node.parentNode.children=node.parentNode.children.filter(n=>n!==node);node.parentNode=this;this.children.push(node); } }
+  prepend(node) { this.append(node); this.children.unshift(this.children.pop()); }
   matches(selector) {
     const parts = /^(\.[\w-]+)(?:\[data-([\w-]+)="([^"\]]*)"\])?$/.exec(selector);
     if (!parts || !this.classList.contains(parts[1].slice(1))) return false;
@@ -151,14 +152,25 @@ const collapsedResults = new Node("div"); panel.append(collapsedResults);
 const mechanical = {...matches[0], codePrefix:"MC", id:"mechanical-result"};
 instance.defaultExpandedResultSource = `MC|${defaultSyncCodeVersion}`;
 c.appendSearchResultGroups(collapsedResults, [...matches, mechanical], "means of egress", instance);
-assert.equal(collapsedResults.querySelector(".search-family-card").dataset.family, "BC", "Old automatic previews never reorder families");
+assert.equal(collapsedResults.querySelector(".search-family-card").dataset.family, "BC", "Stored expansion does not change ranked family order");
 assert.equal(collapsedResults.querySelector('.search-result-group[data-source-key="MC|' + defaultSyncCodeVersion + '"]').querySelector('.search-result-group-toggle').attrs['aria-label'], 'Collapse MC results', 'The selected preview source exposes its strongest chapters');
 instance.defaultExpandedResultSource = `BC|${historicalConstructionSyncCodeVersion}`;
 c.appendSearchResultGroups(collapsedResults, [...matches, mechanical], "means of egress", instance);
-assert.equal(collapsedResults.querySelector(".search-result-group").dataset.sourceVersion, defaultSyncCodeVersion, "Editions retain their usual order");
+assert.equal(collapsedResults.querySelector(".search-result-group").dataset.sourceVersion, defaultSyncCodeVersion, "An append keeps the displayed edition order stable");
 const expandedResults = new Node("div"); panel.append(expandedResults);
 instance.expandedResultSources = [`MC|${defaultSyncCodeVersion}`];
 c.appendSearchResultGroups(expandedResults, [...matches, mechanical], "means of egress", instance);
 const group = expandedResults.querySelector(`.search-result-group[data-source-key="MC|${defaultSyncCodeVersion}"]`);
 assert.equal(group.querySelector(".search-result-group-toggle").attrs["aria-label"], "Collapse MC results", "Manual expansions remain open");
-console.log("Search chapter rendering passed: collapsed defaults in every edition, ranked groups, honest loaded counts, pagination deduplication, explicit expansion/restore, and stable source identities.");
+
+const rankedResults = new Node("div"); panel.append(rankedResults);
+rankedResults.preferredResult = mechanical;
+instance.searchPosition.chapterExpansion = {};
+c.appendSearchResultGroups(rankedResults, [mechanical, matches[40], matches[0]], "duct", instance);
+assert.deepEqual(rankedResults.querySelectorAll(".search-family-card").map(family => family.dataset.family), ["MC", "BC"]);
+assert.deepEqual(rankedResults.querySelectorAll(".search-result-group").map(edition => edition.dataset.sourceVersion),
+  [defaultSyncCodeVersion, historicalConstructionSyncCodeVersion, defaultSyncCodeVersion]);
+assert.equal(rankedResults.querySelector(".search-chapter-group").open, true, "The top result's chapter opens automatically");
+c.appendSearchResultGroups(rankedResults, [matches[1]], "duct", instance);
+assert.equal(rankedResults.querySelector(".search-family-card").dataset.family, "MC", "Pagination leaves the top family in place");
+console.log("Search chapter rendering passed: best source and chapter first, honest counts, stable pagination, and restored expansion choices.");

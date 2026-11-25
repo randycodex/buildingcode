@@ -13,7 +13,7 @@ import { Menu } from "@mantine/core";
 import "@blocknote/mantine/style.css";
 import "./notebook.css";
 import { notebookReferenceBlocks } from "../public/notebook-passage-blocks.js";
-import { normalizeNotebookDocumentStyles, notebookFontSize, notebookFontSizes, notebookLineSpacings } from "../public/notebook-styles.js";
+import { normalizeNotebookDocumentStyles, notebookFontSize, notebookFontSizes, notebookLineSpacings, notebookTextColor, notebookTextColors } from "../public/notebook-styles.js";
 import { TableHandlesExtension } from '@blocknote/core/extensions';
 import { TextSelection } from "@tiptap/pm/state";
 import { addColumnAfter, addRowAfter, deleteColumn, deleteRow, selectedRect } from "@tiptap/pm/tables";
@@ -47,8 +47,25 @@ const notebookReferenceCodeNames = {
   FGC: "Fuel Gas Code",
   FC: "Fire Code",
   AC: "Administrative Code",
-  ZR: "Zoning Resolution"
+  ZR: "Zoning Resolution",
+  ECC: "Energy Conservation Code",
+  EC: "Electrical Code",
+  HMC: "Housing Maintenance Code",
+  T24: "Administrative Code Title 24",
+  T25: "Administrative Code Title 25",
+  T26: "Administrative Code Title 26",
+  T28: "Administrative Code Title 28",
+  LL: "Construction-Related Local Laws"
 };
+
+function notebookReferenceAppearance(kind, label) {
+  if (!["selectedPassage", "canonicalSection"].includes(kind)) return;
+  const code = String(label || "").split(/\s*[·§]\s*/, 1)[0].trim().replace(/\s+\(?\d{4}\)?$/, "");
+  // Prefer the most specific name so 1968 and specialty books keep their own colors.
+  const prefix = Object.keys(notebookReferenceCodeNames).find(key => key === code.toUpperCase() ||
+    notebookReferenceCodeNames[key].toLowerCase() === code.toLowerCase());
+  if (prefix) return {"--notebook-reference-color": `var(--notebook-reference-${prefix.toLowerCase()}, LinkText)`};
+}
 
 function normalizedNotebookReferenceLabel(label) {
   return String(label || "Linked item").trim().replace(
@@ -111,25 +128,34 @@ const PermitextReference = createReactInlineContentSpec(
   {
     render: ({ inlineContent }) => {
       if (inlineContent.props.referenceKind === "selectedPassage") {
-        const parts = notebookReferenceParts(inlineContent.props.referenceKind, inlineContent.props.label);
+        const { referenceKind, referenceID, label } = inlineContent.props;
         return React.createElement("span", {
           className: "notebook-reference-chip",
+          style: notebookReferenceAppearance(referenceKind, label),
           "data-permitext-reference": "true",
-          "data-reference-kind": inlineContent.props.referenceKind,
-          "data-reference-id": inlineContent.props.referenceID,
-          "data-reference-label": inlineContent.props.label
+          "data-reference-kind": referenceKind,
+          "data-reference-id": referenceID,
+          "data-reference-label": label
         },
-        React.createElement("button", { type: "button", className: "notebook-reference-meta notebook-passage-source",
-          "aria-label": `Open ${inlineContent.props.label}`, title: "Open source in Reader" }, parts.meta),
-        React.createElement("button", { type: "button", className: "notebook-reference-title notebook-passage-toggle",
-          "data-notebook-passage-toggle": "true", "aria-expanded": "true",
-          "aria-label": `Collapse passage: ${inlineContent.props.label}` }, parts.title));
+        React.createElement("button", {
+          type: "button",
+          className: "notebook-passage-source",
+          "aria-label": `Open ${label}`,
+          title: "Open source in Reader"
+        }, ...notebookReferenceChildren(referenceKind, label)),
+        React.createElement("button", {
+          type: "button",
+          className: "notebook-passage-toggle",
+          "data-notebook-passage-toggle": "true",
+          hidden: true
+        }));
       }
       return React.createElement(
       "button",
       {
         type: "button",
         className: "notebook-reference-chip",
+        style: notebookReferenceAppearance(inlineContent.props.referenceKind, inlineContent.props.label),
         "data-permitext-reference": "true",
         "data-reference-kind": inlineContent.props.referenceKind,
         "data-reference-id": inlineContent.props.referenceID,
@@ -194,6 +220,36 @@ const notebookFontSizeStyle = createStyleSpec({type:'fontSize',propSchema:'strin
   parse:element=>notebookFontSize(element.style.fontSize)
 });
 
+function notebookTextColorProperties(color) {
+  return color && {
+    "--notebook-text-color-light": color.light,
+    "--notebook-text-color-dark": color.dark
+  };
+}
+
+const notebookTextColorStyle = createStyleSpec({type: "textColor", propSchema: "string"}, {
+  render: value => {
+    const dom = document.createElement("span");
+    for (const [property, color] of Object.entries(notebookTextColorProperties(notebookTextColor(value)) || {})) {
+      dom.style.setProperty(property, color);
+    }
+    return {dom, contentDOM: dom};
+  },
+  toExternalHTML: value => {
+    const dom = document.createElement("span");
+    const color = notebookTextColor(value);
+    if (color) {
+      dom.style.color = color.light;
+      dom.dataset.notebookTextColor = value;
+    }
+    return {dom, contentDOM: dom};
+  },
+  parse: element => {
+    const value = element.getAttribute("data-notebook-text-color");
+    if (notebookTextColor(value)) return value;
+  }
+});
+
 export const permitextNotebookSchema = BlockNoteSchema.create({
   blockSpecs: notebookBlockSpecs,
   inlineContentSpecs: {
@@ -206,6 +262,7 @@ export const permitextNotebookSchema = BlockNoteSchema.create({
     strike: defaultStyleSpecs.strike,
     underline: defaultStyleSpecs.underline,
     backgroundColor: notebookBackgroundColor,
+    textColor: notebookTextColorStyle,
     superscript: notebookSuperscript,
     fontSize: notebookFontSizeStyle
   }
@@ -398,6 +455,21 @@ function PermitextFormattingToolbar({ editor, options }) {
   const sizeMenu = formatMenu('Font size',state.fontSize ? `${state.fontSize} pt` : 'Size',
     [{value:'default',label:'Default',selected:!state.styles.fontSize},...notebookFontSizes.map(value=>({value,label:`${value} pt`,selected:state.styles.fontSize===value}))],
     value=>value==='default'?editor.removeStyles({fontSize:state.styles.fontSize || ''}):editor.addStyles({fontSize:value}),!inlineSelection);
+  const textColorChoices = [["default", {label: "Default"}], ...Object.entries(notebookTextColors)]
+    .map(([value, color]) => ({
+      value,
+      selected: (state.styles.textColor || "default") === value,
+      label: React.createElement("span", {className: "notebook-format-color-option"},
+        React.createElement("span", {className: "notebook-format-color-swatch", "aria-hidden": "true",
+          style: color.light ? notebookTextColorProperties(color) : undefined}),
+        color.label)
+    }));
+  const textColorMenu = formatMenu("Text color",
+    React.createElement("span", {className: "notebook-format-color-icon", "aria-hidden": "true",
+      style: notebookTextColorProperties(notebookTextColor(state.styles.textColor))}, "A"),
+    textColorChoices,
+    value => value === "default" ? editor.removeStyles({textColor: ""}) : editor.addStyles({textColor: value}),
+    !inlineSelection);
   const spacing = first?.props?.lineSpacing || 'normal';
   const spacingMenu = formatMenu('Line spacing',spacing==='normal'?'Spacing':`${spacing}×`,
     notebookLineSpacings.map(value=>({value,label:value==='normal'?'Default':value==='1'?'1 · Single':value==='2'?'2 · Double':value,selected:spacing===value})),
@@ -443,6 +515,7 @@ function PermitextFormattingToolbar({ editor, options }) {
     styleButton("italic", "Italic", React.createElement("em", null, "I")),
     styleButton("underline", "Underline", React.createElement("u", null, "U")),
     styleButton("strike", "Strikethrough", React.createElement("s", null, "S")),
+    textColorMenu,
     React.createElement("button", {
       type: "button", className: "notebook-format-button notebook-format-highlight",
       title: "Highlight", "aria-label": "Highlight", "aria-pressed": state.styles.backgroundColor === "yellow",

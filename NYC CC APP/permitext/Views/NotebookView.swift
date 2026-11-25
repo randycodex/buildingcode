@@ -27,12 +27,23 @@ struct ResearchNotebookHandoff: Identifiable {
     let projectID: String?
 }
 
-/// Review the destination before linking an answer to a Note. The immutable answer stays a
-/// linked source; it is never copied into the user's professional conclusion.
-struct ResearchNotebookHandoffSheet: View {
+struct ReaderNotebookHandoff: Identifiable {
+    let id = UUID().uuidString.lowercased()
+    let sectionID: Int64
+    let codeVersion: String
+    let projectID: String?
+}
+
+/// Choose a Note for an Assistant citation or an entire Reader section.
+struct NotebookSourceHandoffSheet: View {
+    private enum Source {
+        case answer(ResearchNotebookHandoff)
+        case section(ReaderNotebookHandoff)
+    }
+
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dismiss) private var dismiss
-    let handoff: ResearchNotebookHandoff
+    private let source: Source
     let owner: NativePrivateRequestIdentity?
     @State private var projectID: String
     @State private var isSaving = false
@@ -48,13 +59,25 @@ struct ResearchNotebookHandoffSheet: View {
     @State private var pendingDocument: NotebookDocument
 
     init(handoff: ResearchNotebookHandoff, owner: NativePrivateRequestIdentity?) {
-        self.handoff = handoff
+        source = .answer(handoff)
         self.owner = owner
         _projectID = State(initialValue: handoff.projectID ?? "")
         _pendingDocument = State(initialValue: NotebookDocument(document: [
             .reference(kind: "researchAnswer", id: handoff.id, label: ResearchNotebookHandoffPresentation.referenceLabel(question: handoff.question)),
             .paragraph()
         ]))
+    }
+
+    init(section: ReaderNotebookHandoff, owner: NativePrivateRequestIdentity?) {
+        source = .section(section)
+        self.owner = owner
+        _projectID = State(initialValue: section.projectID ?? "")
+        _pendingDocument = State(initialValue: NotebookDocument(document: []))
+    }
+
+    private var answer: ResearchNotebookHandoff? {
+        if case let .answer(handoff) = source { return handoff }
+        return nil
     }
 
     private var isCurrentOwner: Bool { owner != nil && owner == library.privateRequestIdentity }
@@ -69,12 +92,13 @@ struct ResearchNotebookHandoffSheet: View {
                 if let savedCardID {
                     ProjectNotebookView(
                         projectID: projectID, projectName: projectName, accentColor: .appChrome,
-                        referenceCandidates: [NativeNotebookReferenceCandidate(
-                            kind: "researchAnswer", referenceID: handoff.id,
-                            label: ResearchNotebookHandoffPresentation.referenceLabel(question: handoff.question), detail: "Linked Assistant answer"
-                        )], initialCardID: savedCardID
+                        referenceCandidates: answer.map {
+                            [NativeNotebookReferenceCandidate(kind: "researchAnswer", referenceID: $0.id,
+                                label: ResearchNotebookHandoffPresentation.referenceLabel(question: $0.question),
+                                detail: "Linked Assistant answer")]
+                        } ?? [], initialCardID: savedCardID
                     )
-                    .environment(\.returnToResearch, { dismiss() })
+                    .environment(\.returnToResearch, answer == nil ? nil : { dismiss() })
                 } else {
                     Form {
                         Section("Destination") {
@@ -104,10 +128,16 @@ struct ResearchNotebookHandoffSheet: View {
                                 }
                             }
                         }
-                        Section("Assistant reference") {
-                            Text(handoff.question)
-                            Text("The note will link to this answer and its evidence.")
-                                .font(.footnote).foregroundStyle(.secondary)
+                        if let answer {
+                            Section("Assistant reference") {
+                                Text(answer.question)
+                                Text("The note will link to this answer and its evidence.")
+                                    .font(.footnote).foregroundStyle(.secondary)
+                            }
+                        } else {
+                            Section("Reader section") {
+                                Text("The Note will include the whole section and a link to its code edition.")
+                            }
                         }
                         if let errorMessage {
                             Section { Text(errorMessage).foregroundStyle(.secondary) }
@@ -132,6 +162,7 @@ struct ResearchNotebookHandoffSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     if savedCardID == nil { Button("Cancel") { dismiss() }.disabled(isSaving) }
+                    else if answer == nil { Button("Done") { dismiss() } }
                 }
             }
             .interactiveDismissDisabled(isSaving)
@@ -172,18 +203,21 @@ struct ResearchNotebookHandoffSheet: View {
         do {
             let existing = selectedNoteID.isEmpty ? nil : try await library.notebookCard(projectID: projectID, cardID: selectedNoteID)
             guard isCurrentOwner, !Task.isCancelled else { return }
-            var document = existing?.document ?? pendingDocument
+            let capture = try await captureSource(cardID: existing?.id ?? "")
+            guard isCurrentOwner, !Task.isCancelled else { return }
             if let existing {
-                if document.document.contains(where: { $0.id == pendingDocument.document[0].id }) {
+                if documentAlreadyContains(existing, capture: capture) {
                     savedCardID = existing.id
                     return
                 }
-                document.document.append(contentsOf: pendingDocument.document)
             }
+            var document = existing?.document ?? NotebookDocument(document: [])
+            document.document.append(contentsOf: capture.blocks)
             let card = try await library.saveNotebookCard(
                 projectID: projectID, cardID: existing?.id, expectedVersion: existing?.version ?? 0,
-                title: existing?.title ?? ResearchNotebookHandoffPresentation.boundedText(handoff.question, maximumUTF16Count: 160), document: document,
-                evidenceLinks: existing?.evidenceLinks ?? [], clientMutationID: mutationID
+                title: existing?.title ?? ResearchNotebookHandoffPresentation.boundedText(capture.title, maximumUTF16Count: 160),
+                document: document, evidenceLinks: (existing?.evidenceLinks ?? []) + [capture.link].compactMap { $0 },
+                clientMutationID: mutationID
             )
             guard isCurrentOwner, !Task.isCancelled else { return }
             UserDefaults.standard.set(card.id, forKey: preferenceKey)
@@ -192,6 +226,45 @@ struct ResearchNotebookHandoffSheet: View {
         } catch {
             guard isCurrentOwner, !Task.isCancelled else { return }
             errorMessage = error.localizedDescription
+        }
+    }
+
+    private struct SourceCapture {
+        let title: String
+        let blocks: [NotebookBlock]
+        let link: NotebookEvidenceLink?
+    }
+
+    private func documentAlreadyContains(_ card: NotebookCard, capture: SourceCapture) -> Bool {
+        if let link = capture.link { return card.evidenceLinks.contains { $0.id == link.id } }
+        guard let first = capture.blocks.first else { return false }
+        return card.document.document.contains { $0.id == first.id }
+    }
+
+    private func captureSource(cardID: String) async throws -> SourceCapture {
+        switch source {
+        case let .answer(handoff):
+            return SourceCapture(title: handoff.question, blocks: pendingDocument.document, link: nil)
+        case let .section(handoff):
+            let reader = library.makeSearchReaderLibrary(sourceVersion: handoff.codeVersion)
+            guard await reader.prepareCodeVersionForEvidence(handoff.codeVersion),
+                  case let .loaded(detail) = await reader.loadSectionDetailResultAsync(sectionID: handoff.sectionID),
+                  let category = reader.codeSections.first(where: { $0.id == detail.codeSectionID }) else {
+                throw NotebookReferenceEvidencePreparer.Failure.unavailable
+            }
+            let edition = NativeReaderEditionLabel.label(for: handoff.codeVersion)
+            let prefix = try NotebookReferenceEvidencePreparer.codePrefix(for: category.name)
+            let title = detail.title.displayTitle(for: detail.sectionNumber)
+            let label = "\(prefix) · \(edition) · § \(detail.sectionNumber) · \(title)"
+            var link = try NotebookReferenceEvidencePreparer.makeLink(label: label, projectID: projectID, cardID: cardID,
+                codeName: category.name, codeVersion: UserContentSyncCodeVersion.server(handoff.codeVersion),
+                codeEdition: edition, sectionID: String(detail.id), sectionNumber: detail.sectionNumber,
+                sectionTitle: title, officialText: detail.officialText, scope: "section", linkID: handoff.id)
+            link.noteTextVersion = 1
+            let body = detail.officialText.components(separatedBy: "\n\n").filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            return SourceCapture(title: title,
+                blocks: [.reference(kind: "selectedPassage", id: link.id, label: label)] + body.map(NotebookBlock.paragraph),
+                link: link)
         }
     }
 }
@@ -525,7 +598,7 @@ private struct ProjectNotebookSessionView: View {
                 .disabled(selectedNoteIDs.isEmpty)
             Button("Cancel", role: .cancel) { }
         } message: {
-            Text("You can restore \(selectedNoteIDs.count == 1 ? "this note" : "these notes") from Trash for 30 days.")
+            Text("You can restore \(selectedNoteIDs.count == 1 ? "this note" : "these notes") in Settings under Trash / Undo deletion for 30 days.")
         }
         .alert("Could not move all selected notes", isPresented: Binding(get: { moveError != nil }, set: { if !$0 { moveError = nil } })) {
             Button("OK", role: .cancel) { moveError = nil }
@@ -1230,7 +1303,7 @@ private struct NotebookCardEditorView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text(canMoveNoteToTrash ? "You can restore this note from Trash for 30 days." : "This cannot be undone.")
+            Text(canMoveNoteToTrash ? "You can restore this note in Settings under Trash / Undo deletion for 30 days." : "This cannot be undone.")
         }
         .onDisappear {
             isEditorVisible = false
@@ -1269,6 +1342,12 @@ private struct NotebookCardEditorView: View {
                     formatButton("Default", command: .fontSize, value: "default")
                     ForEach([8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48], id: \.self) { size in
                         formatButton("\(size) pt", command: .fontSize, value: String(size))
+                    }
+                }
+                Menu("Text color") {
+                    formatButton("Default", command: .textColor, value: "default")
+                    ForEach(["Gray", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Pink"], id: \.self) { color in
+                        formatButton(color, command: .textColor, value: color.lowercased())
                     }
                 }
                 Menu("Line spacing") {
@@ -1887,7 +1966,6 @@ private struct NotebookCardEditorView: View {
         if requiresConflictReview || errorMessage != nil && !retryAfterReconnect { return "Needs attention" }
         if isSaving && !retryAfterReconnect { return "Syncing" }
         if hasLocalDraft { return "Saved on this device · Waiting to sync" }
-        if lastSyncedContent != nil && currentCardID != nil { return "Synced" }
         return nil
     }
 
@@ -2297,15 +2375,16 @@ private enum NotebookReferenceEvidencePreparer {
 
     static func makeLink(label: String, projectID: String, cardID: String, codeName: String,
                          codeVersion: String, codeEdition: String, sectionID: String, sectionNumber: String,
-                         sectionTitle: String, officialText: String) throws -> NotebookEvidenceLink {
+                         sectionTitle: String, officialText: String, scope: String? = nil,
+                         linkID: String = UUID().uuidString.lowercased()) throws -> NotebookEvidenceLink {
         guard !codeVersion.isEmpty, !sectionID.isEmpty, !sectionNumber.isEmpty,
               !officialText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { throw Failure.unavailable }
         guard officialText.utf16.count <= 50_000 else { throw Failure.passageTooLarge }
         let source = NotebookEvidenceSource(jurisdiction: "New York City", codePrefix: try codePrefix(for: codeName),
             codeEdition: codeEdition, codeVersion: codeVersion, sourceID: sectionID, sectionID: sectionID,
             sectionNumber: sectionNumber, sectionTitle: sectionTitle.isEmpty ? "Section" : sectionTitle,
-            sourceLibraryVersion: codeVersion)
-        return NotebookEvidenceLink(id: UUID().uuidString.lowercased(), label: label, relationshipRole: "context",
+            sourceLibraryVersion: codeVersion, scope: scope)
+        return NotebookEvidenceLink(id: linkID, label: label, relationshipRole: "context",
             projectID: projectID, notebookCardID: cardID, source: source,
             passages: [NotebookEvidencePassage(exact: officialText, prefix: "", suffix: "", start: nil, end: nil)],
             createdAt: ISO8601DateFormatter().string(from: Date()),

@@ -168,7 +168,7 @@ const allState={readers:[{id:'a',codePrefix:'BC',codeVersion:defaultSyncCodeVers
 const appContext=vm.createContext({readerShortcutLabel,currentColumnWorkflowView:()=>allContext.endsWith(':notebook')?'notebook':'research',state:allState,track:allTrack,isProAccount:()=>true,workflowPaneIsVisible:()=>true,
   paneIDForReader:r=>`reader:${r.id}`,syncCodeVersion,syncCodeVersionForPrefix,defaultSyncCodeVersion,historicalConstructionSyncCodeVersion,
   readerTabs:()=>[{}],readerPositionLabel:r=>`Reader ${allState.readers.indexOf(r)+1}`,columnPaneLabel:()=> 'Evidence',
-  activePaneIDs:()=>allState.paneOrder,capturePaneResizeWidths(){},captureWorkspaceColumnMotion:()=>null,animateWorkspaceColumnMotion(){},paneGroupForMove:id=>[id],pinCriticalWorkflowPanesToLeft:ids=>ids,
+  activePaneIDs:()=>allState.paneOrder,activePinnedPaneID:()=>allState.pinnedPaneID || '',capturePaneResizeWidths(){},captureWorkspaceColumnMotion:()=>null,animateWorkspaceColumnMotion(){},paneGroupForMove:id=>[id],pinCriticalWorkflowPanesToLeft:ids=>ids,
   get dragPreviewOrder(){return previewOrder;},
   applyDragPreviewOrder(order){previewOrder=Array.from(order);allPanels.forEach(panel=>{panel.style.order=String(previewOrder.indexOf(panel.dataset.paneId));});},
   clearDragPreviewOrder(){previewOrder=[];allPanels.forEach(panel=>{panel.style.order='';});},

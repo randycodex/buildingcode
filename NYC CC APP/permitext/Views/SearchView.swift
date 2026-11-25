@@ -530,7 +530,9 @@ struct SearchView: View {
                 }
 
                 if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    searchResultSummary
+                    if !isSearchRequestPending && (!library.isSearchInProgress || !cachedFilteredResults.isEmpty) {
+                        searchResultSummary
+                    }
                     if !library.allEditionSearchWarnings.isEmpty {
                         Text("Some editions could not be searched. Results from available editions are shown.")
                             .font(.footnote).foregroundStyle(.secondary)
@@ -586,13 +588,6 @@ struct SearchView: View {
                                 .frame(height: 16)
                                 .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 22, bottomTrailingRadius: 22, style: .continuous))
                                 .padding(.bottom, 12)
-                        }
-                        if library.isSearchInProgress {
-                            HStack(spacing: 8) {
-                                ProgressView().controlSize(.small)
-                                Text("Searching more editions…").font(.caption).foregroundStyle(.secondary)
-                            }
-                            .padding(.vertical, 12)
                         }
                     }
                     .scrollTargetLayout()
@@ -817,7 +812,8 @@ struct SearchView: View {
         cachedFilteredResults = filtered
         cachedGroupedResults = Self.makeGroupedResults(
             filtered,
-            codeSections: library.allEditionSearchSections
+            codeSections: library.allEditionSearchSections,
+            query: query
         )
         resolveAutomaticSearchExpansion()
     }
@@ -837,7 +833,8 @@ struct SearchView: View {
 
     private static func makeGroupedResults(
         _ results: [CodeSearchResult],
-        codeSections: [CodeSectionCategory]
+        codeSections: [CodeSectionCategory],
+        query: String
     ) -> [SearchResultGroup] {
         let grouped = Dictionary(grouping: results) { $0.searchFilterID }
         let groups: [SearchResultGroup] = grouped.map { id, results in
@@ -850,13 +847,29 @@ struct SearchView: View {
                 results: results
             )
         }
-        // Normalize historical prefixes before sorting so 1968 stays with
-        // Building Code, after the newer editions rather than ahead of them.
+        let needle = NativeSearchCitation(query).query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let terms = needle.split(whereSeparator: \.isWhitespace).map(String.init)
+        func rank(_ group: SearchResultGroup) -> Int {
+            guard let result = group.results.first, !needle.isEmpty else { return 3 }
+            if result.fireSubsection?.number == needle ||
+                result.sectionNumber.compare(needle, options: .caseInsensitive) == .orderedSame { return 0 }
+            if result.title.localizedCaseInsensitiveContains(needle) { return 1 }
+            if terms.allSatisfy({ result.title.localizedCaseInsensitiveContains($0) }) { return 2 }
+            return 3
+        }
+        let ranks = Dictionary(uniqueKeysWithValues: groups.map { ($0.id, rank($0)) })
+        let familyRanks = Dictionary(grouping: groups, by: \.familyName).mapValues { editions in
+            editions.compactMap { ranks[$0.id] }.min() ?? 3
+        }
         return groups.sorted { lhs, rhs in
+            let leftFamilyRank = familyRanks[lhs.familyName] ?? 3
+            let rightFamilyRank = familyRanks[rhs.familyName] ?? 3
+            if leftFamilyRank != rightFamilyRank { return leftFamilyRank < rightFamilyRank }
             if lhs.familyRank != rhs.familyRank { return lhs.familyRank < rhs.familyRank }
             if lhs.familyName != rhs.familyName {
                 return lhs.familyName.localizedCaseInsensitiveCompare(rhs.familyName) == .orderedAscending
             }
+            if ranks[lhs.id] != ranks[rhs.id] { return (ranks[lhs.id] ?? 3) < (ranks[rhs.id] ?? 3) }
             if lhs.editionYear != rhs.editionYear { return lhs.editionYear > rhs.editionYear }
             return lhs.id < rhs.id
         }
@@ -894,16 +907,18 @@ struct SearchView: View {
                 .font(.title2)
                 .foregroundStyle(.secondary)
 
-            Text(allInstalledSourcesDisabled == true ? "No code sources enabled" : "No results for “\(query.trimmingCharacters(in: .whitespacesAndNewlines))”")
+            Text(allInstalledSourcesDisabled == true ? "No code sources enabled" : "No matches for all words")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.primary)
                 .multilineTextAlignment(.center)
 
-            Text(noResultsGuidance)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
+            if let noResultsGuidance {
+                Text(noResultsGuidance)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
 
             if !activeSearchFilterCodeSectionIDs.isEmpty {
                 Button(hasDisabledCodeSources ? "Search Enabled Codes" : "Search All Codes") {
@@ -924,7 +939,7 @@ struct SearchView: View {
             ProgressView()
                 .tint(accentColor)
 
-            Text(library.isInitialContentLoaded ? "Searching codes…" : "Loading codes…")
+            Text(library.isInitialContentLoaded ? "Searching" : "Loading codes")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
         }
@@ -973,15 +988,14 @@ struct SearchView: View {
         return "\(names.count) code books"
     }
 
-    private var noResultsGuidance: String {
+    private var noResultsGuidance: String? {
         if allInstalledSourcesDisabled == true {
             return "Enable a code source in Settings to search it. Your saved passages and search history are preserved."
         }
         if !library.allEditionSearchWarnings.isEmpty {
             return "Nothing matched in the editions that could be searched. Some editions were unavailable."
         }
-        let base = "Nothing matched in \(activeSearchScopeName). Try a shorter phrase or a section number"
-        return activeSearchFilterCodeSectionIDs.isEmpty ? "\(base). Search matches an exact phrase." : "\(base), or clear the code filters."
+        return nil
     }
 
     private func handleSearchTabRetap() {

@@ -65,3 +65,18 @@ for (const editionCount of [1, 2, 22]) {
   assert.ok(result.groups.every(group=>group.hasMore && group.nextCandidateOffset === limit));
 }
 console.log('Edition previews retain deterministic order and cursors with at most sixteen concurrent body reads.');
+
+const verifiedRanking = vm.createContext({
+  exactSearchConcurrency: 8, initialSearchGroupLimit, codeSearchSectionVersion: () => '2022',
+  searchableSectionPlainText: async section => section.id === 1 ? 'other' : 'water',
+  matchesSearchWords: values => values.at(-1) === 'water',
+  codeSearchResults: async matches => matches.map(hit => hit.section.id)
+});
+vm.runInContext(actual('exactSearchPage') + actual('groupedCodeSearchPage'), verifiedRanking);
+const verified = await verifiedRanking.groupedCodeSearchPage([
+  {section:{id:1,codePrefix:'BC'},rank:1},
+  {section:{id:2,codePrefix:'ZR'},rank:2},
+  {section:{id:3,codePrefix:'BC'},rank:4}
+], 'water', 25, 'words');
+assert.deepEqual(Array.from(verified.results), [2, 3], 'A candidate that failed verification cannot promote a source group');
+assert.deepEqual(Array.from(verified.groups, group => group.codePrefix), ['ZR', 'BC']);

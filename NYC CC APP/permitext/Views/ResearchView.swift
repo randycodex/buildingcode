@@ -717,7 +717,7 @@ private struct ResearchSessionView: View {
                 }
             }
             .sheet(item: $pendingNotebookHandoff) { handoff in
-                ResearchNotebookHandoffSheet(handoff: handoff, owner: owner)
+                NotebookSourceHandoffSheet(handoff: handoff, owner: owner)
                     .environmentObject(library)
             }
             .sheet(isPresented: $showingProjectCreator) {

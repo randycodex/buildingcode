@@ -50,8 +50,8 @@ const searchGroupCountText = new Function(
   `${functionSource(appSource, "searchGroupCountText")}; return searchGroupCountText;`
 )();
 
-assert.equal(searchProgressLabel(null, { status: "searching" }), "Searching…");
-assert.equal(searchProgressLabel(0, { status: "searching" }), "Searching…");
+assert.equal(searchProgressLabel(null, { status: "searching" }), "Searching");
+assert.equal(searchProgressLabel(0, { status: "searching" }), "Searching");
 assert.equal(searchProgressLabel(null, { status: "typing" }), "Keep typing");
 assert.equal(searchProgressLabel(null, { status: "unavailable" }), "Search unavailable");
 assert.equal(searchProgressLabel(25, { hasMore: true }), "25 loaded · more available");

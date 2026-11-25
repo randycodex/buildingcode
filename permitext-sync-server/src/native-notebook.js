@@ -1,6 +1,6 @@
 import { applyNotebookTableAction, mountPermitextNotebookEditor, notebookTableActions } from "./notebook-editor.js";
 import { nativeNotebookDocumentSnapshot } from "./native-notebook-state.js";
-import { notebookFontSizes, notebookLineSpacings } from "../public/notebook-styles.js";
+import { notebookFontSizes, notebookLineSpacings, notebookTextColor } from "../public/notebook-styles.js";
 import { appendFindingTemplate } from "../public/project-workflow.js";
 import "./native-notebook.css";
 
@@ -237,6 +237,11 @@ async function configure(command) {
   applyTypography(command.bodyFontSize);
   applyLayout(command.availableWidth);
   readOnly = command.readOnly;
+  for (const [prefix, { light, dark }] of Object.entries(command.referenceColors || {})) {
+    if (/^[a-z0-9]+$/.test(prefix) && /^#[a-f\d]{6}$/i.test(light) && /^#[a-f\d]{6}$/i.test(dark)) {
+      mount.style.setProperty(`--notebook-reference-${prefix}`, `light-dark(${light}, ${dark})`);
+    }
+  }
   document.documentElement.dataset.readOnly = String(readOnly);
   ready = new Promise((resolve) => {
     controller = mountPermitextNotebookEditor(mount, {
@@ -360,6 +365,7 @@ window.PermitextNativeNotebook = {
       case "blur": return finalizeEditing();
       case "format":
       case "fontSize":
+      case "textColor":
       case "lineSpacing":
       case "table":
       case "findingTemplate":
@@ -391,6 +397,12 @@ window.PermitextNativeNotebook = {
           else {
             if (!notebookFontSizes.includes(command.value)) throw new Error("Unsupported font size.");
             editor.addStyles({fontSize: command.value});
+          }
+        } else if (command.type === "textColor") {
+          if (command.value === "default") editor.removeStyles({textColor: ""});
+          else {
+            if (!notebookTextColor(command.value)) throw new Error("Unsupported text color.");
+            editor.addStyles({textColor: command.value});
           }
         } else if (command.type === "lineSpacing") {
           if (!notebookLineSpacings.includes(command.value)) throw new Error("Unsupported line spacing.");

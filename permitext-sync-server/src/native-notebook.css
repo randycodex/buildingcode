@@ -6,7 +6,8 @@ body { -webkit-text-size-adjust: 100%; }
 .permitext-notebook-editor .bn-editor { background: transparent; padding-inline: 0; min-height: 220px; font-size: var(--native-note-body-size, 17px); line-height: 1.55; }
 .permitext-notebook-editor .bn-block-content { padding-inline: 0; }
 .permitext-notebook-editor .bn-side-menu, .permitext-notebook-editor [data-test="dragHandle"] { display: none !important; }
-.permitext-notebook-editor .notebook-reference-chip { max-width: 100%; border: 0; border-radius: 4px; color: LinkText; background: transparent; text-align: left; padding: 0 2px; font: inherit; }
+.permitext-notebook-editor .notebook-reference-chip { max-width: 100%; border: 0; border-radius: 4px; color: var(--notebook-reference-color, LinkText); background: transparent; text-align: left; padding: 0 2px; font: inherit; }
+.permitext-notebook-editor .notebook-passage-source { display: block; max-width: 100%; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: inherit; }
 .notebook-reference-meta, .notebook-reference-preview { display: none; }
 .notebook-reference-title { font-weight: 500; }
 .permitext-notebook-editor img { max-width: 100%; }

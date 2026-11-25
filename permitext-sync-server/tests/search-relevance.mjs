@@ -45,5 +45,13 @@ try {
   const empty = await (await fetch(`http://127.0.0.1:${server.address().port}/code/search?${disabled}`)).json();
   assert.equal(empty.results.length,0);
   assert.equal((empty.suggestions || []).length,0,'Disabled sources must not contribute spelling terms.');
+  for (const q of ['distance windows lot lines', 'distance between legally required windows and lot lines']) {
+    const params = new URLSearchParams({q, version:'all', match:'words', grouped:'true', limit:'25'});
+    const response = await fetch(`http://127.0.0.1:${server.address().port}/code/search?${params}`);
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.equal(payload.groups[0].codePrefix, 'ZR');
+    assert.equal(payload.results[0].sectionNumber, '23-372');
+  }
   console.log(JSON.stringify(rows,null,2));
 } finally {server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}

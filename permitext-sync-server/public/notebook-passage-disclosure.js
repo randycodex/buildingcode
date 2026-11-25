@@ -33,7 +33,7 @@ export function notebookPassageGroups(document, evidenceLinks = [], previous = n
   return groups;
 }
 
-export function createNotebookPassageDisclosure(element, { getDocument, getEvidenceLinks }) {
+export function createNotebookPassageDisclosure(element, { getDocument, getEvidenceLinks, getReferenceTheme }) {
   const document = element.ownerDocument;
   const scope = `notebook-passages-${++nextScope}`;
   const style = document.createElement("style");
@@ -51,14 +51,30 @@ export function createNotebookPassageDisclosure(element, { getDocument, getEvide
       const reference = button.closest("[data-permitext-reference]");
       const id = reference.dataset.referenceId;
       const expanded = !collapsed.has(id);
-      button.disabled = !groups.has(id);
+      button.hidden = !groups.has(id);
       button.setAttribute("aria-expanded", String(expanded));
       button.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} passage: ${reference.dataset.referenceLabel}`);
     });
   };
   const refresh = () => {
     if (disposed) return;
-    groups = notebookPassageGroups(getDocument(), getEvidenceLinks(), groups);
+    const evidenceLinks = getEvidenceLinks();
+    groups = notebookPassageGroups(getDocument(), evidenceLinks, groups);
+    if (getReferenceTheme) {
+      const links = new Map(evidenceLinks.map(link => [link.id, link]));
+      element.querySelectorAll("[data-permitext-reference]").forEach(reference => {
+        const theme = getReferenceTheme(reference, links.get(reference.dataset.referenceId));
+        const previous = reference.dataset.referenceCodeTheme;
+        if (theme === previous) return;
+        if (previous) reference.classList.remove(`code-theme-${previous}`);
+        if (theme) {
+          reference.classList.add(`code-theme-${theme}`);
+          reference.dataset.referenceCodeTheme = theme;
+        } else {
+          delete reference.dataset.referenceCodeTheme;
+        }
+      });
+    }
     paint();
   };
   const observer = new document.defaultView.MutationObserver(() => {

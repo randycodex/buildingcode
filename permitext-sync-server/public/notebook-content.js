@@ -61,7 +61,7 @@ export function tableDisplayCells(rows, spans = []) {
 
 // The editable presentation copy stays separate from the exact evidence locator.
 export function notebookBlocksFromSourceElement(root) {
-  const inline = (node, styles = {}) => {
+  const inline = (node, styles = {}, children = node.childNodes) => {
     if (node.nodeType === 3) return [{type:'text', text:node.textContent.replace(/[\t\r\n ]+/g, ' '), styles}];
     if (node.nodeType !== 1 || ['SCRIPT','STYLE'].includes(node.tagName) || node.matches('[data-research-selection-exclude], .inline-bookmark-toggle, .inline-note-toggle')) return [];
     if (node.tagName === 'BR') return [{type:'text', text:'\n', styles}];
@@ -69,12 +69,12 @@ export function notebookBlocksFromSourceElement(root) {
       ...(node.tagName === 'U' ? {underline:true} : {}), ...(['S','STRIKE','DEL'].includes(node.tagName) ? {strike:true} : {}),
       ...(node.tagName === 'MARK' ? {backgroundColor:'yellow'} : {}),
       ...(node.tagName === 'SUP' || node.style?.verticalAlign === 'super' ? {superscript:true} : {})};
-    const content = [...node.childNodes].flatMap((child,index) => {
+    const content = [...children].flatMap((child,index) => {
       const runs=inline(child,next);
       // Table cells accept inline content, so retain source paragraph
       // boundaries explicitly when copying a published table into a Note.
       if (node.closest?.('td,th') && /^(P|DIV|H[1-6]|PRE|BLOCKQUOTE)$/.test(child.nodeName) &&
-          [...node.childNodes].slice(index+1).some(sibling=>sibling.nodeType!==3 || sibling.textContent.trim())) {
+          [...children].slice(index+1).some(sibling=>sibling.nodeType!==3 || sibling.textContent.trim())) {
         runs.push({type:'text',text:'\n',styles:next});
       }
       return runs;
@@ -91,34 +91,62 @@ export function notebookBlocksFromSourceElement(root) {
     return content;
   };
   const blocks = [];
-  const visit = node => {
+  const visit = (node, target = blocks) => {
+    if (node.nodeType === 1 && ['OL', 'UL'].includes(node.tagName)) {
+      const numbered = node.tagName === 'OL';
+      [...node.children].filter(item => item.tagName === 'LI').forEach((item, index) => {
+        const block = {type: numbered ? 'numberedListItem' : 'bulletListItem', content: [], children: []};
+        const start = Number(item.getAttribute('value') ?? (index === 0 ? node.getAttribute('start') : null));
+        if (numbered && Number.isInteger(start) && start > 0 && start <= 100_000) block.props = {start};
+        let pending = [];
+        let nested = false;
+        const flush = () => {
+          const content = inline(item, {}, pending);
+          if (!nested) block.content = content;
+          else if (notebookInlineText(content).trim()) block.children.push({type: 'paragraph', content});
+          pending = [];
+        };
+        for (const child of item.childNodes) {
+          if (child.nodeType === 1 && ['OL', 'UL', 'TABLE', 'IMG'].includes(child.tagName)) {
+            flush();
+            visit(child, block.children);
+            nested = true;
+          } else {
+            pending.push(child);
+          }
+        }
+        flush();
+        target.push(block);
+      });
+      return;
+    }
     if (node.nodeType === 1 && node.tagName === 'IMG') {
       const url = node.getAttribute('src') || '';
       const imageURL = url ? new URL(url,root.ownerDocument?.baseURI || 'https://per.codes') : null;
       if (imageURL?.pathname.startsWith('/code/assets/')) {
         imageURL.protocol = 'https:'; imageURL.hostname = 'per.codes'; imageURL.port = '';
       }
-      if (imageURL) blocks.push({type:'image',props:{url:imageURL.href,
+      if (imageURL) target.push({type:'image',props:{url:imageURL.href,
         name:node.alt || 'Code figure',caption:'',showPreview:true}});
       return;
     }
     if (node.nodeType === 1 && node.tagName === 'TABLE') {
-      if (node.caption?.textContent.trim()) blocks.push({type:'paragraph',content:inline(node.caption)});
+      if (node.caption?.textContent.trim()) target.push({type:'paragraph',content:inline(node.caption)});
       const rows = [...node.rows].map(row => ({cells:[...row.cells].map(cell => ({type:'tableCell',
         props:{colspan:cell.colSpan || 1,rowspan:cell.rowSpan || 1},content:inline(cell)}))}));
       const firstBody = [...node.rows].findIndex(row => ![...row.cells].every(cell => cell.tagName === 'TH'));
       const mergedHeaderRows = Math.max(1, ...[...(node.rows[0]?.cells || [])].map(cell => cell.rowSpan || 1));
-      if (rows.length) blocks.push({type:'table',content:{type:'tableContent',rows,
+      if (rows.length) target.push({type:'table',content:{type:'tableContent',rows,
         headerRows:node.tHead?.rows.length || (firstBody < 0 ? rows.length : firstBody) || Math.min(mergedHeaderRows, rows.length)}});
       return;
     }
     if (node.nodeType === 1 && (node.querySelector('table, img') || !['P','LI','H1','H2','H3','H4','H5','H6'].includes(node.tagName) && [...node.children].some(child => /^(P|DIV|UL|OL|TABLE|H[1-6])$/.test(child.tagName)))) {
-      [...node.childNodes].forEach(visit); return;
+      [...node.childNodes].forEach(child => visit(child, target)); return;
     }
     const content = inline(node);
-    if (notebookInlineText(content).trim()) blocks.push({type: /^H[1-6]$/.test(node.tagName || '') ? 'heading' : node.tagName === 'LI' ? 'bulletListItem' : 'paragraph',
+    if (notebookInlineText(content).trim()) target.push({type: /^H[1-6]$/.test(node.tagName || '') ? 'heading' : node.tagName === 'LI' ? 'bulletListItem' : 'paragraph',
       ...(/^H[1-6]$/.test(node.tagName || '') ? {props:{level:Number(node.tagName[1])}} : {}), content});
   };
-  [...root.childNodes].forEach(visit);
+  [...root.childNodes].forEach(node => visit(node));
   return blocks;
 }

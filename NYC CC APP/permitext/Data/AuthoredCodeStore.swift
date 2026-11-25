@@ -1417,7 +1417,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         codeSectionID: Int64? = nil,
         includeSnippets: Bool = true,
         resultLimit: Int? = 200,
-        allowedCodeSectionIDs: Set<Int64>? = nil
+        allowedCodeSectionIDs: Set<Int64>? = nil,
+        matchAllWords: Bool = false
     ) -> [CodeSearchResult] {
         let signpostID = OSSignpostID(log: AppSignpost.search)
         os_signpost(.begin, log: AppSignpost.search, name: "search", signpostID: signpostID)
@@ -1434,8 +1435,29 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let startsWithWord = trimmed.prefix(1).range(of: word, options: .regularExpression) != nil
         let endsWithWord = trimmed.suffix(1).range(of: word, options: .regularExpression) != nil
         let exactPhrase = try? NSRegularExpression(pattern: (startsWithWord ? "(?<!\(word))" : "") + phrase + (endsWithWord ? "(?!\(word))" : ""), options: [.caseInsensitive])
-        let queryTokens = Self.tokenize(trimmed)
+        let phraseTokens = Self.tokenize(trimmed)
+        guard !phraseTokens.isEmpty else { return [] }
+        let useWordMatch = matchAllWords && citation.codePrefix == nil && phraseTokens.count > 1
+        let queryTokens = useWordMatch
+            ? phraseTokens.map { $0.trimmingCharacters(in: .punctuationCharacters) }.filter { !$0.isEmpty }
+            : phraseTokens
         guard !queryTokens.isEmpty else { return [] }
+        let wordForms = queryTokens.map { token -> [String] in
+            guard useWordMatch, token.count >= 3, token.allSatisfy(\.isLetter),
+                  !["ss", "us", "is"].contains(where: token.hasSuffix) else { return [token] }
+            if token.hasSuffix("s") { return token.count >= 4 ? [token, String(token.dropLast())] : [token] }
+            return [token, token + "s"]
+        }
+        let wordPatterns = wordForms.compactMap { forms -> NSRegularExpression? in
+            guard useWordMatch else { return nil }
+            let alternatives = forms.map { NSRegularExpression.escapedPattern(for: $0) }.joined(separator: "|")
+            return try? NSRegularExpression(pattern: "(?<!\(word))(?:\(alternatives))(?!\(word))", options: [.caseInsensitive])
+        }
+        func hasAllWords(_ text: String) -> Bool {
+            let range = NSRange(text.startIndex..., in: text)
+            return wordPatterns.count == queryTokens.count &&
+                wordPatterns.allSatisfy { $0.firstMatch(in: text, range: range) != nil }
+        }
 
         guard !Task.isCancelled else { return [] }
         os_signpost(.begin, log: AppSignpost.search, name: "searchCandidateLookup", signpostID: signpostID)
@@ -1444,9 +1466,17 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             os_signpost(.end, log: AppSignpost.search, name: "searchCandidateLookup", signpostID: signpostID)
             return []
         }
-        var candidateIDs = Set(index[queryTokens[0]] ?? [])
-        for token in queryTokens.dropFirst() {
-            candidateIDs.formIntersection(index[token] ?? [])
+        func postings(for forms: [String]) -> Set<Int64> {
+            var matches = Set(forms.flatMap { index[$0] ?? [] })
+            if useWordMatch {
+                // The installed index can retain sentence punctuation on a token.
+                for form in forms { matches.formUnion(index[form + "."] ?? []) }
+            }
+            return matches
+        }
+        var candidateIDs = postings(for: wordForms[0])
+        for forms in wordForms.dropFirst() {
+            candidateIDs.formIntersection(postings(for: forms))
             if candidateIDs.isEmpty { break }
         }
 
@@ -1480,7 +1510,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 }
                 let official = searchOfficialText(for: indexed)
                 let text = [indexed.section.sectionNumber, indexed.section.title, official].joined(separator: " ")
-                guard exactPhrase?.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil else { return nil }
+                guard useWordMatch ? hasAllWords(text) :
+                    exactPhrase?.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil else { return nil }
 
                 let sectionNumber = indexed.section.sectionNumber.lowercased()
                 let title = indexed.section.title.lowercased()
@@ -1492,8 +1523,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                     rank = 1
                 } else if title.contains(lowercasedQuery) {
                     rank = 2
-                } else {
+                } else if useWordMatch && hasAllWords(title) {
                     rank = 3
+                } else {
+                    rank = 4
                 }
                 return SearchHit(
                     rank: rank,

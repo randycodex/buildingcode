@@ -41,6 +41,7 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
   };
   let frameID = 0, saves = 0, layouts = 0, workflow = 'research';
   const handle = {
+    classList: { contains: () => false },
     setPointerCapture() {}, hasPointerCapture: () => true, releasePointerCapture() {}, setAttribute() {},
     getBoundingClientRect: () => ({ left: 800, right: 801 })
   };
@@ -63,7 +64,7 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
     syncReferenceReaderLayout() {}, scheduleVisibleReaderScrollIndicatorUpdates() {}, updateAdjacentDividerValue() {},
     notifyWorkspaceLayoutChange() { layouts++; context.syncResearchColumnLayout(); }, saveWorkspaceState() { saves++; }
   });
-  vm.runInContext(['minimumPaneWidthForID', 'maximumPaneWidthForID', 'constrainPaneWidth', 'migrateLegacyPaneWidth',
+  vm.runInContext(['sourceResultReaderOwner', 'researchColumnLayoutMembership', 'minimumPaneWidthForID', 'maximumPaneWidthForID', 'constrainPaneWidth', 'migrateLegacyPaneWidth',
     'applyPaneWeight', 'syncNotebookColumnLayout', 'syncResearchColumnLayout', 'capturePaneResizeWidths','notebookReferenceResize', 'singleExpandedDividerEdge', 'startPaneResize', 'startPaneEdgeResize'].map(actual).join('\n'), context);
   context.syncResearchColumnLayout();
   return {

@@ -57,7 +57,7 @@ final class NotebookDocumentEditorController: ObservableObject {
     }
 
     enum FormatCommand: String {
-        case fontSize, lineSpacing, table
+        case fontSize, textColor, lineSpacing, table
     }
 
     func applyFormat(_ command: FormatCommand, value: String) async throws {
@@ -442,6 +442,9 @@ struct NotebookDocumentEditor: UIViewRepresentable {
                     let response = try await command(type: "configure", payload: [
                         "document": try NotebookDocumentEditorController.json(initial), "readOnly": parent.isReadOnly,
                         "bodyFontSize": parent.bodyFontSize, "availableWidth": availableWidth,
+                        "referenceColors": CodeSectionThemeProfile.notebookReferenceProfiles.mapValues {
+                            ["light": $0.lightAccentHex, "dark": $0.darkAccentHex]
+                        },
                         "diagnostics": ProcessInfo.processInfo.arguments.contains("--native-notebook-layout-diagnostics"),
                         "inputDiagnostics": inputTracingEnabled, "syntheticFixture": inputTracingEnabled
                     ])

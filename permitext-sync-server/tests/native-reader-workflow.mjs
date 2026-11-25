@@ -160,7 +160,8 @@ ${handoff}
   let long=NativeSearchResultPresentation(sectionNumber:"1",title:"1 Scope",isParagraph:false,codeName:"2022 Code",edition:"2022",chapterNumber:"",parentLabels:[],snippet:"1 Scope " + String(repeating:"Façade 🚪 concrete ",count:50))
   precondition(long.source == "2022 Code" && long.excerpt.count <= 240 && !long.excerpt.hasPrefix("1 Scope"))
   precondition(NativeSearchGroupExpansion.automaticGroup(groupIDs:["2022"],isSearching:false,isPending:false) == "2022")
-  for ids in [[],["2014","2022"]] { precondition(NativeSearchGroupExpansion.automaticGroup(groupIDs:ids,isSearching:false,isPending:false) == nil) }
+  precondition(NativeSearchGroupExpansion.automaticGroup(groupIDs:[],isSearching:false,isPending:false) == nil)
+  precondition(NativeSearchGroupExpansion.automaticGroup(groupIDs:["ZR","BC"],isSearching:false,isPending:false) == "ZR")
   precondition(NativeSearchGroupExpansion.automaticGroup(groupIDs:["2022"],isSearching:true,isPending:false) == nil)
   precondition(NativeSearchGroupExpansion.automaticGroup(groupIDs:["2022"],isSearching:false,isPending:true) == nil)
   let labels = ReaderLabels()

@@ -22,10 +22,11 @@ const context = vm.createContext({state, track, adjacentColumnWidths, workspaceC
   applyPaneWeight:(pane,id)=>{pane.width=state.paneWeights[id];},
   notifyWorkspaceLayoutChange:()=>layouts++, saveWorkspaceState:()=>saves++,
   scheduleVisibleReaderScrollIndicatorUpdates:()=>indicators++,
-  document:{createElement(){return {dataset:{}, attrs:{}, handlers:{}, children:[], classList:{add(){},toggle(){}}, append(child){this.children.push(child);},
+  document:{createElement(){const classes=new Set(); return {dataset:{}, attrs:{}, handlers:{}, children:[],
+    classList:{add(...names){names.forEach(name=>classes.add(name));},toggle(){},contains:name=>classes.has(name)}, append(child){this.children.push(child);},
     setAttribute(k,v){this.attrs[k]=v;}, removeAttribute(k){delete this.attrs[k];}, addEventListener(k,v){this.handlers[k]=v;}};}}
 });
-vm.runInContext(['minimumPaneWidthForID','maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','notebookReferenceResize','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
+vm.runInContext(['sourceResultReaderOwner','minimumPaneWidthForID','maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','notebookReferenceResize','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
 
 const divider=context.createDivider('left','right');
 function press(handle,key,shiftKey=false){let prevented=false;handle.handlers.keydown({key,shiftKey,preventDefault(){prevented=true;}});return prevented;}
@@ -68,6 +69,13 @@ restoreWidths=()=>{panes.get('left').width=680;panes.get('right').width=640;rest
 context.resizeAdjacentPanesBy('left','right',24,divider);
 assert.deepEqual([panes.get('left').width,panes.get('right').width],[704,640]);
 console.log('Single-column keyboard resizing passed: all pane types, no neighbor changes, minimums, stored widths, collapsed columns and restored expansion.');
+
+const resultDivider=context.createDivider('left','right');
+resultDivider.classList.add('source-result-divider');
+panes.get('left').width=800;
+panes.get('right').width=800;
+press(resultDivider,'ArrowRight',true);
+assert.deepEqual([panes.get('left').width,panes.get('right').width],[880,720],'The inner divider transfers width between list and Reader.');
 
 workflow='notebook';panes.clear();state.paneWeights={};
 for(const [id,width] of [['reader:one',810],['utility:saved:one',450],['project:notes-index:one',300],['project:notebook:one',1500]])

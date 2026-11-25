@@ -1609,6 +1609,37 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testTopicalSearchShowsZoningFirstAndReturnsFromReader() throws {
+#if !DEBUG
+        throw XCTSkip("Requires the isolated Debug account fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons["Search"].tap()
+        let field = app.textFields["Search codes"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        let clear = app.buttons["Clear search"]
+        if clear.exists { clear.tap() }
+        let query = "distance windows lot lines"
+        field.tap()
+        field.typeText(query + "\n")
+
+        let topBook = app.staticTexts.matching(NSPredicate(format: "identifier BEGINSWITH %@", "search-family-")).firstMatch
+        let topResult = app.buttons.matching(NSPredicate(format:
+            "identifier BEGINSWITH %@ AND label CONTAINS %@", "search-result-", "23-372")).firstMatch
+        XCTAssertTrue(topResult.waitForExistence(timeout: 45), app.debugDescription)
+        XCTAssertTrue(topBook.label.localizedCaseInsensitiveContains("Zoning Resolution"))
+        topResult.tap()
+        let close = app.buttons["Close passage"]
+        XCTAssertTrue(close.waitForExistence(timeout: 20))
+        close.tap()
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        XCTAssertEqual(field.value as? String, query)
+#endif
+    }
+
     func testExact2022SearchResultOpensPassageAndReturnsToQuery() throws {
 #if !DEBUG
         throw XCTSkip("Requires the isolated Debug account fixture.")

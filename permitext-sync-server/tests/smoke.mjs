@@ -1473,7 +1473,7 @@ async function main() {
         workspaceScript.text.includes('sourceSurface: "search"') &&
         workspaceScript.text.includes("function updateSearchDock") &&
         workspaceScript.text.includes("summary.hidden = !query;") &&
-        workspaceScript.text.includes('return "Searching…";') &&
+        workspaceScript.text.includes('return "Searching";') &&
         workspaceScript.text.includes("loaded · more available") &&
         workspaceScript.text.includes('return `${loadedLabel} ${matchLabel}`;'),
       "Search results restored a retired Reader action or omitted their row-level detail action and count."
@@ -1821,8 +1821,8 @@ async function main() {
       "Closing a Search section-detail column should also close only its linked Reader."
     );
     assert(
-      workspaceScript.text.includes("async function openSavedItemInReader(item, savedPaneID)") &&
-        workspaceScript.text.includes("void openSavedItemInReader(openItem, paneID)") &&
+      workspaceScript.text.includes("async function openSavedItemInReader(item, savedPaneID,") &&
+        workspaceScript.text.includes("void openSavedItemInReader(readerItem, paneID)") &&
         workspaceScript.text.includes("async function openSourceInReader(item, anchorPaneID = \"\", options = {})") &&
         workspaceScript.text.includes("readerMatchesSource(candidate, detail)") &&
         workspaceScript.text.includes("candidate.sourceAnchorPaneID === anchorPaneID") &&

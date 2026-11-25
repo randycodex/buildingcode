@@ -144,6 +144,14 @@ enum CodeSectionThemeProfile: Sendable {
     case currentConsolidation
     case localLaw
 
+    static let notebookReferenceProfiles: [String: Self] = [
+        "bc": .building, "fgc": .fuelGas, "ac": .administrative, "mc": .mechanical,
+        "pc": .plumbing, "zr": .zoning, "ecc": .energy, "ec": .electrical,
+        "ebc": .existingBuilding, "fc": .fire, "bc68": .historical, "hmc": .housing,
+        "t24": .environmental, "t25": .landUse, "t26": .housingBuildings,
+        "t28": .currentConsolidation, "ll": .localLaw
+    ]
+
     init(codeSectionName: String?) {
         let normalizedName = (codeSectionName ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)

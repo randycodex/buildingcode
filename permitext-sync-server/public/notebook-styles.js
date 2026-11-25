@@ -1,7 +1,19 @@
-// Notes expose one highlight color. Clipboard CSS colors must not create marks
-// that the editor can display but the save contract cannot accept.
 export const notebookFontSizes = Object.freeze(['8','9','10','11','12','14','16','18','20','24','28','32','36','48']);
 export const notebookLineSpacings = Object.freeze(['normal','1','1.15','1.5','2']);
+export const notebookTextColors = Object.freeze({
+  gray: {label: 'Gray', light: '#5f626a', dark: '#b6bac4'},
+  red: {label: 'Red', light: '#ad252b', dark: '#ff8b89'},
+  orange: {label: 'Orange', light: '#a34f0c', dark: '#ffae6e'},
+  yellow: {label: 'Yellow', light: '#796006', dark: '#f0d06c'},
+  green: {label: 'Green', light: '#26683d', dark: '#82d99d'},
+  blue: {label: 'Blue', light: '#275bb0', dark: '#8bbcff'},
+  purple: {label: 'Purple', light: '#6943a4', dark: '#c8a5ff'},
+  pink: {label: 'Pink', light: '#9c3972', dark: '#f3a0d0'}
+});
+
+export function notebookTextColor(value) {
+  return typeof value === 'string' && Object.hasOwn(notebookTextColors, value) ? notebookTextColors[value] : undefined;
+}
 
 export function notebookFontSize(value) {
   if (typeof value !== 'string' || !/^\d{1,2}(?:\.5)?(?:pt|px)?$/i.test(value.trim())) return undefined;

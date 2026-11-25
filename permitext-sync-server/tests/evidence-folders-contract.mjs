@@ -233,7 +233,7 @@ assert.match(
 const openSavedItemSource = functionSource(appSource, "openSavedItemInReader");
 assert.match(
   openSavedItemSource,
-  /openSourceInReader\(item, savedPaneID, \{ sourceSurface: "saved", isCurrent,\s*forceNewReader: !fromEvidence && currentColumnWorkflowView\(\) !== 'notebook',[\s\S]*?evidenceAnchor: item\.evidenceAnchor/,
+  /openSourceInReader\(item, savedPaneID, \{ sourceSurface: "saved", isCurrent,\s*forceNewReader: forceNewReader \|\| \(!fromEvidence && currentColumnWorkflowView\(\) !== 'notebook'\),[\s\S]*?evidenceAnchor: item\.evidenceAnchor/,
   "A saved passage opens its exact source directly in Reader."
 );
 assert.doesNotMatch(openSavedItemSource, /openOrUpdateLinkedReaderForSearch/,

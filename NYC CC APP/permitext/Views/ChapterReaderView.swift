@@ -559,6 +559,7 @@ struct ReaderCurrentSectionBookmarkButton: View {
     @State private var isFolderPickerOpen = false
     @State private var pendingFolderIDs: Set<Int64> = []
     @State private var folderCreationRequest: ReaderBookmarkFolderCreation?
+    @State private var notebookHandoff: ReaderNotebookHandoff?
 
     var body: some View {
         Button {
@@ -586,6 +587,12 @@ struct ReaderCurrentSectionBookmarkButton: View {
         .accessibilityValue("\(displayedIsBookmarked ? "Saved" : "Not saved") · \(library.readerSaveDestinationName)")
         .contextMenu {
             ReaderSaveDestinationMenuContent()
+            if let sectionID, let version = library.selectedVersion?.codeVersion, library.hasProjectAccess {
+                Button("Add whole section to Note", systemImage: "note.text.badge.plus") {
+                    notebookHandoff = ReaderNotebookHandoff(sectionID: sectionID, codeVersion: version,
+                        projectID: library.activeProjectID.flatMap { library.backendProjectID(for: $0) })
+                }
+            }
             if let sectionID, library.isBookmarked(sectionID: sectionID) {
                 Divider()
                 Button("Add to Projects") { openFolderPicker() }
@@ -596,6 +603,10 @@ struct ReaderCurrentSectionBookmarkButton: View {
         .onChange(of: library.bookmarkRevision) { _, _ in synchronizeState() }
         .onChange(of: sectionID.map { library.folderMembership[$0] ?? [] }) { _, _ in synchronizeState() }
         .onChange(of: library.readerSaveDestination) { _, _ in synchronizeState() }
+        .sheet(item: $notebookHandoff) { handoff in
+            NotebookSourceHandoffSheet(section: handoff, owner: library.privateRequestIdentity)
+                .environmentObject(library)
+        }
         .sheet(isPresented: $isFolderPickerOpen) {
             if let sectionID {
                 FolderPickerSheet(

@@ -68,7 +68,7 @@ const item=(id,extra={})=>({sectionID:id,codePrefix:'BC',codeVersion:'2022',chap
   assert.equal((await f.c.openSearchResultDetail(item('after-new'),f.search)).id,owned.id,'Normal clicks keep updating the Search-owned Reader');
   assert.equal(explicit.sectionID,'new','The explicit new Reader stays on its passage');
   const beforeNewSaved=JSON.stringify(f.readers);
-  const savedNew=await f.c.openSourceInReader(item('fresh-saved'),'utility:saved:list',{sourceSurface:'saved',forceNewReader:true});
+  const savedNew=await f.c.openSavedItemInReader(item('fresh-saved'),'utility:saved:list',{forceNewReader:true});
   assert.equal(f.readers.length,6);assert.notEqual(savedNew.id,saved.id);
   assert.equal(JSON.stringify(f.readers.slice(0,-1)),beforeNewSaved);
   assert.equal((await f.c.openSavedItemInReader(item('after-new-evidence'),'utility:saved:list')).id,saved.id);

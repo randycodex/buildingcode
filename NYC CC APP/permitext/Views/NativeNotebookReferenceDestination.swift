@@ -74,7 +74,7 @@ struct NativeNotebookReferenceDestination: View {
             } else if let readerTarget {
                 VStack(spacing: 0) {
                     if !route.passages.isEmpty {
-                        DisclosureGroup("Saved passage") {
+                        DisclosureGroup(route.source?.scope == "section" ? "Saved section" : "Saved passage") {
                             ScrollView {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ForEach(Array(route.passages.enumerated()), id: \.offset) { _, passage in

@@ -20,12 +20,12 @@ const c = vm.createContext({
   track, state: {}, reportScreen:null, localWelcomePreviewPending: false, firstUseWelcomeActive: false,
   workspaceProject:()=>null,
   detachedProjectWindow: false, closeActiveCustomSelect() {}, orderPanes: panes => panes,
-  activePinnedPaneID: () => '', applyLinkedPanePlacements: ids => ids, pairSavedEvidenceDetails: ids => ids,
+  activePinnedPaneID: () => '', applyLinkedPanePlacements: ids => ids, pairSavedEvidenceDetails: ids => ids, orderSourceResultReaders: ids => ids,
   ensureWorkspacePanelAccessibleName() {}, preparePaneCollapse() {events.push('prepare');},
   cleanupInactiveWorkboardMounts() {}, cleanupInactiveNotebookMounts() {}, cleanupInactiveReportDraftMounts() {},
   reconcileNotebookReferences() {return false;},
   bindPaneDragging() {}, workflowPaneIsVisible: () => true, currentColumnWorkflowView: () => 'research',
-  createDivider: (previousPaneId, nextPaneId) => ({dataset: {previousPaneId, nextPaneId}}),
+  createDivider: (previousPaneId, nextPaneId) => ({dataset: {previousPaneId, nextPaneId}, classList: classes()}),
   refreshColumnGroupPresentation(options = {}) {
     assert.equal(options.preparePanels, false, 'Already prepared panes must not reset their widths again');
     assert.equal(options.refreshDividers, false, 'Divider measurements wait for final widths');

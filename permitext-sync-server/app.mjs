@@ -25179,7 +25179,10 @@ async function groupedCodeSearchPage(hits, query, resultLimit, matchMode = "exac
       pages[index] = { codePrefix: source.codePrefix, codeVersion: source.codeVersion, ...page };
     }
   }));
-  const available = pages.filter(page => page.hits.length || page.hasMore);
+  // A source's best candidate may fail passage matching. Rank its preview
+  // by the best result it can actually display.
+  const available = pages.filter(page => page.hits.length || page.hasMore)
+    .sort((left, right) => (left.hits[0]?.rank ?? Infinity) - (right.hits[0]?.rank ?? Infinity));
   const groups = available.map(page => ({
     codePrefix: page.codePrefix, codeVersion: page.codeVersion,
     nextOffset: page.hits.length, nextCandidateOffset: page.nextCandidateOffset, cursorKind: "candidate",

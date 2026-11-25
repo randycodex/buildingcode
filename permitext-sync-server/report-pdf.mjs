@@ -2,6 +2,7 @@ import PDFDocument from "pdfkit";
 import {captureReportEditLayout} from './report-edit-layout.mjs';
 import {letterDocumentLayout as documentLayout, reportDocumentLayout} from './public/document-layout.js';
 import { notebookTableDisplayData, tableDisplayCells } from './public/notebook-content.js';
+import { notebookTextColor } from './public/notebook-styles.js';
 import {researchAnswerURL} from './public/research-answer-links.js';
 
 // Source indentation is presentation whitespace, never a printed control glyph.
@@ -372,14 +373,14 @@ export function drawReportRichText(document, runs, {size = documentLayout.bodySi
     const segments = [];
     for (const run of line) {
       const last = segments.at(-1);
-      if (last && ['bold','italic','strike','underline','highlight','superscript','fontSize','href'].every(key => last[key] === run[key])) {
+      if (last && ['bold','italic','strike','underline','highlight','superscript','fontSize','textColor','href'].every(key => last[key] === run[key])) {
         last.text += run.text;
       } else segments.push({...run});
     }
     for (const run of segments) {
       const runWidth = measure(run);
       if (run.highlight) document.save().fillColor("#f4d35e").fillOpacity(0.5).rect(x, top + 1, runWidth, runSize(run) * 1.25).fill().restore();
-      document.fillColor(colors.ink).font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(runSize(run))
+      document.fillColor(notebookTextColor(run.textColor)?.light || colors.ink).font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(runSize(run))
         .text(run.text, x, top - (run.superscript ? size * 0.15 : 0), {lineBreak:false, oblique:run.italic || false, strike:run.strike || false,
           underline:run.underline || Boolean(run.href), ...(run.href ? {link:run.href} : {})});
       x += runWidth;
@@ -435,7 +436,7 @@ function drawReportTableOnce(document, table, startX, contentWidth, {headerBold,
     (cell.content || []).map(run => run.text).join('').normalize('NFKC').replace(/[\s\u00ad\u200b-\u200d\ufeff]+/g,'')]));
   // Retain distinctly formatted or linked tables even when the text matches.
   const marked = table.rows.some(row => row.some(cell => cell.some(run =>
-    run.highlight || run.href || published && hasInlineStyle(run))));
+    run.highlight || run.href || run.textColor || published && hasInlineStyle(run))));
   const key = !marked && JSON.stringify(plain);
   const prior = key && tracker?.seen.get(key);
   if (prior && (prior.published || published)) {

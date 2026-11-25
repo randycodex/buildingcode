@@ -1,5 +1,5 @@
 import { normalizeNotebookQuestions } from "./public/notebook-questions.js";
-import { normalizeNotebookStyles, notebookFontSize, notebookLineSpacings } from "./public/notebook-styles.js";
+import { normalizeNotebookStyles, notebookFontSize, notebookLineSpacings, notebookTextColor } from "./public/notebook-styles.js";
 import {
   emptyNotebookDocument as emptyVersionedNotebookDocument,
   notebookBlockTypes,
@@ -129,7 +129,8 @@ export function normalizeNotebookEvidenceLinks(input) {
         sectionID: requiredText(source.sectionID, "Notebook evidence section ID", 256),
         sectionNumber: requiredText(source.sectionNumber, "Notebook evidence section number", 256),
         sectionTitle: requiredText(source.sectionTitle || source.title || "Section", "Notebook evidence section title", 1_000),
-        sourceLibraryVersion: optionalText(source.sourceLibraryVersion || source.codeVersion, "Notebook evidence source-library version", 1_024)
+        sourceLibraryVersion: optionalText(source.sourceLibraryVersion || source.codeVersion, "Notebook evidence source-library version", 1_024),
+        ...(source.scope === "section" ? { scope: "section" } : {})
       },
       passages,
       ...(link?.noteTextVersion === 1 ? { noteTextVersion: 1 } : {}),
@@ -168,6 +169,12 @@ function canonicalStyles(styles) {
     }
     if (name === "backgroundColor" && (value === "yellow" || value === "default")) {
       if (value === "yellow") canonical.backgroundColor = "yellow";
+      continue;
+    }
+    if (name === "textColor") {
+      if (value === "default") continue;
+      if (!notebookTextColor(value)) throw new Error("Notebook text color is invalid.");
+      canonical.textColor = value;
       continue;
     }
     if (!permittedStyleNames.has(name)) {
@@ -478,6 +485,8 @@ function renderInlineHTML(content) {
     if (node.styles.superscript) html = `<sup>${html}</sup>`;
     if (node.styles.backgroundColor === "yellow") html = `<mark>${html}</mark>`;
     if (node.styles.fontSize) html = `<span style="font-size:${node.styles.fontSize}pt">${html}</span>`;
+    const textColor = notebookTextColor(node.styles.textColor);
+    if (textColor) html = `<span data-notebook-text-color="${node.styles.textColor}" style="color:${textColor.light}">${html}</span>`;
     return html;
   }).join("");
 }

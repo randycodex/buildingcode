@@ -2453,7 +2453,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 }
                 let cacheKey: CompletedSearchCache.Key? = revisions.count == versions.count && !versions.isEmpty
                     ? .init(query: query, scope: cacheScope, corpusRevision: revisions.joined(separator: "\n"),
-                            engineRevision: "native-exact-phrase-v3") : nil
+                            engineRevision: "native-all-words-v1") : nil
                 if let cacheKey, let cached = await CompletedSearchCache.shared.value(for: cacheKey) {
                     try Task.checkCancellation()
                     var expectedFilters: [CodeSectionCategory] = []
@@ -2539,7 +2539,8 @@ final class CodeLibraryViewModel: ObservableObject {
                             allCategories = store.codeSections()
                             let allowed = allowedByVersion[version.fileName]
                             categories = allCategories.filter { allowed?.contains($0.id) ?? true }
-                            matches = store.search(query: query, includeSnippets: false, resultLimit: nil, allowedCodeSectionIDs: allowed)
+                            matches = store.search(query: query, includeSnippets: false, resultLimit: nil,
+                                allowedCodeSectionIDs: allowed, matchAllWords: true)
                         case .sqlite:
                             let database = try CodeDatabase(databaseURL: version.fileURL, locator: BundleDatabaseLocator())
                             categories = []

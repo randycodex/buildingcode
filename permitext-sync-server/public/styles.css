@@ -805,6 +805,10 @@ textarea:focus-visible {
   pointer-events: none;
 }
 
+.connection-status:not([data-state="offline"]):not([data-state="pending"]):not([data-state="conflict"]) {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .connection-status { transition: none; }
 }
@@ -4611,7 +4615,9 @@ select option:checked {
 
 .reader-section-heading-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: auto;
   align-items: start;
   grid-column: 1 / -1;
   gap: var(--space-1);
@@ -4619,19 +4625,24 @@ select option:checked {
   margin-bottom: var(--space-2);
 }
 
-.reader-section-saved-marker {
+.reader-section-saved-marker,
+.reader-section-note-marker {
   display: grid;
+  min-width: 22px;
   width: 22px;
+  min-height: 22px;
   height: 22px;
   place-items: center;
   color: var(--text-secondary);
 }
 
-.reader-section-saved-marker[hidden] {
+.reader-section-saved-marker[hidden],
+.reader-section-note-marker[hidden] {
   display: none;
 }
 
-.reader-section-saved-marker svg {
+.reader-section-saved-marker svg,
+.reader-section-note-marker svg {
   width: 18px;
   height: 18px;
 }
@@ -5365,6 +5376,10 @@ select option:checked {
   scrollbar-gutter: stable;
   scrollbar-color: color-mix(in srgb, var(--text-tertiary) 58%, transparent) transparent;
   scrollbar-width: thin;
+}
+
+.search-results > .reader-empty:not(:has(> p)) > h3 {
+  text-align: center;
 }
 
 .search-dock {
@@ -13953,10 +13968,6 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
     box-shadow: 0 4px 16px color-mix(in srgb, #000000 16%, transparent);
   }
 
-  .connection-status:not([data-state="offline"]):not([data-state="pending"]):not([data-state="conflict"]) {
-    display: none;
-  }
-
   .topbar-actions {
     display: grid;
     width: 100%;
@@ -14888,8 +14899,13 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   background: transparent;
 }
 
+.notebook-reference-chip[data-reference-kind="selectedPassage"] {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--space-1);
+}
+
 .notebook-reference-chip > :is(.notebook-passage-source, .notebook-passage-toggle) {
-  display: block;
   min-height: 0;
   padding: 0;
   border: 0;
@@ -14899,6 +14915,38 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   text-align: left;
 }
 
+.notebook-reference-chip > .notebook-passage-source {
+  display: grid;
+  justify-items: start;
+  gap: 1px;
+}
+
+.notebook-reference-chip > .notebook-passage-toggle {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+}
+
+.notebook-reference-chip > .notebook-passage-toggle[hidden] {
+  display: none;
+}
+
+.notebook-passage-toggle::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border: solid currentColor;
+  border-width: 0 1px 1px 0;
+  transform: rotate(-45deg);
+}
+
+.notebook-passage-toggle[aria-expanded="true"]::before {
+  transform: translateY(-2px) rotate(45deg);
+}
+
 .notebook-reference-meta {
   color: var(--text-tertiary);
   font-size: 0.78em;
@@ -14906,7 +14954,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   line-height: 1.2;
 }
 
-.notebook-reference-chip > .notebook-passage-source:hover {
+.notebook-reference-chip > :is(.notebook-passage-source, .notebook-passage-toggle):hover {
   background: var(--menu-highlight);
   color: var(--text-primary);
 }
@@ -14932,6 +14980,10 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 .notebook-reference-chip:hover .notebook-reference-title,
 .notebook-reference-chip:focus-visible .notebook-reference-title {
   color: var(--project-color, var(--text-primary));
+}
+
+.notebook-reference-chip[data-reference-code-theme] :is(.notebook-reference-meta, .notebook-reference-title) {
+  color: var(--code-accent);
 }
 
 .notebook-reference-chip:focus-visible,
@@ -18196,7 +18248,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .column-group-choice:has(input:checked) { background: rgba(57,117,110,.22); }
 .column-group-choice:has(input:focus-visible) { outline: none; box-shadow: none; }
 
-.reader-section-heading-row .reader-section-saved-marker {
+.reader-section-heading-row :is(.reader-section-saved-marker, .reader-section-note-marker) {
   opacity: 0;
   pointer-events: none;
   transition: opacity 140ms ease;
@@ -18208,10 +18260,17 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   cursor: pointer;
 }
 
-.reader-section-heading-row:hover .reader-section-saved-marker,
-.reader-section-heading-row:focus-within .reader-section-saved-marker {
+.reader-section-heading-row > .reader-section-saved-marker.is-saved,
+.reader-section-heading-row:is(:hover, :focus-within) :is(.reader-section-saved-marker, .reader-section-note-marker) {
   opacity: 1;
   pointer-events: auto;
+}
+
+@media (hover: none) {
+  .reader-section-heading-row :is(.reader-section-saved-marker, .reader-section-note-marker) {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .bookmark-undo-tray { position: absolute; bottom: 16px; left: 16px; right: 16px; z-index: 20; display: grid; gap: 8px; max-height: 35vh; overflow: auto; }
@@ -19739,12 +19798,12 @@ span.reader-collapse-title { cursor: default; line-height: var(--panel-title-row
 /* Keep the mounted column in the same track to preserve editor/reader state. */
 @media (min-width: 761px) {
   .panel-track:has(> .workspace-panel.is-pinned:not(.is-workflow-hidden)) > .pane-left-edge-resizer {
-    order: -3;
+    order: -5;
   }
   .panel-track > .workspace-panel.is-pinned {
     position: sticky;
     left: 0;
-    order: -2;
+    order: -4;
     /* Ordinary dividers use z-index 12 and must remain behind this surface. */
     z-index: 40;
     /* The adjacent pane-divider supplies the single 1px boundary. */
@@ -19752,9 +19811,25 @@ span.reader-collapse-title { cursor: default; line-height: var(--panel-title-row
   }
   .panel-track > .pane-divider.is-pinned-divider {
     position: sticky;
-    left: var(--pinned-pane-width);
+    left: var(--pinned-columns-width);
     order: -1;
     z-index: 41;
+  }
+  .panel-track > .pane-divider.is-pinned-result-divider {
+    position: sticky;
+    left: var(--pinned-pane-width);
+    order: -3;
+    z-index: 41;
+  }
+  .panel-track > .workspace-panel.is-pinned-result-reader {
+    position: sticky;
+    left: var(--pinned-result-start);
+    order: -2;
+    z-index: 40;
+  }
+  .panel-track > .workspace-panel.is-source-pin-overflow {
+    position: relative;
+    left: auto;
   }
 }
 
@@ -22323,6 +22398,12 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
 }
 #panel-track > .search-panel { --column-tint: var(--search-column-surface); }
 #panel-track > .saved-panel { --column-tint: var(--evidence-column-surface); }
+#panel-track[data-workspace-theme="tinted"] > .reader-panel[data-result-reader-owner^="utility:search"] {
+  --column-tint: var(--search-column-surface);
+}
+#panel-track[data-workspace-theme="tinted"] > .reader-panel[data-result-reader-owner^="utility:saved"] {
+  --column-tint: var(--evidence-column-surface);
+}
 #panel-track > .analysis-panel { --column-tint: var(--assistant-column-surface); }
 #panel-track > .calculator-panel { --column-tint: var(--calculator-column-surface); }
 #panel-track > :is(.notebook-index-panel, .notebook-panel) { --column-tint: var(--notes-column-surface); }

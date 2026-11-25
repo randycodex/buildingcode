@@ -28,7 +28,7 @@ class Node {
   async click(){await this.events.click?.();}
   get isConnected(){return Boolean(this.parentNode)||this.connected===true;}
 }
-const listeners=[]; let permitted=false, reads=0, writes=0;
+const listeners=[], noteCalls=[]; let permitted=false, reads=0, writes=0;
 const gate={get allowed(){return permitted;},subscribe(fn){listeners.push(fn);return()=>{};}};
 const panel=new Node("article");panel.className="reader-panel workspace-panel";panel.__workspaceAccessGate=gate;panel.connected=true;
 const reader={id:"reader",codePrefix:"BC",codeVersion:"2022",chapterID:"chapter",sectionID:"section"};
@@ -41,30 +41,36 @@ const context=vm.createContext({
   sectionDisplayTitle:(_number,title)=>title, readerAnnotatedBlocksForSection:value=>value.blocks,
   annotationTargetForSection:()=>({...target,blockID:""}), annotationTargetForBlock:()=>target,
   renderCodeBlock(block){const node=new Node("p");node.textContent=block.plainText;return node;},
+  renderOccupantLoadCalculation:()=>null,
   linkInlineCodeReferences(){},decorateReaderDefinitions(){},
   savedSectionRecord(){reads++;return {saved:true};},
   workingResearchNote(){reads++;return null;},
   bookmarkIconSVG:saved=>saved?"saved":"save", bookmarkActionLabel:saved=>saved?"Remove passage":"Save passage",
   checkActionIconSVG:()=>"check",
-  readerPassagePayload:()=>target,persistSectionBookmark:async()=>{writes++;return true;},
+  readerPassagePayload:(_section,_reader,source)=>source,persistSectionBookmark:async()=>{writes++;return true;},
+  captureCodeBlocksForNotebook(blocks){assert.equal(blocks,section.blocks);return {exact:blocks[0].plainText,blocks:[{type:"paragraph"}]};},
+  addPassageToNotebook(...args){noteCalls.push(args);},
   saveReaderPassage:async()=>{writes++;return true;},syncReaderNoteBookmarkButtons(){},
   clear(host){host.children=[];}, readerSectionIdentityValues:()=>new Set(["section"]),
   readerProjectsForSection(){reads++;return [];},isSectionSaved(){reads++;return true;},readerSectionHasNote(){reads++;return false;}
 });
 const subscriptionLifecycle = source.slice(source.indexOf("const workspaceNodeAccessRecords"), source.indexOf("function readerPrivateContentAllowed"));
-vm.runInContext(subscriptionLifecycle + ["noteAddIconSVG","readerPrivateContentAllowed","renderReaderChapterSection", "buildReaderChapterSection","renderAnnotatedCodeBlock","renderInlineCommentBox","renderReaderSectionProjectContext"].map(actual).join("\n"),context);
+vm.runInContext(subscriptionLifecycle + ["noteAddIconSVG","readerPrivateContentAllowed","renderReaderChapterSection", "buildReaderChapterSection","renderAnnotatedCodeBlock","renderInlineCommentBox","renderReaderSectionProjectContext","setResearchNoteActionLabel"].map(actual).join("\n"),context);
 const rendered=context.renderReaderChapterSection(panel,reader,section,new Map());panel.append(rendered);
 const body=rendered.querySelector(".annotated-code-block").children[0];
 const bookmark=rendered.querySelector(".reader-section-saved-marker");
+const sectionNote=rendered.querySelector(".reader-section-note-marker");
 const inline=rendered.querySelector(".annotated-code-block").querySelector(".inline-comment");
 const addNote=inline.querySelector(".inline-note-toggle");
 assert.equal(addNote.hidden,true);
 assert.equal(reads,0,"Pending Reader construction must not read saved records or private Research labels.");
 assert.equal(body.textContent,"Complete public enacted text");assert.equal(bookmark.hidden,true);
 assert.equal(bookmark.parentNode,rendered.querySelector(".reader-section-heading-row"),"Whole-section extraction retains a real stable bookmark node.");
+assert.equal(sectionNote.parentNode,bookmark.parentNode);
+assert.equal(sectionNote.hidden,true);
 const host=new Node("div");panel.append(host);context.renderReaderSectionProjectContext(host,section,reader,panel);
 assert.equal(reads,0,"Project context must not read Project membership, names or note presence while pending.");assert.equal(host.hidden,true);
-await bookmark.click();await addNote.click();assert.equal(writes,0);
+await bookmark.click();await addNote.click();await sectionNote.click();assert.equal(writes,0);assert.equal(noteCalls.length,0);
 
 permitted=true;listeners.forEach(fn=>fn());
 assert.equal(rendered.querySelector(".annotated-code-block").children[0],body,"Upgrade retains the exact enacted-text node.");
@@ -72,9 +78,15 @@ assert.equal(rendered.querySelector(".reader-section-saved-marker"),bookmark,"Up
 assert.equal(bookmark.hidden,false);assert.equal(bookmark.disabled,false);assert.equal(bookmark.attrs["aria-label"],"Remove section from Evidence");
 assert.equal(host.hidden,false);
 assert.equal(addNote.hidden,false);assert.equal(addNote.attrs['aria-label'],'Add to note');
+assert.equal(sectionNote.hidden,false);assert.equal(sectionNote.attrs['aria-label'],'Add whole section to note');
+await sectionNote.click();
+assert.equal(noteCalls.length,1);
+assert.equal(noteCalls[0][1].scope,'section');
+assert.equal(noteCalls[0][1].blockID,'');
+assert.equal(noteCalls[0][2],body.textContent);
 assert.equal(body.textContent,"Complete public enacted text");
 const writesBefore=writes,readsBefore=reads;permitted=false;bookmark.disabled=false;addNote.disabled=false;
-await bookmark.click();await addNote.click();assert.equal(writes,writesBefore,"Revoked gate blocks private mutations even if control is still enabled.");assert.equal(reads,readsBefore);
+await bookmark.click();await addNote.click();await sectionNote.click();assert.equal(noteCalls.length,1);assert.equal(writes,writesBefore,"Revoked gate blocks private mutations even if control is still enabled.");assert.equal(reads,readsBefore);
 
 // Null gate retains existing explicit bookmark behavior without a new saved read.
 const legacyReads=reads;const legacy=context.renderInlineCommentBox(section,reader,target,{showBookmark:true});
