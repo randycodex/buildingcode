@@ -1211,7 +1211,6 @@ private enum FactPresentation {
 
     // The former transit field is only shown for Projects that already have it.
     static let standardFields = sections.flatMap { $0.fields }.filter { $0.key != "transit-zone" }
-    static let standardKeys = Set(standardFields.map { $0.key })
     private static let standardKeysByLabel = Dictionary(uniqueKeysWithValues: standardFields.map {
         ($0.label.lowercased(), $0.key)
     })
@@ -1240,6 +1239,10 @@ private enum FactPresentation {
         key.flatMap { positions[$0] } ?? (sections.count - 1, 0)
     }
 
+    static func ordered<Rows: Collection>(_ rows: Rows, by key: (Rows.Element) -> String?) -> [Rows.Element] {
+        rows.sorted { position(key($0)) < position(key($1)) }
+    }
+
     static func hasRecordedValue(_ fact: ProjectStructuredFact) -> Bool {
         fact.status.caseInsensitiveCompare("unknown") != .orderedSame &&
             !emptyValues.contains(fact.value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())
@@ -1261,10 +1264,6 @@ private struct ProjectFactDraft: Identifiable {
         self.value = value
         self.initialValue = value
         self.original = original
-    }
-
-    var isStandard: Bool {
-        key.map(FactPresentation.standardKeys.contains) ?? false
     }
 }
 
@@ -1348,11 +1347,21 @@ private struct ProjectFactsView: View {
     private var folder: CodeFolder? { library.folder(id: folderID) }
     private var editAnimation: Animation? { reduceMotion ? nil : .easeInOut(duration: 0.2) }
 
+    private var recordedFacts: [ProjectStructuredFact] {
+        guard let folder else { return [] }
+        var facts = folder.structuredFacts
+        if !facts.contains(where: { FactPresentation.presentationKey(for: $0) == "address" }) {
+            facts.append(ProjectStructuredFact(id: "project-fact:address", key: "address", label: "Address",
+                value: folder.address, status: "stated", source: "", sourceText: "", updatedAt: nil))
+        }
+        return facts.filter(FactPresentation.hasRecordedValue)
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 if isEditing {
-                    LazyVStack(alignment: .leading, spacing: 12) { factsEditor }
+                    LazyVStack(alignment: .leading, spacing: 0) { factsEditor }
                 } else {
                     savedFacts
                 }
@@ -1385,15 +1394,12 @@ private struct ProjectFactsView: View {
 
     @ViewBuilder
     private var savedFacts: some View {
-        let facts = (folder?.structuredFacts ?? []).filter(FactPresentation.hasRecordedValue)
+        let facts = recordedFacts
         if facts.isEmpty {
             Text("No facts yet.").font(.subheadline).foregroundStyle(.secondary)
         } else {
             VStack(alignment: .leading, spacing: 0) {
-                let ordered = facts.sorted {
-                    FactPresentation.position(FactPresentation.presentationKey(for: $0)) <
-                        FactPresentation.position(FactPresentation.presentationKey(for: $1))
-                }
+                let ordered = FactPresentation.ordered(facts, by: FactPresentation.presentationKey(for:))
                 ForEach(Array(ordered.enumerated()), id: \.element.id) { index, fact in
                     let section = FactPresentation.position(FactPresentation.presentationKey(for: fact)).0
                     if index == 0 || FactPresentation.position(FactPresentation.presentationKey(for: ordered[index - 1])).0 != section {
@@ -1417,55 +1423,36 @@ private struct ProjectFactsView: View {
 
     @ViewBuilder
     private var factsEditor: some View {
-        let ordered = $factsDraft.sorted {
-            FactPresentation.position($0.wrappedValue.key) < FactPresentation.position($1.wrappedValue.key)
-        }
+        let ordered = FactPresentation.ordered($factsDraft, by: { $0.wrappedValue.key })
         ForEach(Array(ordered.enumerated()), id: \.element.wrappedValue.id) { index, binding in
             let draft = binding.wrappedValue
             let section = FactPresentation.position(draft.key).0
             if index == 0 || FactPresentation.position(ordered[index - 1].wrappedValue.key).0 != section {
                 factHeading(section)
             }
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text("\(index + 1).")
-                        .monospacedDigit()
-                        .accessibilityIdentifier("project-fact-number-\(draft.id)")
-                    if draft.key == nil {
-                        TextField("Fact name", text: binding.label)
-                            .accessibilityIdentifier("project-fact-label-\(draft.id)")
-                    } else {
-                        Text(draft.label)
-                    }
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                HStack(alignment: .center, spacing: 12) {
-                    TextField("Value", text: binding.value, axis: .vertical)
-                        .font(.subheadline)
-                        .lineLimit(1...4)
+            // An empty multiline field does not report the placeholder's baseline.
+            ProjectFactRowLayout(verticalAlignment: draft.value.isEmpty ? .center : .firstTextBaseline) {
+                if draft.key == nil {
+                    TextField("Fact name", text: binding.label, axis: .vertical)
                         .textFieldStyle(.plain)
-                        .frame(minHeight: 44)
+                        .accessibilityIdentifier("project-fact-label-\(draft.id)")
+                } else {
+                    Text(draft.label)
+                }
+            } value: { alignment in
+                VStack(alignment: alignment, spacing: 4) {
+                    TextField("Add value", text: binding.value,
+                              prompt: Text("Add value").foregroundColor(.secondary), axis: .vertical)
+                        .textFieldStyle(.plain)
                         .accessibilityLabel(draft.label.isEmpty ? "Fact value" : draft.label)
                         .accessibilityIdentifier("project-fact-value-\(draft.id)")
-                    if !draft.isStandard || !draft.value.isEmpty {
-                        Button(role: .destructive) {
-                            if draft.isStandard {
-                                binding.value.wrappedValue = ""
-                            } else {
-                                withAnimation(editAnimation) {
-                                    factsDraft.removeAll { $0.id == draft.id }
-                                }
-                            }
-                        } label: {
-                            Image(systemName: "minus.circle").frame(width: 44, height: 44)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Remove \(draft.label.isEmpty ? "fact" : draft.label)")
+                    if !draft.value.isEmpty, draft.value == draft.initialValue, let original = draft.original {
+                        ProjectStructuredFactStatus(status: original.status)
                     }
                 }
             }
             .transition(.opacity)
+            if index + 1 < ordered.count { Divider() }
         }
         addFactButton
         if let saveError {
@@ -1510,14 +1497,10 @@ private struct ProjectFactsView: View {
             let label = draft.label.trimmingCharacters(in: .whitespacesAndNewlines)
             let value = draft.value.trimmingCharacters(in: .whitespacesAndNewlines)
             if value == draft.initialValue.trimmingCharacters(in: .whitespacesAndNewlines) {
-                if let fact = draft.original {
-                    facts.append(fact)
-                    continue
-                }
-                if draft.isStandard { continue }
+                if let fact = draft.original { facts.append(fact) }
+                continue
             }
-            if draft.isStandard && value.isEmpty && draft.key != "address" { continue }
-            if draft.original == nil && label.isEmpty && value.isEmpty { continue }
+            if value.isEmpty && draft.key != "address" { continue }
             guard !label.isEmpty else {
                 saveError = "Give each fact a name."
                 return

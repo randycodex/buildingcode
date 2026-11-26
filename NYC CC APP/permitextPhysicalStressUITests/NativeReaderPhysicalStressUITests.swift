@@ -1146,9 +1146,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let value = app.textFields["project-fact-value-occupancy"]
         reveal(value, in: app)
         XCTAssertTrue(value.waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["project-fact-number-occupancy"].label, "10.")
-        XCTAssertEqual(app.buttons["Remove Occupancy"].frame.midY, value.frame.midY, accuracy: 2,
-                       "Delete aligns to the value rather than the label")
+        XCTAssertLessThan(app.staticTexts["Occupancy"].frame.midX, value.frame.midX)
         XCTAssertFalse(contextTab.isEnabled, "Save or cancel Facts before switching tabs.")
         value.tap()
         value.typeText(" phone edit")
@@ -1522,6 +1520,18 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(taxLotValue.waitForExistence(timeout: 5))
         XCTAssertLessThan(taxLotLabel.frame.midX, taxLotValue.frame.midX)
         XCTAssertEqual(taxLotLabel.frame.midY, taxLotValue.frame.midY, accuracy: 4)
+        let readOnlyLabelEdge = taxLotLabel.frame.minX
+        let readOnlyValueEdge = taxLotValue.frame.maxX
+        let populatedLabels = ["Address", "Tax Lot Area", "Occupancy", "Construction Type"]
+        func assertPopulatedFieldOrder() {
+            let labels = populatedLabels.map { app.staticTexts[$0] }
+            for label in labels { XCTAssertTrue(label.exists, label.debugDescription) }
+            for (previous, next) in zip(labels, labels.dropFirst()) {
+                XCTAssertLessThan(previous.frame.minY, next.frame.minY)
+            }
+        }
+        XCTAssertTrue(app.staticTexts["100 Acceptance Court, Brooklyn, NY 11215"].exists)
+        assertPopulatedFieldOrder()
         XCTAssertTrue(app.staticTexts["6000"].exists)
         XCTAssertTrue(app.staticTexts["9,600 gross sq ft above grade"].exists)
         XCTAssertTrue(app.staticTexts["46 ft to main roof"].exists)
@@ -1538,10 +1548,25 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let edit = app.buttons["project-zoning-edit"]
         let overviewBar = app.navigationBars["Overview"]
         edit.tap()
+        let taxLotEditor = app.textFields["project-fact-value-tax-lot-area"]
         let borough = app.textFields["project-fact-value-project-fact:borough"]
-        let zip = app.textFields["project-fact-value-project-fact:zip-code"]
+        let zipCode = app.textFields["project-fact-value-project-fact:zip-code"]
+        let bbl = app.textFields["project-fact-value-project-fact:bbl"]
         XCTAssertTrue(borough.waitForExistence(timeout: 5))
-        XCTAssertTrue(zip.exists)
+        XCTAssertTrue(zipCode.exists)
+        XCTAssertTrue(bbl.exists)
+        assertPopulatedFieldOrder()
+        XCTAssertLessThan(app.staticTexts["Address"].frame.minY, bbl.frame.minY)
+        XCTAssertLessThan(bbl.frame.minY, borough.frame.minY)
+        XCTAssertLessThan(borough.frame.minY, zipCode.frame.minY)
+        XCTAssertLessThan(zipCode.frame.minY, taxLotEditor.frame.minY)
+        XCTAssertEqual(taxLotLabel.frame.minX, readOnlyLabelEdge, accuracy: 2)
+        XCTAssertEqual(taxLotEditor.frame.maxX, readOnlyValueEdge, accuracy: 2)
+        XCTAssertEqual(taxLotLabel.frame.midY, taxLotEditor.frame.midY, accuracy: 4)
+        XCTAssertEqual(borough.value as? String, "Add value")
+        XCTAssertEqual(app.staticTexts["Borough"].frame.midY, borough.frame.midY, accuracy: 4)
+        let singleLineEditorHeight = taxLotEditor.frame.height
+        keepScreenshot(named: "Zoning inline editor", from: app)
         borough.tap()
         borough.typeText("Manhattan")
         overviewBar.buttons["Save"].tap()
@@ -1551,7 +1576,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         edit.tap()
         XCTAssertTrue(borough.waitForExistence(timeout: 5))
         XCTAssertEqual(borough.value as? String, "Manhattan")
-        app.buttons["Remove Borough"].tap()
+        XCTAssertFalse(app.buttons["Remove Borough"].exists)
+        borough.coordinate(withNormalizedOffset: CGVector(dx: 0.99, dy: 0.5)).tap()
+        borough.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: "Manhattan".count))
+        XCTAssertEqual(borough.value as? String, "Add value")
         XCTAssertTrue(borough.exists, "Clearing a standard field leaves its input in edit mode.")
         overviewBar.buttons["Save"].tap()
         XCTAssertFalse(app.staticTexts["Borough"].exists)
@@ -1565,12 +1593,26 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(waitForNonexistence(sourceDetails, timeout: 3))
 
         edit.tap()
+        let construction = app.textFields["project-fact-value-construction-type"]
+        reveal(construction, in: app)
+        XCTAssertTrue(construction.isHittable)
+        XCTAssertGreaterThan(construction.frame.height, singleLineEditorHeight,
+                             "Long values expand in the trailing column.")
         let commercialOverlay = app.textFields["project-fact-value-commercial-overlays"]
         let specialDistrict = app.textFields["project-fact-value-special-purpose-districts"]
         reveal(commercialOverlay, in: app)
         XCTAssertTrue(commercialOverlay.isHittable)
         reveal(specialDistrict, in: app)
         XCTAssertTrue(specialDistrict.isHittable)
+        let location = app.textFields["project-fact-value-location"]
+        reveal(location, in: app)
+        XCTAssertTrue(location.isHittable)
+        XCTAssertFalse(app.buttons["Remove Location"].exists)
+        location.coordinate(withNormalizedOffset: CGVector(dx: 0.99, dy: 0.5)).tap()
+        location.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: "New York City".count))
+        XCTAssertEqual(location.value as? String, "Add value")
+        overviewBar.buttons["Save"].tap()
+        XCTAssertFalse(app.staticTexts["Location"].exists)
     }
 
     private func verifySavedProjectNavigation(largeText: Bool) throws {

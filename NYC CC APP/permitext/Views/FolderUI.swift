@@ -669,10 +669,25 @@ struct ProjectStructuredFactsSources: View {
 
 struct ProjectStructuredFactRow: View {
     let fact: ProjectStructuredFact
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    private var statusLabel: String? {
-        switch fact.status.lowercased() {
+    var body: some View {
+        ProjectFactRowLayout {
+            Text(fact.label)
+        } value: { alignment in
+            VStack(alignment: alignment, spacing: 4) {
+                Text(fact.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Not provided" : fact.value)
+                    .fixedSize(horizontal: false, vertical: true)
+                ProjectStructuredFactStatus(status: fact.status)
+            }
+        }
+    }
+}
+
+struct ProjectStructuredFactStatus: View {
+    let status: String
+
+    private var label: String? {
+        switch status.lowercased() {
         case "sourced", "stated": return nil
         case "confirmed": return "Confirmed"
         case "rejected": return "Rejected"
@@ -681,28 +696,33 @@ struct ProjectStructuredFactRow: View {
     }
 
     var body: some View {
+        if let label {
+            Text(label).font(.caption).foregroundStyle(.secondary)
+        }
+    }
+}
+
+struct ProjectFactRowLayout<Label: View, Value: View>: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    var verticalAlignment: VerticalAlignment = .firstTextBaseline
+    @ViewBuilder let label: () -> Label
+    @ViewBuilder let value: (HorizontalAlignment) -> Value
+
+    var body: some View {
         let stacksVertically = dynamicTypeSize.isAccessibilitySize
         let layout = stacksVertically ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
-            : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: 12))
+            : AnyLayout(HStackLayout(alignment: verticalAlignment, spacing: 12))
         layout {
-            Text(fact.label)
+            label()
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            VStack(alignment: stacksVertically ? .leading : .trailing, spacing: 4) {
-                Text(fact.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Not provided" : fact.value)
-                    .font(.subheadline)
-                    .fixedSize(horizontal: false, vertical: true)
-                if let statusLabel {
-                    Text(statusLabel)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .multilineTextAlignment(stacksVertically ? .leading : .trailing)
-            .frame(maxWidth: .infinity, alignment: stacksVertically ? .leading : .trailing)
+            value(stacksVertically ? .leading : .trailing)
+                .font(.subheadline)
+                .multilineTextAlignment(stacksVertically ? .leading : .trailing)
+                .frame(maxWidth: .infinity, alignment: stacksVertically ? .leading : .trailing)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 8)
