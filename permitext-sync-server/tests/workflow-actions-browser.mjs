@@ -12,7 +12,9 @@ try {
   const errors=[];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(fixtureURL.href);
-  await page.getByRole('button',{name:'Choose workspace',exact:true}).click();
+  await page.locator('#workspace-actions').waitFor();
+  assert.equal(await page.getByRole('region',{name:'Workspace required'}).count(),0);
+  await page.locator('#workspace-actions').click();
   await page.getByRole('menuitemradio',{name:'Synthetic Project 1',exact:true}).click();
   const closeColumns=async()=>{
     await page.locator('#workspace-actions').click();

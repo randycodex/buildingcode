@@ -852,8 +852,6 @@ let activeWebWarningClose = null;
 const webWarningPositionCleanups = new WeakMap();
 let activeWorkspaceIssueAction = null;
 let activeWorkspaceIssueDismiss = null;
-let projectRequiredColumnNoticeVisible = false;
-let projectRequiredColumnNoticeTimer = null;
 let pendingResearchIntentResumePromise = null;
 let pendingResearchIntentInFlightID = "";
 let localWelcomePreviewPending = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname)
@@ -2313,26 +2311,12 @@ function workspaceColumnsRequireProject() {
 
 function notifyProjectRequiredForColumn() {
   if (!workspaceColumnsRequireProject()) return false;
-  projectRequiredColumnNoticeVisible = true;
-  const message = track.querySelector(".workspace-project-required-message");
-  if (message) message.hidden = false;
-  clearTimeout(projectRequiredColumnNoticeTimer);
-  projectRequiredColumnNoticeTimer = setTimeout(() => {
-    projectRequiredColumnNoticeVisible = false;
-    projectRequiredColumnNoticeTimer = null;
-    const currentMessage = track.querySelector(".workspace-project-required-message");
-    if (currentMessage) currentMessage.hidden = true;
-  }, 4000);
+  void openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
   return true;
 }
 
 function enforceProjectRequiredWorkspace() {
-  if (!workspaceColumnsRequireProject()) {
-    projectRequiredColumnNoticeVisible = false;
-    clearTimeout(projectRequiredColumnNoticeTimer);
-    projectRequiredColumnNoticeTimer = null;
-    return false;
-  }
+  if (!workspaceColumnsRequireProject()) return false;
   if (state.readers.length || state.utilityInstances.length || openProjectDetails().length ||
       Object.values(state.utilities).some(Boolean) || openCodeQuestionPaneIDs().length ||
       supplementalResearchConversationIDs.length) {
@@ -2957,7 +2941,7 @@ function renderWorkspaceTabs() {
   shell?.classList.toggle("has-no-workspace", empty);
   const emptyState = shell?.querySelector(".workspace-add-empty");
   if (emptyState) {
-    // The workspace-required state provides its own choose/create action.
+    // Unselected Pro accounts choose a project from the toolbar.
     emptyState.hidden = !isProAccount() || !empty || currentColumnWorkflowView() !== "research" ||
       workspaceColumnsRequireProject() || defaultActivePaneIDs().some(workflowPaneIsVisible);
     emptyState.querySelector("button").disabled = !isProAccount();
@@ -47512,48 +47496,6 @@ document.querySelector("#copy-workspace-link")?.addEventListener("click", async 
   }
 });
 
-function renderProjectRequiredWorkspace() {
-  const welcome = document.createElement("section");
-  welcome.className = "workspace-empty-state workspace-empty-guidance";
-  welcome.setAttribute("aria-label", "Workspace required");
-  const workspaces = workspacePrivatePresentationAllowed() ? visibleWorkspaceRecords() : [];
-  const canChoose = workspaces.length > 0;
-  const content = document.createElement("div");
-  const actions = document.createElement("div");
-  actions.className = "workspace-empty-actions";
-  const create = document.createElement("button");
-  create.type = "button";
-  create.textContent = canChoose ? "Choose workspace" : "add workspace";
-  create.disabled = !isProAccount();
-  create.addEventListener("click", event => {
-    event.stopPropagation();
-    if (canChoose) void openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
-    else void createNewWorkspace();
-  });
-  if (canChoose) {
-    for (const workspace of workspaces.sort((a, b) => (b.updatedAt || "").localeCompare(a.updatedAt || "")).slice(0, 3)) {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = workspace.name;
-      button.addEventListener("click", () => void switchWorkspace(workspace.id));
-      actions.append(button);
-    }
-    create.textContent = "All workspaces";
-  }
-  const guidance = document.createElement("p");
-  guidance.textContent = "Open a workspace to use Reader, Search, Assistant, and Calculator.";
-  content.append(guidance);
-  actions.append(create);
-  const message = document.createElement("p");
-  message.className = "workspace-project-required-message";
-  message.setAttribute("role", "alert");
-  message.textContent = "Choose a workspace before opening columns.";
-  message.hidden = !projectRequiredColumnNoticeVisible;
-  content.append(actions, message);
-  welcome.append(content);
-  return welcome;
-}
-
 function renderFirstUseWelcome() {
   const welcome = document.createElement("section");
   welcome.className = "workspace-empty-state workspace-first-use";
@@ -48477,9 +48419,7 @@ function appendPaneSequence(panes) {
     }
     if (next) nodes.push(next);
   }
-  if (!orderedPanes.length && workspaceColumnsRequireProject()) {
-    nodes.push(renderProjectRequiredWorkspace());
-  } else if (!orderedPanes.length && !detachedProjectWindow && shouldShowFirstUseWelcome()) {
+  if (!orderedPanes.length && !workspaceColumnsRequireProject() && !detachedProjectWindow && shouldShowFirstUseWelcome()) {
     nodes.push(renderFirstUseWelcome());
   }
   nodes.push(...orderedPanes.filter(pane => !visiblePanes.includes(pane)));

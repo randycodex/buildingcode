@@ -16,7 +16,8 @@ async function openWorkspace() {
   page.setDefaultTimeout(10000);
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(fixtureURL.href);
-  await page.getByRole('button', {name: 'Choose workspace', exact: true}).waitFor();
+  await page.locator('#workspace-actions').waitFor();
+  assert.equal(await page.getByRole('region', {name: 'Workspace required'}).count(), 0);
   return page;
 }
 async function chooseFor(page, view, project = 'Synthetic Project 1') {
@@ -58,8 +59,7 @@ try {
   console.log('Notebook passed: saved notes on entry, open/return preserves editor, project isolation, narrow layout and new-note action.');
 
   const search = await openWorkspace();
-  await search.getByRole('button', {name: 'Choose workspace', exact: true}).click();
-  await search.getByRole('menuitemradio', {name: 'Synthetic Project 1', exact: true}).click();
+  await chooseProject(search, 'Synthetic Project 1');
   await search.getByRole('button', {name: 'Search', exact: true}).click();
   const input = search.locator('input[type=search]:visible');
   await input.fill('corridor');
@@ -88,8 +88,7 @@ try {
   console.log('Broad Search passed: visible preferred-edition passages, retained collapse after reload and historical result opening.');
 
   const reader = await openWorkspace();
-  await reader.getByRole('button', {name: 'Choose workspace', exact: true}).click();
-  await reader.getByRole('menuitemradio', {name: 'Synthetic Project 1', exact: true}).click();
+  await chooseProject(reader, 'Synthetic Project 1');
   await reader.getByRole('button', {name: 'Reader', exact: true}).click();
   await reader.getByRole('button', {name: 'Fire Code (2022)', exact: true}).click();
   await reader.locator('.reader-panel:visible').waitFor();
@@ -107,8 +106,7 @@ try {
   await cancelled.getByRole('menu', {name: 'Choose a workspace for Report'}).waitFor();
   await cancelled.keyboard.press('Escape');
   assert.equal(await cancelled.getByRole('menu').count(), 0);
-  await cancelled.getByRole('button', {name: 'Choose workspace', exact: true}).click();
-  await cancelled.getByRole('menuitemradio', {name: 'Synthetic Project 1', exact: true}).click();
+  await chooseProject(cancelled, 'Synthetic Project 1');
   await cancelled.getByRole('button', {name: 'Research', exact: true, pressed: true}).waitFor();
   assert.equal(await cancelled.locator('.report-workspace-view:not([hidden])').count(), 0);
   console.log('Cancellation passed: choosing a workspace later does not resume a dismissed Report action.');

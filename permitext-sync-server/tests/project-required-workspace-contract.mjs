@@ -6,33 +6,35 @@ import {documentFixture} from "./helpers/workflow-dom.mjs";
 
 const app = await readFile(new URL("../public/app.js",import.meta.url),"utf8");
 const actual = name => { const match=app.match(new RegExp(`^(?:async )?function ${name}\\([\\s\\S]*?^}`,"m")); assert.ok(match,name); return match[0]; };
-let pro=false, selected=null, projects=[], clears=0, opens=0, settings=0, choices=0, creates=0;
+let pro=false, selected=null, projects=[], clears=0, opens=0, settings=0, choices=0;
 const document=documentFixture();
 document.querySelector=()=>null;
-const track=document.createElement('main');
+const workspaceActionsButton={};
 const state={...emptyWorkspaceLayout(),readers:[{id:"legacy-reader"}],utilityInstances:[{id:"legacy-search",key:"search"}],
  utilities:{search:true,calculator:true},localSavedItems:[{id:"recoverable"}]};
-const context=vm.createContext({state,document,track,isProAccount:()=>pro,readerShortcuts:null,
- detachedProjectWindow:false,detachedProject:null,activeWorkspaceID:'general',workspaceActionsButton:{},
+const context=vm.createContext({state,document,isProAccount:()=>pro,readerShortcuts:null,
+ detachedProjectWindow:false,detachedProject:null,activeWorkspaceID:'general',workspaceActionsButton,
  activeWorkspaceRecord:()=>selected,currentContentSummary:()=>({projects}),
  activeFolderRecords:values=>values.filter(p=>!p.deletedAt&&!p.archivedAt),
  mergeProjectsWithOrganizationAccess:values=>values,visibleProjectRecords:values=>values,
  projectRecordID:project=>project.id,
- clearTimeout(){},setTimeout:()=>1,emptyWorkspaceLayout,
+ emptyWorkspaceLayout,
  applyStoredWorkspaceLayout:layout=>{clears++;applyWorkspaceLayout(state,layout);},
  openProjectDetails:()=>state.projectDetails,
  openCodeQuestionPaneIDs:()=>[],supplementalResearchConversationIDs:[],
  codeQuestionWorkspaceState:()=>({}),closeCodeDecisionContext:value=>value,setCodeQuestionWorkspaceState(){},
- workspacePrivatePresentationAllowed:()=>true,visibleWorkspaceRecords:()=>projects.filter(p=>!p.deletedAt&&!p.archivedAt),
- switchWorkspace:async id=>assert.equal(id,"p"),openWorkspaceContextMenu:async()=>{choices++;},createNewWorkspace:async()=>{creates++;},
+ openWorkspaceContextMenu:async (id, anchor)=>{
+  assert.equal(id,'general');
+  assert.equal(anchor,workspaceActionsButton);
+  choices++;
+ },
  openReaderCodePicker:()=>{opens++;},notifyReaderColumnLimit:()=>false,currentColumnWorkflowView:()=>"research",captureAccountRequest:()=>({}),
  paneIDForReader:reader=>`reader:${reader.id}`,
  restoreAssistantConversationOwners:()=>assert.fail('Unselected workspace must not restore Assistant owners'),
  toggleAccountDialog:()=>{settings++;},releaseSurfaceVisibility:{workboard:true},
  repeatableUtilityKeys:new Set(['search','analysis','saved'])});
-vm.runInContext("let projectRequiredColumnNoticeVisible=false,projectRequiredColumnNoticeTimer=null;"+
- ["workspaceProject","workspaceColumnsRequireProject","notifyProjectRequiredForColumn","enforceProjectRequiredWorkspace",
- 'openReaderFromToolbar','defaultActivePaneIDs','workspacePaneDescriptors','renderProjectRequiredWorkspace',
+vm.runInContext(["workspaceProject","workspaceColumnsRequireProject","notifyProjectRequiredForColumn","enforceProjectRequiredWorkspace",
+ 'openReaderFromToolbar','defaultActivePaneIDs','workspacePaneDescriptors',
  'toggleUtilityPane','focusUtility','focusRecentUtilityColumn','openNewSearchColumn','openNewResearchColumn','openCalculatorColumn','openGenericWorkboard'].map(actual).join("\n"),context);
 
 // Free reading never requires a private workspace, signed in or signed out.
@@ -43,6 +45,7 @@ for (selected of [null,{id:'general'}, {id:'project:p',projectID:'p'}]) {
 }
 assert.equal(clears,0);
 await context.openReaderFromToolbar({});assert.equal(opens,1,'Free Reader remains public');
+assert.equal(choices,0,'Free Reader does not open the workspace chooser');
 
 pro=true; selected=null;
 projects=[{id:'p',name:'Existing workspace'}];
@@ -52,7 +55,9 @@ for (const workspace of [null,{id:'general'},{id:'missing',projectID:'missing'}]
  assert.deepEqual(Array.from(context.defaultActivePaneIDs()),[],'Restored readers and utilities cannot appear before selection');
  assert.deepEqual(Array.from(context.workspacePaneDescriptors()),[],'No column loaders run before selection');
  for (const action of ['openReaderFromToolbar','openNewSearchColumn','openNewResearchColumn','openCalculatorColumn','openGenericWorkboard']) {
+  const previousChoices=choices;
   await context[action]({});
+  assert.equal(choices,previousChoices+1,`${action} opens the toolbar workspace chooser`);
  }
  for (const key of ['search','analysis','calculator','saved','archive']) {
   assert.equal(await context.toggleUtilityPane(key),false,key);
@@ -64,17 +69,11 @@ assert.equal(opens,1,'Pro cannot reach the Reader picker without a selected work
 assert.equal(state.readers[0].id,'legacy-reader','Blocked entry points do not alter restored layouts');
 assert.equal(state.utilityInstances.length,1);
 await context.focusUtility('settings');assert.equal(settings,1,'Settings remains available to manage workspaces');
-let prompt=context.renderProjectRequiredWorkspace();
-const [direct,chooser]=prompt.querySelectorAll('button');
-assert.equal(direct.textContent,'Existing workspace');
-direct.dispatch('click',{});
-assert.equal(chooser.textContent,'All workspaces');
-let stopped=false;
-chooser.dispatch('click',{stopPropagation(){stopped=true;}});assert.equal(choices,1);
-assert.equal(stopped,true,'The opening click cannot immediately dismiss the workspace chooser');
-projects=[];prompt=context.renderProjectRequiredWorkspace();
-assert.equal(prompt.querySelector('button').textContent,'add workspace');
-prompt.querySelector('button').dispatch('click',{stopPropagation(){}});assert.equal(creates,1);
+assert.doesNotMatch(app,/workspace-empty-guidance|renderProjectRequiredWorkspace/);
+projects=[];
+const previousChoices=choices;
+assert.equal(context.notifyProjectRequiredForColumn(),true);
+assert.equal(choices,previousChoices+1,'An empty account also opens the workspace chooser');
 assert.equal(context.enforceProjectRequiredWorkspace(),true);
 assert.equal(state.readers.length,0,'Unassigned columns retire when the verified shell renders');
 assert.equal(state.utilityInstances.length,0);
