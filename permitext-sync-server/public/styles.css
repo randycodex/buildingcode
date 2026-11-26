@@ -10945,6 +10945,41 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   box-shadow: none;
 }
 
+.saved-project-structured-fact-control {
+  display: grid;
+  min-width: 0;
+}
+
+/* Reserve the full height of the wrapped value, including on browsers without field-sizing. */
+.saved-project-structured-fact-control::after {
+  content: attr(data-value) " ";
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.saved-project-structured-fact-control > .saved-project-structured-fact-value,
+.saved-project-structured-fact-control::after {
+  grid-area: 1 / 1;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 24px;
+  padding: 2px 0;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: right;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.saved-project-structured-fact-control > .saved-project-structured-fact-value {
+  align-self: stretch;
+  field-sizing: fixed;
+  resize: none;
+  overflow: hidden;
+}
+
 @media (max-width: 720px) {
   .saved-project-structured-fact {
     grid-template-columns: minmax(0, 1fr);
@@ -20354,13 +20389,13 @@ dialog.report-export-review {
 .project-details-screen .saved-project-structured-fact { display: grid; grid-template-columns: minmax(150px, 240px) minmax(0, 1fr); align-items: start; gap: 12px 24px; padding: 14px 0; }
 .project-details-screen .saved-project-structured-fact-label { padding-top: 8px; font-size: 13px; }
 .project-details-screen input.saved-project-structured-fact-value { width: 100%; max-width: none; min-width: 0; min-height: 36px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; }
-.project-details-screen .saved-project-structured-fact > :not(label):not(input) { grid-column: 2; }
+.project-details-screen .saved-project-structured-fact > .project-fact-review-status { grid-column: 2; }
 @media (max-width:700px) {
  .project-details-screen .saved-project-structured-fact { grid-template-columns: 1fr; gap: 8px; }
- .project-details-screen .saved-project-structured-fact > :not(label):not(input) { grid-column: 1; }
+ .project-details-screen .saved-project-structured-fact > .project-fact-review-status { grid-column: 1; }
 }
 
-.project-details-screen .saved-project-structured-fact-value { text-align: left; }
+.project-details-screen input.saved-project-structured-fact-value { text-align: left; }
 
 /* Keep the workspace tools between the brand and account controls. */
 :root {
@@ -20608,7 +20643,7 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
   line-height: 1.4;
   text-align: right;
 }
-.project-details-screen .project-details-columns .saved-project-structured-fact > :not(label):not(input) {
+.project-details-screen .project-details-columns .saved-project-structured-fact > .project-fact-review-status {
   grid-column: 2;
   text-align: right;
   overflow-wrap: anywhere;
