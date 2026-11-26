@@ -545,12 +545,6 @@ private struct ProjectNotebookSessionView: View {
                         NativeNotebookLoadFailureView(message: errorMessage) {
                             Task { await loadCards(forceNetwork: true) }
                         }
-                    } else {
-                        ContentUnavailableView(
-                            "No Notes yet",
-                            systemImage: "note.text",
-                            description: Text(access.readOnly ? "This Project’s Notebook is read-only." : "Create a Note for analysis, evidence, and code research.")
-                        )
                     }
                 }
                 .transition(.opacity)

@@ -2848,11 +2848,15 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launch()
         let retry = app.buttons["native-notebook-retry"]
         XCTAssertTrue(retry.waitForExistence(timeout: 30), "First-load failure must be visible and recoverable.")
-        XCTAssertFalse(app.staticTexts["No Notes yet"].exists, "A load failure is not an empty Notebook.")
         keepScreenshot(named: "Native Notebook first-load retry", from: app)
         retry.tap()
-        XCTAssertTrue(app.staticTexts["No Notes yet"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.buttons["New Note"].exists, "Successful retry must restore server-authorized editing.")
+        XCTAssertTrue(app.buttons["New Note"].waitForExistence(timeout: 10),
+                      "Successful retry must restore server-authorized editing.")
+        XCTAssertTrue(waitForNonexistence(retry, timeout: 10))
+        XCTAssertFalse(app.staticTexts["No Notes yet"].exists)
+        XCTAssertFalse(app.staticTexts["Create a Note for analysis, evidence, and code research."].exists)
+        app.buttons["New Note"].tap()
+        XCTAssertTrue(app.textFields["Note title"].waitForExistence(timeout: 10))
     }
 
     func testNativeNotebookConflictRequiresReviewAndDeletionDoesNotRestoreDraft() throws {
@@ -2938,27 +2942,29 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertTrue(deletionAlert.staticTexts[recoveryMessage].exists)
             let confirmDelete = deletionAlert.buttons["Move to Trash"]
             XCTAssertTrue(confirmDelete.isHittable && deletionAlert.buttons["Cancel"].isHittable, app.debugDescription)
-            XCTAssertFalse(app.staticTexts["No Notes yet"].exists, "Opening confirmation must not delete the note.")
+            XCTAssertTrue(title.exists, "Opening confirmation must keep the current note open.")
             keepScreenshot(named: "Native Notebook deletion requires confirmation after reviewed conflict", from: app)
             confirmDelete.tap()
         } else {
             selectionTrash.buttons["Move to Trash"].tap()
         }
-        XCTAssertTrue(app.staticTexts["No Notes yet"].waitForExistence(timeout: 10))
+        let newNote = app.buttons["New Note"]
+        XCTAssertTrue(newNote.waitForExistence(timeout: 10))
         XCTAssertFalse(app.staticTexts["Loading Notebook…"].exists)
         XCTAssertFalse(app.staticTexts["list-selection-count"].exists)
         XCTAssertFalse(savedNote.exists)
         XCTAssertFalse(app.staticTexts["Drafts on this iPhone"].exists)
         XCTAssertFalse(cachedDraft.exists)
         XCTAssertFalse(app.textFields["Note title"].exists, "Deletion must dismiss the editor to its parent list.")
-        XCTAssertTrue(app.buttons["New Note"].exists)
         // Foreground refresh rereads both the server list and local draft cache.
         // Do not relaunch: the isolated harness deliberately reseeds on launch.
         XCUIDevice.shared.press(.home)
         app.activate()
-        XCTAssertTrue(app.staticTexts["No Notes yet"].waitForExistence(timeout: 10))
+        XCTAssertTrue(newNote.waitForExistence(timeout: 10))
+        XCTAssertTrue(waitForNonexistence(app.staticTexts["Loading Notebook…"], timeout: 10))
         XCTAssertFalse(app.staticTexts["Drafts on this iPhone"].exists, "A cache refresh must not recreate the deleted draft.")
         XCTAssertFalse(cachedDraft.exists)
+        XCTAssertFalse(savedNote.exists)
         keepScreenshot(named: "Deleted Notebook stays empty after foreground cache refresh", from: app)
     }
 
