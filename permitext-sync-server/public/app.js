@@ -18,7 +18,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-note-toolbar-icons-v2712";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-note-table-resize-v2713";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -180,7 +180,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261126-note-toolbar-icons-v2712";
+} from "./offline-storage.js?v=20261126-note-table-resize-v2713";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3638,8 +3638,12 @@ function publishNotebookColumn(projectID, paneID, card, cards) {
   const panel = notebookColumnMounts.get(paneID)?.panel;
   if (panel && card) {
     panel.dataset.noteId = card.id || '';
-    panel.dataset.notebookTitle = card.title || 'Untitled';
-    preparePaneCollapse(panel);
+    const title = card.title || 'Untitled';
+    // A body autosave refreshes the note list without resetting the fitted pane width.
+    if (panel.dataset.notebookTitle !== title) {
+      panel.dataset.notebookTitle = title;
+      preparePaneCollapse(panel);
+    }
   }
   syncNotebookNoteTabs();
 }
@@ -22451,9 +22455,10 @@ function bindSearchHistoryDivider(results, divider, instance) {
 }
 
 function bindHorizontalWheelScroll(element, options = {}) {
-  if (!element || element.dataset.horizontalWheelBound === "true") return;
-  element.dataset.horizontalWheelBound = "true";
-  element.addEventListener(
+  const eventTarget = options.eventTarget ?? element;
+  if (!element || eventTarget.dataset.horizontalWheelBound === "true") return;
+  eventTarget.dataset.horizontalWheelBound = "true";
+  eventTarget.addEventListener(
     "wheel",
     (event) => {
       if (event.defaultPrevented || event.ctrlKey || event.metaKey) return;
@@ -22478,6 +22483,20 @@ function bindHorizontalWheelScroll(element, options = {}) {
     },
     { passive: false }
   );
+}
+
+function syncNotebookTableLayout(root) {
+  for (const columns of root.querySelectorAll('.bn-editor .tableWrapper-inner > table > colgroup')) {
+    const count = columns.childElementCount;
+    if (!count) continue;
+    const width = `calc((100cqi - 1px) / ${count})`;
+    if (columns.style.getPropertyValue('--notebook-default-column-width') !== width) {
+      columns.style.setProperty('--notebook-default-column-width', width);
+    }
+    const scroller = columns.closest('.tableWrapper-inner');
+    // Keep the binding marker outside the editor's observed table content.
+    bindHorizontalWheelScroll(scroller, { eventTarget: scroller.parentElement, shiftWheel: true, contain: true });
+  }
 }
 
 
@@ -33572,10 +33591,12 @@ async function renderProjectNotebook(project, options = {}) {
         },
         onChange(document) {
           if (notebookReadOnly || disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence) return;
+          syncNotebookTableLayout(editorElement);
           draftDocument = document;
           markNotebookDirty();
         },
         onReady() {
+          syncNotebookTableLayout(editorElement);
           const localPosition = notebookEditingPositions.get(focusedCardID);
           const position = localPosition || readNotebookReturnScroll(returnScrollContext, focusedCardID);
           window.requestAnimationFrame(() => {

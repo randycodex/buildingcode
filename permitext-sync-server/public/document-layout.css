@@ -137,8 +137,21 @@ body .panel-track > article.workspace-panel.notebook-panel .notebook-title-contr
   font-size: var(--document-table-size);
   line-height: var(--document-table-line-spacing);
 }
-.notebook-panel .bn-editor table col,
 .report-screen .bn-editor table col { width: auto !important; }
+.notebook-panel .bn-editor [data-content-type="table"] .tableWrapper-inner {
+  container-type: inline-size;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.notebook-panel .bn-editor [data-content-type="table"] table:has(> colgroup[style*="--notebook-default-column-width"]) {
+  /* Fixed layout expands from the column widths. A fixed page width would
+     squeeze untouched columns during growth and redistribute width on shrink. */
+  width: 0 !important;
+  max-width: none;
+}
+.notebook-panel .bn-editor [data-content-type="table"] col:not([style*="width:"]) {
+  width: var(--notebook-default-column-width);
+}
 .notebook-panel .bn-editor [data-content-type="table"] .tableWrapper,
 .report-screen .bn-editor [data-content-type="table"] .tableWrapper {
   width: calc(100% + 31px);
