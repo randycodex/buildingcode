@@ -1239,6 +1239,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         tabs.buttons["Questions"].tap()
         XCTAssertFalse(app.keyboards.firstMatch.exists)
         XCTAssertEqual(app.tabBars.buttons.count, 4)
+        XCTAssertFalse(app.staticTexts["No questions yet."].exists)
         app.buttons["project-workflow-add"].tap()
         let question = app.textFields["project-question-text-0"]
         let questionText = question.exists ? question : app.textViews["project-question-text-0"]
