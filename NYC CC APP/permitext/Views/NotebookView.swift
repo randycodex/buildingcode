@@ -752,7 +752,6 @@ private struct ProjectNotebookSessionView: View {
                 access = NotebookAccess(role: "viewer", readOnly: true)
             }
             if NativePrivateCachePolicy.requiresInvalidation(after: error) {
-                library.invalidateProjectDashboardPreview(projectID: projectID)
                 try? cache.removeProject(accountID: owner.accountID, projectID: projectID)
                 localDrafts = []
                 editorRoute = nil
@@ -1720,7 +1719,6 @@ private struct NotebookCardEditorView: View {
             guard isCurrentOwner, !Task.isCancelled else { return }
             if NativePrivateCachePolicy.requiresInvalidation(after: error) {
                 // Preserve the draft, but do not display or edit revoked server content.
-                library.invalidateProjectDashboardPreview(projectID: projectID)
                 try? cache.removeProject(accountID: accountID, projectID: projectID)
                 hasLoaded = false
             } else if !isLeaving, !hasLoaded, deferredDraft == nil, !forceNetwork,
@@ -1902,7 +1900,6 @@ private struct NotebookCardEditorView: View {
                     hasDeniedWriteAccess = true
                     // Match the existing read invalidation policy; keep the live
                     // draft in memory, but stop displaying private source content.
-                    library.invalidateProjectDashboardPreview(projectID: projectID)
                     if let owner { try? cache.removeProject(accountID: owner.accountID, projectID: projectID) }
                     hasLoaded = false
                 }

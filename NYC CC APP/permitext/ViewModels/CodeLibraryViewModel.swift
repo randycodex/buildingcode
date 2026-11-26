@@ -195,8 +195,6 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var savedRemovalUndoFailed = false
     @Published private(set) var projectBookmarksByFolderID: [Int64: [BookmarkedSection]] = [:]
     @Published private(set) var projectEvidenceRecordCountByFolderID: [Int64: Int] = [:]
-    @Published private var projectDashboardPreviews: [String: ProjectDashboardPreview] = [:]
-    private var projectDashboardPreviewLoads: [String: Task<Void, Never>] = [:]
     @Published private(set) var exportState: BookmarkExportState = .idle
     @Published private(set) var folders: [CodeFolder] = []
     @Published private(set) var readerSaveDestinationChoice: NativeReaderSaveDestination = .unassigned
@@ -251,9 +249,6 @@ final class CodeLibraryViewModel: ObservableObject {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
             deferredContinuitySyncTask?.cancel()
             deferredContinuitySyncTask = nil
-            for load in projectDashboardPreviewLoads.values { load.cancel() }
-            projectDashboardPreviewLoads.removeAll()
-            projectDashboardPreviews.removeAll()
             readerSaveDestinationChoice = NativeReaderSaveDestination.load(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
             activeProjectID = nil
             openProjectID = nil
@@ -4287,41 +4282,6 @@ final class CodeLibraryViewModel: ObservableObject {
         projectEvidenceRecordCountByFolderID[folderID] ?? bookmarks(inFolder: folderID).count
     }
 
-    func projectDashboardPreview(folderID: Int64) -> ProjectDashboardPreview? {
-        guard hasProjectAccess, let projectID = backendProjectID(for: folderID) else { return nil }
-        return projectDashboardPreviews[projectID]
-    }
-
-    func prepareProjectDashboardPreview(folderID: Int64) async {
-        guard hasProjectAccess, let identity = privateRequestIdentity,
-              let projectID = backendProjectID(for: folderID),
-              projectDashboardPreviews[projectID] == nil else { return }
-        if let load = projectDashboardPreviewLoads[projectID] {
-            await load.value
-            return
-        }
-        let cache = projectHubOfflineCache
-        let load = Task { [weak self] in
-            let cached = try? await ProjectHubOfflineCacheWorker.shared.load(
-                ProjectHubSnapshot.self, from: cache,
-                accountID: identity.accountID, projectID: projectID, scope: ProjectHubSnapshot.personalCacheScope
-            )
-            guard !Task.isCancelled, let self, identity == self.privateRequestIdentity else { return }
-            self.projectDashboardPreviewLoads[projectID] = nil
-            guard self.hasProjectAccess, self.backendProjectID(for: folderID) == projectID,
-                  self.projectDashboardPreviews[projectID] == nil,
-                  let cached, cached.value.projectID == projectID else { return }
-            self.projectDashboardPreviews[projectID] = ProjectDashboardPreview(snapshot: cached.value)
-        }
-        projectDashboardPreviewLoads[projectID] = load
-        await load.value
-    }
-
-    func invalidateProjectDashboardPreview(projectID: String) {
-        projectDashboardPreviewLoads.removeValue(forKey: projectID)?.cancel()
-        if projectDashboardPreviews[projectID] != nil { projectDashboardPreviews[projectID] = nil }
-    }
-
     func projectHubSnapshot(folderID: Int64) async throws -> ProjectHubSnapshot {
         guard let folder = folder(id: folderID) else {
             throw ProjectHubLoadError.projectUnavailable
@@ -4340,8 +4300,6 @@ final class CodeLibraryViewModel: ObservableObject {
                 projectID: projectID
             )
             guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
-            let preview = ProjectDashboardPreview(snapshot: snapshot)
-            if projectDashboardPreviews[projectID] != preview { projectDashboardPreviews[projectID] = preview }
             try? await ProjectHubOfflineCacheWorker.shared.store(
                 snapshot, in: projectHubOfflineCache,
                 accountID: signedInAccount.appUserID,
@@ -4353,7 +4311,6 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             if NativePrivateCachePolicy.requiresInvalidation(after: error) {
-                invalidateProjectDashboardPreview(projectID: projectID)
                 try? await ProjectHubOfflineCacheWorker.shared.removeProject(
                     from: projectHubOfflineCache, accountID: signedInAccount.appUserID, projectID: projectID
                 )
@@ -8795,7 +8752,6 @@ extension CodeLibraryViewModel {
                 }
                 try? cache.store(draft, accountID: accountID, projectID: projectID, scope: scope)
                 if NativePrivateCachePolicy.requiresInvalidation(after: error) {
-                    invalidateProjectDashboardPreview(projectID: projectID)
                     try? cache.removeProject(accountID: accountID, projectID: projectID)
                 }
                 notebookReconnectRevision &+= 1

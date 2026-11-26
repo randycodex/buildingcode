@@ -1041,18 +1041,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         throw XCTSkip("Project overview acceptance uses the isolated Debug fixture.")
 #else
         let app = XCUIApplication()
-        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--native-project-overview-fixture", "--native-project-overview-delayed-load", "--permitext-disable-clerk"]
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--native-project-overview-fixture", "--permitext-disable-clerk"]
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
         let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch
         project.tap()
         let root = element(in: app, identifier: "project-folder-root")
         XCTAssertTrue(root.waitForExistence(timeout: 10))
-        let notesCard = app.buttons["project-section-notebook"]
         let reportsCard = app.buttons["project-section-reports"]
-        XCTAssertTrue(notesCard.label.contains("Cached project note") && notesCard.label.contains("1 note"))
-        XCTAssertTrue(reportsCard.label.contains("Cached project report") && reportsCard.label.contains("1 report"),
-                      "Dashboard cards must show their local previews before the delayed refresh completes.")
         let expectedSummary = ["address": "100 Acceptance Court, Brooklyn, NY 11215", "tax-lot-area": "5,000 sq ft",
                                "occupancy": "R-2 — 8 permanent dwelling units (assumed)",
                                "construction-type": "Type III-B (assumed) — masonry exterior walls and wood floor joists",
@@ -1063,11 +1059,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertEqual(item.value as? String, value)
         }
         XCTAssertFalse(element(in: app, identifier: "project-summary-building-height").exists)
-        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            notesCard.label.contains("0 notes") && reportsCard.label.contains("0 reports")
-        }, object: nil)], timeout: 10), .completed)
         let cards = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-section-"))
         XCTAssertEqual(cards.count, 6)
+        for (section, title) in [("overview", "Overview"), ("review", "Review"), ("notebook", "Notes"),
+                                 ("evidence", "Evidence"), ("calculator", "Calculator"), ("reports", "Reports")] {
+            XCTAssertEqual(app.buttons["project-section-\(section)"].label, title)
+        }
         let projectName = app.staticTexts["project-workspace-name"]
         XCTAssertEqual(projectName.frame.minX, app.buttons["project-section-overview"].frame.minX, accuracy: 1)
         XCTAssertEqual(element(in: app, identifier: "project-summary-address").frame.minX, projectName.frame.minX, accuracy: 1)
@@ -1179,7 +1176,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(savedContext.label.hasPrefix("Phone edit."))
         overviewBar.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(overviewCard.waitForExistence(timeout: 5))
-        XCTAssertTrue(overviewCard.label.contains("Phone edit."))
+        XCTAssertEqual(overviewCard.label, "Overview")
         overviewCard.tap()
         XCTAssertTrue(savedContext.waitForExistence(timeout: 5),
                       "Reopening Overview should restore Context after switching back.")
@@ -1208,8 +1205,6 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             }
             bar.buttons.element(boundBy: 0).tap()
             XCTAssertTrue(root.waitForExistence(timeout: 10))
-            XCTAssertTrue(app.buttons["project-section-notebook"].label.contains("0 notes"), "Loaded previews survive the delayed refresh")
-            XCTAssertTrue(app.buttons["project-section-reports"].label.contains("0 reports"))
         }
         app.buttons["main-tab-saved"].tap()
         XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
@@ -1287,7 +1282,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Reviewed"].exists)
         review.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(root.waitForExistence(timeout: 5))
-        XCTAssertTrue(reviewCard.label.contains("1/5 records reviewed"))
+        XCTAssertEqual(reviewCard.label, "Review")
         let notesCard = app.buttons["project-section-notebook"]
         reveal(notesCard, in: app)
         notesCard.tap()
@@ -5612,7 +5607,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["main-tab-saved"].tap()
         let evidence = app.buttons["project-section-evidence"]
         XCTAssertTrue(evidence.waitForExistence(timeout: 10), app.debugDescription)
-        XCTAssertTrue(evidence.label.contains("2 saved"), evidence.label)
+        XCTAssertEqual(evidence.label, "Evidence")
         reveal(evidence, in: app)
         evidence.tap()
         XCTAssertTrue(app.navigationBars["Evidence"].waitForExistence(timeout: 10))

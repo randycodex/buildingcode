@@ -1009,24 +1009,6 @@ private struct Phase3EntitledResearchHarness: View {
                 _ = library.saveSection(sectionID: section.id, toFolderIDs: [acceptanceProject.id])
             }
         }
-        if overviewFixture, ProcessInfo.processInfo.arguments.contains("--native-project-overview-delayed-load"),
-           let account = library.signedInAccount, let projectID = library.backendProjectID(for: acceptanceProject.id) {
-            let timestamp = "2026-09-15T12:00:00Z"
-            let note = ProjectNotebookCardSummary(id: "cached-note", version: 1, cardType: "finding", title: "Cached project note",
-                                                  plainText: "Synthetic note", referenceCount: 0, createdAt: timestamp, updatedAt: timestamp)
-            let report = ProjectReportSummary(id: "cached-report", projectID: projectID, draftID: "cached-draft", title: "Cached project report",
-                reportDate: timestamp, author: ProjectReportAuthor(userID: "fixture", displayName: "Fixture"), codeEdition: "2022",
-                reportVersion: 1, itemCount: 0, contentHash: "fixture", generatorVersion: "1", createdAt: timestamp, files: nil)
-            let snapshot = ProjectHubSnapshot(projectID: projectID, notebookCards: [note], researchConversations: [],
-                                              researchAnswers: [], activity: [], reports: [report])
-            do {
-                try ProjectHubOfflineCache(directoryURL: configuration.cacheDirectoryURL).store(snapshot, accountID: account.appUserID,
-                    projectID: projectID, scope: ProjectHubSnapshot.personalCacheScope)
-            } catch {
-                failureMessage = "The isolated dashboard preview could not be cached."
-                return
-            }
-        }
         if ProcessInfo.processInfo.arguments.contains("--native-project-evidence-toolbar-fixture") {
             guard let scope = library.sections(for: chapterOne).first(where: { $0.sectionNumber == "101.2" }),
                   library.saveSection(sectionID: scope.id, toFolderIDs: [acceptanceProject.id]) else {

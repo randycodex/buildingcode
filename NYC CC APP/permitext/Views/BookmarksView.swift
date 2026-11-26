@@ -648,9 +648,6 @@ private var filteredSavedEmptyState: some View {
                         .accessibilityHint("Open Project. Touch and hold, then drag to reorder.")
                         .accessibilityAction(named: "Move earlier") { moveProject(folder, offset: -1) }
                         .accessibilityAction(named: "Move later") { moveProject(folder, offset: 1) }
-                        .task(id: library.privateSessionID) {
-                            await library.prepareProjectDashboardPreview(folderID: folder.id)
-                        }
                 } else {
                     projectTileSlot(folder)
                 }
@@ -1127,8 +1124,19 @@ private struct BookmarkExportPreviewSheet: View {
     }
 }
 
-enum ProjectOverviewSection: CaseIterable, Hashable {
+enum ProjectOverviewSection: String, CaseIterable, Hashable {
     case overview, review, notebook, evidence, calculator, reports
+
+    fileprivate var cardLabel: (title: String, systemImage: String) {
+        switch self {
+        case .overview: ("Overview", "list.bullet.rectangle")
+        case .review: ("Review", "checklist")
+        case .notebook: ("Notes", "note.text")
+        case .evidence: ("Evidence", "bookmark")
+        case .calculator: ("Calculator", "plus.forwardslash.minus")
+        case .reports: ("Reports", "doc.richtext")
+        }
+    }
 }
 
 enum ProjectOverviewTab: String, Hashable {
@@ -1951,14 +1959,7 @@ struct ProjectView: View {
         let task = Task {
             defer { if !Task.isCancelled { projectHubLoadTask = nil } }
             do {
-                await library.prepareProjectDashboardPreview(folderID: folderID)
                 try Task.checkCancellation()
-#if DEBUG
-                if ProcessInfo.processInfo.arguments.contains("--native-project-overview-fixture"),
-                   ProcessInfo.processInfo.arguments.contains("--native-project-overview-delayed-load") {
-                    try await Task.sleep(for: .seconds(5))
-                }
-#endif
                 let snapshot = try await library.projectHubSnapshot(folderID: folderID)
                 guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
                 projectHubSnapshot = snapshot
@@ -2126,76 +2127,25 @@ struct ProjectView: View {
         .tint(Color.appChrome)
     }
 
-    @ViewBuilder
     private func projectSectionLink(_ section: ProjectOverviewSection, compact: Bool, expands: Bool) -> some View {
-        switch section {
-        case .overview:
-            NavigationLink(value: ProjectOverviewSection.overview) {
-                let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                let summary = String(formattedProjectContext(description).characters)
-                    .split(whereSeparator: \.isWhitespace).joined(separator: " ")
-                let facts = folder?.structuredFacts ?? []
-                let firstFact = facts.first.map { "\($0.label): \($0.value)" }
-                projectSectionCard("Overview", systemImage: "list.bullet.rectangle",
-                    count: "\(facts.count) \(facts.count == 1 ? "fact" : "facts")",
-                    preview: summary.isEmpty ? (firstFact ?? "Add context") : summary,
-                    compact: compact, expands: expands, previewLineLimit: 2)
+        let label = section.cardLabel
+        let minimumHeight: CGFloat = dynamicTypeSize.isAccessibilitySize ? 140 : (compact ? 74 : 116)
+        return NavigationLink(value: section) {
+            HStack(spacing: 8) {
+                Image(systemName: label.systemImage)
+                    .font(.body.weight(.medium))
+                    .accessibilityHidden(true)
+                Text(label.title).font(.headline)
             }
-            .accessibilityIdentifier("project-section-overview")
-
-        case .review:
-            NavigationLink(value: ProjectOverviewSection.review) {
-                let unanswered = folder?.openQuestions?.count { question in
-                    !question.question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-                        question.answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                }
-                let records = folder?.recordsChecklist?.filter { $0.status != .notApplicable }
-                projectSectionCard("Review", systemImage: "checklist",
-                    count: records.map { "\($0.count { $0.status == .reviewed })/\($0.count) records reviewed" },
-                    preview: unanswered.map { "\($0) unanswered" } ?? "Questions and checklist",
-                    compact: compact, expands: expands)
-            }
-            .accessibilityIdentifier("project-section-review")
-
-        case .notebook:
-            NavigationLink(value: ProjectOverviewSection.notebook) {
-                let preview = library.projectDashboardPreview(folderID: folderID)
-                projectSectionCard("Notes", systemImage: "note.text",
-                    count: preview.map { "\($0.noteCount) \($0.noteCount == 1 ? "note" : "notes")" },
-                    preview: preview?.latestNoteTitle ?? (preview == nil ? "Open Notes" : "No notes yet."),
-                    compact: compact, expands: expands)
-            }
-            .accessibilityIdentifier("project-section-notebook")
-
-        case .evidence:
-            NavigationLink(value: ProjectOverviewSection.evidence) {
-                let count = library.projectEvidenceRecordCountByFolderID[folderID]
-                projectSectionCard("Evidence", systemImage: "bookmark",
-                    count: count.map { "\($0) saved" },
-                    preview: projectBookmarks.first.map { "\($0.sectionNumber) · \($0.displayTitle)" }
-                        ?? (count == nil ? "Open Evidence" : ""),
-                    compact: compact, expands: expands)
-            }
-            .accessibilityIdentifier("project-section-evidence")
-
-        case .calculator:
-            NavigationLink(value: ProjectOverviewSection.calculator) {
-                projectSectionCard("Calculator", systemImage: "plus.forwardslash.minus",
-                    count: nil, preview: "Occupant load",
-                    compact: compact, expands: expands)
-            }
-            .accessibilityIdentifier("project-section-calculator")
-
-        case .reports:
-            NavigationLink(value: ProjectOverviewSection.reports) {
-                let preview = library.projectDashboardPreview(folderID: folderID)
-                projectSectionCard("Reports", systemImage: "doc.richtext",
-                    count: preview.map { "\($0.reportCount) \($0.reportCount == 1 ? "report" : "reports")" },
-                    preview: preview?.latestReportTitle ?? (preview == nil ? "Open Reports" : "No reports yet."),
-                    compact: compact, expands: expands)
-            }
-            .accessibilityIdentifier("project-section-reports")
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .foregroundStyle(.primary)
+            .padding(compact ? 8 : 14)
+            .frame(maxWidth: .infinity, minHeight: minimumHeight, maxHeight: expands ? .infinity : nil, alignment: .topLeading)
+            .background(projectTileBackgroundColor(for: folder?.colorHex ?? CodeFolder.defaultColorHex),
+                        in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         }
+        .accessibilityIdentifier("project-section-\(section.rawValue)")
     }
 
     @ViewBuilder
@@ -2242,37 +2192,6 @@ struct ProjectView: View {
             .task { await loadProjectHub() }
             .refreshable { await loadProjectHub() }
         }
-    }
-
-    private func projectSectionCard(_ title: String, systemImage: String, count: String?,
-                                    preview: String, compact: Bool, expands: Bool, previewLineLimit: Int? = nil) -> some View {
-        let minimumHeight: CGFloat = dynamicTypeSize.isAccessibilitySize ? 140 : (compact ? 74 : 116)
-        return VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 8) {
-                Image(systemName: systemImage)
-                    .font(.body.weight(.medium))
-                    .accessibilityHidden(true)
-                Text(title).font(.headline)
-            }
-            Spacer(minLength: compact ? 3 : 8)
-            VStack(alignment: .leading, spacing: compact ? 2 : 4) {
-                if !preview.isEmpty {
-                    Text(preview)
-                        .font(.subheadline)
-                        .lineLimit(compact ? 1 : previewLineLimit ?? (dynamicTypeSize.isAccessibilitySize ? nil : 2))
-                }
-                if let count { Text(count).font(.caption) }
-            }
-            .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .foregroundStyle(.primary)
-        .padding(compact ? 8 : 14)
-        .frame(maxWidth: .infinity, minHeight: minimumHeight, maxHeight: expands ? .infinity : nil, alignment: .topLeading)
-        .background(projectTileBackgroundColor(for: folder?.colorHex ?? CodeFolder.defaultColorHex),
-                    in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .accessibilityElement(children: .combine)
     }
 
     @ViewBuilder
