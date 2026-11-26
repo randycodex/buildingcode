@@ -6051,7 +6051,6 @@ final class CodeLibraryViewModel: ObservableObject {
     var projectDeviceSyncIssue: String? {
         guard signedInAccount != nil else { return nil }
         if !userContentSyncConflicts.isEmpty { return "Needs attention · Sync conflicts" }
-        if userContentSyncCheckpoint?.lastErrorMessage != nil { return "Needs attention · Sync paused" }
         return nil
     }
 

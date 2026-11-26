@@ -221,6 +221,7 @@ struct SettingsView: View {
     @State private var accountDeletionOperationInProgress = false
     @StateObject private var deletionVerification = AccountDeletionVerificationModel()
     @State private var showsSignOutWarning = false
+    @State private var showsSyncOfflineAlert = false
     @State private var didScrollToInitialSection = false
     @State private var pendingSyncConflictResolution: PendingSyncConflictResolution?
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
@@ -822,6 +823,8 @@ struct SettingsView: View {
 
                     if !library.userContentSyncConflicts.isEmpty {
                         syncConflictReviewCard
+                    } else if library.userContentSyncCheckpoint?.lastErrorMessage != nil {
+                        syncRecoveryControls
                     }
 
                     Button {
@@ -1668,6 +1671,27 @@ struct SettingsView: View {
     private func signOut() {
         Task {
             await library.signOut(clerk: clerk)
+        }
+    }
+
+    private var syncRecoveryControls: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Label("Sync paused", systemImage: "arrow.triangle.2.circlepath")
+                .font(.subheadline.weight(.semibold))
+            Button("Retry sync") {
+                guard library.isNetworkAvailable else {
+                    showsSyncOfflineAlert = true
+                    return
+                }
+                Task { await library.syncNow() }
+            }
+            .font(.subheadline.weight(.semibold))
+            .frame(minHeight: 44)
+            .disabled(!library.canSyncNow)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .alert("Connect to the internet to retry sync", isPresented: $showsSyncOfflineAlert) {
+            Button("OK", role: .cancel) {}
         }
     }
 
