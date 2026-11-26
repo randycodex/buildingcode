@@ -1,4 +1,4 @@
-const baseURL = process.env.PERMITEXT_SYNC_PRODUCTION_URL || "https://permitext-sync.vercel.app";
+const baseURL = process.env.PERMITEXT_SYNC_PRODUCTION_URL || "https://per.codes";
 const expectedStorage = process.env.PERMITEXT_SYNC_EXPECTED_STORAGE || "postgres";
 const expectedSchema = process.env.PERMITEXT_SYNC_EXPECTED_SCHEMA || "normalized-v4";
 
@@ -29,14 +29,18 @@ async function main() {
     json?.commercialReadiness?.configured === true,
     "Production health did not confirm complete commercial configuration."
   );
+  const authentication = json?.commercialReadiness?.authentication;
   assert(
-    json?.commercialReadiness?.authentication?.configured === true &&
-      json?.commercialReadiness?.authentication?.livePublishableKey === true &&
-      json?.commercialReadiness?.authentication?.authorizedPartyCount === 2,
+    authentication?.configured === true && authentication.livePublishableKey === true,
     "Production health did not confirm the fail-closed Clerk configuration."
   );
+  // Clerk readiness validates the exact origins for a single domain or both migration domains.
+  assert(
+    [2, 4].includes(authentication.authorizedPartyCount),
+    `Expected 2 or 4 authorized sign-in origins, received ${authentication.authorizedPartyCount ?? "unknown"}.`
+  );
 
-  console.log(`permitext production health passed: ${baseURL} uses ${json.storage}${json.schema ? ` (${json.schema})` : ""}`);
+  console.log(`Permitext production health passed for ${baseURL} with ${json.storage}${json.schema ? ` (${json.schema})` : ""} and ${authentication.authorizedPartyCount} authorized sign-in origins.`);
 }
 
 main().catch((error) => {
