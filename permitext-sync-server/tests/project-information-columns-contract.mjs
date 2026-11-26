@@ -275,7 +275,9 @@ const e = vm.createContext({ activeWorkspaceID: "alpha-workspace", document: { c
   wireProjectSectionMotion(...args) { factMotionCalls.push(args); }, persistProjectSectionExpansion() {}, clear: node => { node.children = []; },
   window: { clearTimeout() {} }, showWebNotice() {},
   projectStructuredFactGroups: [
-    { key: "buildingCode", label: "Building & code", fields: [{ key: "occupancy", label: "Occupancy" }] },
+    { key: "buildingCode", label: "Building & code", fields: [
+      { key: "occupancy", label: "Occupancy" }, { key: "building-height", label: "Building Height" }
+    ] },
     { key: "zoning", label: "Zoning", fields: [{ key: "address", label: "Address", projectAddress: true }, { key: "zoning-districts", label: "Zoning Districts" }] }
   ],
   nycMappedFactFields: [],
@@ -318,8 +320,18 @@ assert.deepEqual(Object.keys(patches[1]).sort(), ["address", "structuredFacts"])
 assert.equal(patches[1].structuredFacts[0].value, "R-2");
 assert.equal(typeof factsEditor.refreshZoLa, "function");
 assert.equal(factsEditor.isRefreshing(), false);
-assert.equal(factsEditor.refresh({...alpha,address:'Updated address',structuredFacts:[]}),true,'Identity address changes refresh Facts in place.');
+assert.equal(factsEditor.refresh({ ...alpha, address: "Updated address", structuredFacts: [
+  { key: "occupancy", label: "Occupancy", value: "R-2", status: "stated" },
+  { key: "building-height", label: "Building Height", value: "85", status: "stated", source: "manual" },
+  { key: "zoning-districts", label: "Zoning Districts", value: "R7A", status: "unknown" }
+] }), true, "Identity address changes refresh Facts in place.");
 assert.equal(addressDisplay(factsRoot).textContent, "Updated address");
+for (const [key, value] of [["occupancy", "R-2"], ["building-height", "85"]]) {
+  const row = find(factsRoot, node => node.dataset.factKey === key);
+  assert.equal(find(row, node => node.tag === "textarea").value, value);
+  assert.equal(find(row, node => node.className === "project-fact-review-status"), undefined);
+}
+assert.equal(find(factsRoot, node => node.className === "project-fact-review-status").textContent, "Needs review");
 assert.equal(factsEditor.refresh({ ...alpha, address: "" }), true);
 assert.equal(addressDisplay(factsRoot).textContent, "Not recorded");
 const refreshedOccupancy = find(factsRoot,node=>node.attributes['aria-label']==='Occupancy');

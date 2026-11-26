@@ -18,7 +18,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-zoning-focus-v2709";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-zoning-status-v2710";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -180,7 +180,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261126-zoning-focus-v2709";
+} from "./offline-storage.js?v=20261126-zoning-status-v2710";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -39970,7 +39970,7 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
       if (identity.sharedOnly) value.disabled = true;
       row.append(valueWrapper || value);
     }
-    if (fact && (fact.status !== "sourced" || fact.source !== "nyc-planning")) {
+    if (fact && !(factsOnly && fact.status === "stated") && (fact.status !== "sourced" || fact.source !== "nyc-planning")) {
       const review = document.createElement("small");
       review.className = "project-fact-review-status";
       review.textContent = ({unknown: "Needs review", assumed: "Assumption", confirmed: "Confirmed", stated: "Stated", sourced: "Sourced", rejected: "Rejected"})[fact.status] || fact.status;
