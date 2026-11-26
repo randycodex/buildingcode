@@ -569,7 +569,6 @@ struct ChapterFindMatchRow: Identifiable {
 struct ChapterFindMatchesSheet: View {
     let rows: [ChapterFindMatchRow]
     let onSelect: (String) -> Void
-    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
     @ScaledMetric(relativeTo: .caption) private var numberWidth = 26.0
 
@@ -598,17 +597,13 @@ struct ChapterFindMatchesSheet: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("chapter-find-match-\(index + 1)")
-                .listRowBackground(Color.clear)
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
             .navigationTitle("Chapter matches")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
             }
         }
-        .presentationBackground(colorScheme == .dark ? Color(white: 0.09) : CodeAppBackdrop.color)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
     }
