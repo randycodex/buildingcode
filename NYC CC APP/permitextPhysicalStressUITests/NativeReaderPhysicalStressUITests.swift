@@ -1444,11 +1444,21 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["Zoning"].tap()
         let sourceToggle = app.buttons["Source information"]
         let sourceDetails = app.staticTexts["Synthetic fixture"]
+        let taxLotLabel = app.staticTexts["Tax Lot Area"]
+        let taxLotValue = app.staticTexts["5,000 Sq Ft"]
+        XCTAssertTrue(taxLotValue.waitForExistence(timeout: 5))
+        XCTAssertLessThan(taxLotLabel.frame.midX, taxLotValue.frame.midX)
+        XCTAssertEqual(taxLotLabel.frame.midY, taxLotValue.frame.midY, accuracy: 4)
+        XCTAssertTrue(app.staticTexts["6000 Sq Ft"].exists)
+        XCTAssertTrue(app.staticTexts["9,600 gross Sq Ft above grade"].exists)
+        XCTAssertTrue(app.staticTexts["46 ft to main roof"].exists)
         XCTAssertTrue(app.staticTexts["R7-2, R7A"].exists)
         XCTAssertTrue(app.staticTexts["No mapped intersection found"].exists)
         XCTAssertFalse(app.staticTexts["Sourced"].exists)
+        XCTAssertFalse(app.staticTexts["Stated"].exists)
         XCTAssertFalse(app.staticTexts["Commercial Overlay(s)"].exists)
         XCTAssertFalse(app.staticTexts["Special Purpose District(s)"].exists)
+        keepScreenshot(named: "Zoning fact labels and values", from: app)
         reveal(sourceToggle, in: app)
         XCTAssertTrue(sourceToggle.isHittable)
         XCTAssertFalse(sourceDetails.exists)

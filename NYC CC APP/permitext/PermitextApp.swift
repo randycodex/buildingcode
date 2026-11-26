@@ -967,6 +967,7 @@ private struct Phase3EntitledResearchHarness: View {
             ("building-area", "Building Area", "9,600 gross sq ft above grade"),
             ("building-height", "Building Height", "46 ft to main roof"),
             ("zoning-districts", "Zoning District(s)", "R7-2, R7A"),
+            ("zoning-lot-area", "Zoning Lot Area", "6000"),
             ("commercial-overlays", "Commercial Overlay(s)", " "),
             ("special-purpose-districts", "Special Purpose District(s)", "Not provided"),
             ("pending-zoning-map-amendments", "Pending Zoning Map Amendments", "No mapped intersection found"),
@@ -975,7 +976,8 @@ private struct Phase3EntitledResearchHarness: View {
             ("edition", "Code edition", "2022")
         ].map { key, label, value in
             ProjectStructuredFact(id: key, key: key, label: label, value: value,
-                                  status: "confirmed", source: "Synthetic fixture", sourceText: "", updatedAt: nil)
+                                  status: key == "tax-lot-area" ? "stated" : "confirmed",
+                                  source: "Synthetic fixture", sourceText: "", updatedAt: nil)
         } : []
         guard let acceptanceProject = library.createFolder(
             name: "Acceptance Project",
