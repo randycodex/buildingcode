@@ -70,7 +70,7 @@
   html body .project-facts-panel .saved-project-structured-fact-value {
     border: 0 !important;
   }
-  html body .project-facts-panel .saved-project-structured-fact-value:focus-visible {
-    background: var(--toolbar-active) !important;
+  html body .project-facts-panel .saved-project-structured-fact:has(.saved-project-structured-fact-value:focus-visible) > .saved-project-structured-fact-label {
+    color: var(--text-primary);
   }
 }
