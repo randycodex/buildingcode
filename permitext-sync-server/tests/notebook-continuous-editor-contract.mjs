@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { blockNoteBlocksFromNotebookDocument } from '../src/notebook-schema.js';
 import { validateNotebookDocument, renderNotebookDocumentHTML } from '../notebook-contract.mjs';
 import { notebookFontSize, notebookFontSizes, notebookLineSpacings, notebookTextColor, notebookTextColors } from '../public/notebook-styles.js';
+import { notebookBlocksWithTableHeights, restoreNotebookTableHeights } from '../src/notebook-table-resize.js';
 
 // Reusing the editor must preserve authored structure and reference identity.
 const fixture = {schema:'permitext-notebook-card',schemaVersion:2,format:'blocknote-json',document:[
@@ -58,6 +59,8 @@ const createdLinks = [];
 let selectionWrites = 0;
 let selectedText = 'Keep';
 const editor = {
+  document:selected,
+  prosemirrorState:{doc:{descendants(){}}},
   _tiptapEditor:{state:{doc:{},selection:{from:5,to:9}},commands:{setTextSelection(value){selectionWrites++;editor._tiptapEditor.state.selection=value;}}},
   getActiveStyles:()=>({...styleState}), getSelectedText:()=>selectedText, getSelectedLinkUrl:()=>'',
   toggleStyles:value=>{for(const style of Object.keys(value)) styleState[style]=!styleState[style];},
@@ -70,6 +73,7 @@ const hookState = [], hookRefs = [];
 let stateIndex = 0, refIndex = 0;
 const context = vm.createContext({
   notebookFontSize,notebookFontSizes,notebookLineSpacings,notebookTextColor,notebookTextColors,
+  notebookBlocksWithTableHeights,restoreNotebookTableHeights,
   getComputedStyle:()=>({fontSize:'13.3333px'}),
   URL, Menu:{Target:'menu-target',Dropdown:'menu-dropdown',Item:'menu-item'},
   useState:initial=>{const index=stateIndex++; if(!(index in hookState)) hookState[index]=initial; return [hookState[index],value=>{hookState[index]=value;}];},
@@ -101,6 +105,12 @@ menuItems(renderToolbar()).find(child=>child?.props?.['aria-label']==='Bold').pr
 assert.equal(styleState.bold,false,'Clicking active Bold toggles it off');
 const descendants = node => node && typeof node === 'object' ? [node,...(node.children || []).flatMap(descendants)] : [];
 const named = (tree,name) => descendants(tree).find(node=>node.props?.['aria-label']===name);
+for (const label of ['Text style', 'Line spacing', 'Table']) {
+  const trigger = named(toolbar, label);
+  assert.equal(trigger.type, 'button');
+  assert.equal(trigger.children[0].type, 'svg');
+  assert.equal(trigger.children[0].props['aria-hidden'], 'true');
+}
 editor.domElement={isConnected:true};
 editor.prosemirrorView={dom:{isConnected:true},domAtPos:()=>({node:{nodeType:1}})};
 assert.equal(named(renderToolbar(),'Font size').children[0],'10 pt','Inherited CSS pixel sizes display as document points.');

@@ -455,10 +455,10 @@ function PermitextFormattingToolbar({ editor, options }) {
   }, glyph);
   const insertActions = [["evidence", "Evidence"], ["research", "Assistant answer"], ["image", "Image"], ["template", "Finding template"]]
     .filter(([kind]) => !options.insertItems || options.insertItems.includes(kind));
-  const formatMenu = (label,caption,choices,apply,disabled=false) => React.createElement(Menu,
+  const formatMenu = (label, trigger, choices, apply, disabled = false) => React.createElement(Menu,
     {position:'bottom-start',offset:8,withinPortal:false,width:190,loop:true,returnFocus:false},
-    React.createElement(Menu.Target,null,React.createElement('button',{type:'button',className:'notebook-format-style','aria-label':label,title:label,
-      disabled:!state.editable || disabled,onMouseDown:event=>event.preventDefault(),onClick:()=>{formatSelection.current=captureSelection();}},caption)),
+    React.createElement(Menu.Target,null,React.createElement('button',{type:'button',className:'notebook-format-button','aria-label':label,title:label,
+      disabled:!state.editable || disabled,onMouseDown:event=>event.preventDefault(),onClick:()=>{formatSelection.current=captureSelection();}},trigger)),
     React.createElement(Menu.Dropdown,{className:'notebook-format-style-menu','aria-label':label},...choices.map(choice=>React.createElement(Menu.Item,
       {key:choice.value,className:'notebook-format-style-option',disabled:choice.disabled,
         'aria-current':choice.selected?'true':undefined,onClick:()=>{if(!restoreSelection(formatSelection.current))return;editor.focus();apply(choice.value);}},choice.label))));
@@ -481,18 +481,22 @@ function PermitextFormattingToolbar({ editor, options }) {
     value => value === "default" ? editor.removeStyles({textColor: ""}) : editor.addStyles({textColor: value}),
     !inlineSelection);
   const spacing = first?.props?.lineSpacing || 'normal';
-  const spacingMenu = formatMenu('Line spacing',spacing==='normal'?'Spacing':`${spacing}×`,
+  const spacingMenu = formatMenu("Line spacing",
+    icon(["M5 3v14M2 6l3-3 3 3M2 14l3 3 3-3", "M11 4h7m-7 6h7m-7 6h7"]),
     notebookLineSpacings.map(value=>({value,label:value==='normal'?'Default':value==='1'?'1 · Single':value==='2'?'2 · Double':value,selected:spacing===value})),
     value=>editor.transact(()=>textBlocks.forEach(block=>editor.updateBlock(block,{props:{lineSpacing:value}}))),!textBlocks.length);
-  const tableMenu = formatMenu("Table", "Table", notebookTableActions(editor),
+  const tableMenu = formatMenu("Table",
+    icon(["M4 4h12a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z", "M3 8h14M3 12h14M8 4v12m4-12v12"]),
+    notebookTableActions(editor),
     value => applyNotebookTableAction(editor, value));
   const textStyleMenu = React.createElement(Menu, {position: "bottom-start", offset: 8, withinPortal: false, width: 180, loop: true, returnFocus: false},
     React.createElement(Menu.Target, null,
       React.createElement("button", {
-        ref: textStyleButton, type: "button", className: "notebook-format-style notebook-format-text-style", "aria-label": "Text style",
+        ref: textStyleButton, type: "button", className: "notebook-format-button", "aria-label": "Text style",
+        title: type.startsWith("heading-") ? `Text style (Heading ${type.slice(-1)})` : "Text style (Body)",
         disabled: !state.editable || !textBlocks.length,
         onMouseDown: event => event.preventDefault()
-      }, type.startsWith("heading-") ? `Heading ${type.slice(-1)}` : "Body")),
+      }, icon(["M15.5 4h-6a4 4 0 0 0 0 8h1M10.5 4v13m3-13v13"]))),
     React.createElement(Menu.Dropdown, {
       className: "notebook-format-style-menu", "aria-label": "Text style",
       onKeyDown: event => { if (event.key === "Escape") textStyleButton.current?.focus(); }
@@ -558,7 +562,8 @@ function PermitextFormattingToolbar({ editor, options }) {
     options.toolbarInsertElement ? React.createElement("span", {className: "notebook-format-insert-slot",
       ref: element => { if (element && options.toolbarInsertElement.parentElement !== element) element.append(options.toolbarInsertElement); }})
       : options.onInsert && React.createElement("details", {className: "notebook-format-insert"},
-        React.createElement("summary", null, "Insert"),
+        React.createElement("summary", {className: "notebook-format-button", "aria-label": "Insert", title: "Insert"},
+          icon(["M10 4v12M4 10h12"])),
         React.createElement("div", {className: "notebook-format-insert-menu"}, ...insertActions.map(([kind, label]) =>
           React.createElement("button", {type:"button", key:kind, disabled: !state.editable,
             onMouseDown:event=>event.preventDefault(), onClick:event=>{

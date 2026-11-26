@@ -8,6 +8,7 @@
 
 /* One writing page; formatting stays above it, never beside individual blocks. */
 .permitext-notebook-editor .notebook-format-toolbar {
+  --notebook-tool-gap: 2px;
   position: sticky;
   top: 0;
   z-index: 4;
@@ -15,8 +16,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  justify-content: space-between;
-  column-gap: 12px;
+  column-gap: var(--notebook-tool-gap);
   row-gap: 2px;
   min-height: 42px;
   padding: 5px 24px;
@@ -30,10 +30,8 @@
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 2px;
+  gap: var(--notebook-tool-gap, 2px);
 }
-.permitext-notebook-editor .notebook-format-toolbar .notebook-format-button { width: 28px; flex: 0 0 28px; }
-.permitext-notebook-editor .notebook-format-toolbar .notebook-format-button svg { width: 17px; height: 17px; }
 .permitext-notebook-editor .notebook-format-toolbar :is(button, select, summary) {
   min-height: 30px;
   border: 0;
@@ -55,6 +53,18 @@
   outline-offset: 1px;
 }
 .permitext-notebook-editor .notebook-format-toolbar :disabled { opacity: .45; cursor: default; }
+.permitext-notebook-editor .notebook-format-toolbar .notebook-format-button {
+  --workspace-button-icon-size: 17px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 34px;
+  width: 34px;
+  padding: 0;
+  white-space: nowrap;
+}
+.permitext-notebook-editor .notebook-format-toolbar .notebook-format-button svg { width: 17px; height: 17px; }
 .permitext-notebook-editor [data-style-type="backgroundColor"][data-value="yellow"] {
   background-color: #f4d35e55;
   color: inherit;
@@ -75,11 +85,6 @@
 .notebook-format-color-option { display: flex; align-items: center; gap: 9px; }
 .notebook-format-color-swatch { width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
 .permitext-notebook-editor .notebook-format-save-status { margin-inline-start: auto; font-size: 11px; color: var(--text-secondary, #777); }
-.permitext-notebook-editor .notebook-format-toolbar .notebook-format-style { display: inline-flex; align-items: center; justify-content: center; gap: 0; width: auto; flex: 0 0 auto; white-space: nowrap; }
-.permitext-notebook-editor .notebook-format-toolbar .notebook-format-style svg { width: 14px; height: 14px; }
-.permitext-notebook-editor .notebook-format-toolbar .notebook-format-text-style { width: 80px; flex-basis: 80px; }
-.permitext-notebook-editor .notebook-format-toolbar [aria-label="Font size"] { min-width: 48px; }
-.permitext-notebook-editor .notebook-format-toolbar [aria-label="Line spacing"] { min-width: 62px; }
 .permitext-notebook-editor .notebook-format-style-menu {
   padding: 6px;
   border: 0;
@@ -120,6 +125,7 @@
 .permitext-notebook-editor .notebook-format-save-status:has(> .notebook-draft-status[hidden]) { display: none; }
 .permitext-notebook-editor .notebook-format-save-status:not(:empty) { flex-basis: 100%; margin-inline-start: 0; }
 .permitext-notebook-editor .notebook-format-insert { position: relative; }
+.permitext-notebook-editor .notebook-format-insert > summary::-webkit-details-marker { display: none; }
 .permitext-notebook-editor .notebook-format-insert-menu {
   position: absolute;
   inset-block-start: 100%;
@@ -141,12 +147,11 @@
   padding-inline: 24px;
 }
 @media (max-width: 600px) {
-  .permitext-notebook-editor .notebook-format-toolbar { padding: 5px 8px; gap: 1px; }
+  .permitext-notebook-editor .notebook-format-toolbar { padding: 5px 8px; }
   .permitext-notebook-editor .notebook-format-toolbar :is(button, select, summary) { min-height: 36px; padding-inline: 6px; }
   .permitext-notebook-editor .bn-editor { padding: 16px 18px 100px; }
 }
 
-.permitext-notebook-editor .notebook-format-button { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; }
 .permitext-notebook-editor .notebook-format-link { position: relative; display: inline-flex; }
 .permitext-notebook-editor .notebook-format-link-form { position: absolute; inset-block-start: 100%; inset-inline-end: 0; z-index: 30; display: grid; gap: 8px; width: 250px; padding: 12px; border: 1px solid var(--border, #ddd); background: var(--surface, white); color: var(--text-primary, #222); }
 .permitext-notebook-editor .notebook-format-link-form label { display: grid; gap: 4px; }

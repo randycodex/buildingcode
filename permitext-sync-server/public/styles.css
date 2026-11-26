@@ -14569,19 +14569,6 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   padding-bottom: var(--space-3);
 }
 
-.notebook-toolbar .notebook-reference-menu-toggle {
-  min-height: 40px;
-  border-radius: var(--radius-pill);
-  background: var(--menu-surface);
-  font-size: 12px !important;
-  font-weight: 400;
-}
-
-.notebook-toolbar .notebook-reference-menu-toggle:hover,
-.notebook-toolbar .notebook-reference-menu-toggle:focus-visible {
-  background: var(--menu-surface);
-}
-
 .notebook-reference-list {
   display: block;
   min-height: 0;

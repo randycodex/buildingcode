@@ -1048,7 +1048,8 @@ async function main() {
         workspaceScript.text.includes('archiveButton.innerHTML = archiveIconSVG()') &&
         workspaceScript.text.includes('selectButton.innerHTML = selectionModeIconSVG()') &&
         !workspaceScript.text.includes('deleteButton.className = "notebook-danger-action"') &&
-        workspaceScript.text.includes('referenceToggle.className = "code-filter-menu-toggle notebook-reference-menu-toggle"') &&
+        workspaceScript.text.includes('referenceToggle.className = "code-filter-menu-toggle notebook-format-button"') &&
+        workspaceScript.text.includes('prependWorkspaceButtonIcon(referenceToggle, "plus")') &&
         workspaceScript.text.includes("const railLabel = noteMenu.label") &&
         workspaceScript.text.includes("createNotebookNoteMenu({") &&
         workspaceScript.text.includes("referenceToggle.append(referenceLabel)") &&
@@ -1686,7 +1687,7 @@ async function main() {
         workspaceStyles.text.includes(".project-section-count {") &&
         workspaceStyles.text.includes(".notebook-toolbar {\n  display: block;") &&
         workspaceStyles.text.includes(".notebook-reference-menu {\n  display: grid;") &&
-        workspaceStyles.text.includes(".notebook-toolbar .notebook-reference-menu-toggle {\n  min-height: 40px;\n  border-radius: var(--radius-pill);\n  background: var(--menu-surface);") &&
+        workspaceStyles.text.includes(".notebook-format-insert-slot .notebook-reference-menu {") &&
         workspaceStyles.text.includes(".notebook-reference-list {\n  display: block;") &&
         workspaceStyles.text.includes("overflow-wrap: anywhere;") &&
         workspaceStyles.text.includes(".notebook-reference-group-title {") &&

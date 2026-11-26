@@ -18,7 +18,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-notebook-table-resize-v2711";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-note-toolbar-icons-v2712";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -180,7 +180,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261126-notebook-table-resize-v2711";
+} from "./offline-storage.js?v=20261126-note-toolbar-icons-v2712";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -388,7 +388,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261126-notebook-table-resize-v11";
+const notebookClientVersion = "20261126-note-toolbar-icons-v12";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 let pendingProjectWorkspaceLink = projectWorkspaceLinkFromLocation();
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
@@ -33272,12 +33272,14 @@ async function renderProjectNotebook(project, options = {}) {
       toolbar.className = "notebook-toolbar code-filter-menu notebook-reference-menu";
       toolbar.setAttribute("aria-label", "Insert into note");
       const referenceToggle = document.createElement("button");
-      referenceToggle.className = "code-filter-menu-toggle notebook-reference-menu-toggle";
+      referenceToggle.className = "code-filter-menu-toggle notebook-format-button";
       referenceToggle.type = "button";
+      referenceToggle.title = "Insert";
       const referenceLabel = document.createElement("span");
-      referenceLabel.className = "code-filter-menu-label";
+      referenceLabel.className = "code-filter-menu-label sr-only";
       referenceLabel.textContent = "Insert";
       referenceToggle.append(referenceLabel);
+      prependWorkspaceButtonIcon(referenceToggle, "plus");
       const referenceList = document.createElement("div");
       referenceList.className = "notebook-reference-list";
       let candidates = (prepared ? prepared.candidates : await notebookReferenceCandidates(identity, foundation, cards))

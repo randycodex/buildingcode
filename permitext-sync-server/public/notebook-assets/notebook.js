@@ -51795,7 +51795,7 @@ function QZ({ editor: e, options: t }) {
 		returnFocus: !1
 	}, _.createElement(aJ.Target, null, _.createElement("button", {
 		type: "button",
-		className: "notebook-format-style",
+		className: "notebook-format-button",
 		"aria-label": t,
 		title: t,
 		disabled: !h.editable || a,
@@ -51834,11 +51834,11 @@ function QZ({ editor: e, options: t }) {
 		className: "notebook-format-color-icon",
 		"aria-hidden": "true",
 		style: qZ(dX(h.styles.textColor))
-	}, "A"), A, (t) => t === "default" ? e.removeStyles({ textColor: "" }) : e.addStyles({ textColor: t }), !v), M = y?.props?.lineSpacing || "normal", N = O("Line spacing", M === "normal" ? "Spacing" : `${M}×`, lX.map((e) => ({
+	}, "A"), A, (t) => t === "default" ? e.removeStyles({ textColor: "" }) : e.addStyles({ textColor: t }), !v), M = y?.props?.lineSpacing || "normal", N = O("Line spacing", C(["M5 3v14M2 6l3-3 3 3M2 14l3 3 3-3", "M11 4h7m-7 6h7m-7 6h7"]), lX.map((e) => ({
 		value: e,
 		label: e === "normal" ? "Default" : e === "1" ? "1 · Single" : e === "2" ? "2 · Double" : e,
 		selected: M === e
-	})), (t) => e.transact(() => g.forEach((n) => e.updateBlock(n, { props: { lineSpacing: t } }))), !g.length), ee = O("Table", "Table", XZ(e), (t) => ZZ(e, t)), P = _.createElement(aJ, {
+	})), (t) => e.transact(() => g.forEach((n) => e.updateBlock(n, { props: { lineSpacing: t } }))), !g.length), ee = O("Table", C(["M4 4h12a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z", "M3 8h14M3 12h14M8 4v12m4-12v12"]), XZ(e), (t) => ZZ(e, t)), P = _.createElement(aJ, {
 		position: "bottom-start",
 		offset: 8,
 		withinPortal: !1,
@@ -51848,11 +51848,12 @@ function QZ({ editor: e, options: t }) {
 	}, _.createElement(aJ.Target, null, _.createElement("button", {
 		ref: d,
 		type: "button",
-		className: "notebook-format-style notebook-format-text-style",
+		className: "notebook-format-button",
 		"aria-label": "Text style",
+		title: b.startsWith("heading-") ? `Text style (Heading ${b.slice(-1)})` : "Text style (Body)",
 		disabled: !h.editable || !g.length,
 		onMouseDown: (e) => e.preventDefault()
-	}, b.startsWith("heading-") ? `Heading ${b.slice(-1)}` : "Body")), _.createElement(aJ.Dropdown, {
+	}, C(["M15.5 4h-6a4 4 0 0 0 0 8h1M10.5 4v13m3-13v13"]))), _.createElement(aJ.Dropdown, {
 		className: "notebook-format-style-menu",
 		"aria-label": "Text style",
 		onKeyDown: (e) => {
@@ -51949,7 +51950,11 @@ function QZ({ editor: e, options: t }) {
 		ref: (e) => {
 			e && t.toolbarInsertElement.parentElement !== e && e.append(t.toolbarInsertElement);
 		}
-	}) : t.onInsert && _.createElement("details", { className: "notebook-format-insert" }, _.createElement("summary", null, "Insert"), _.createElement("div", { className: "notebook-format-insert-menu" }, ...D.map(([e, n]) => _.createElement("button", {
+	}) : t.onInsert && _.createElement("details", { className: "notebook-format-insert" }, _.createElement("summary", {
+		className: "notebook-format-button",
+		"aria-label": "Insert",
+		title: "Insert"
+	}, C(["M10 4v12M4 10h12"])), _.createElement("div", { className: "notebook-format-insert-menu" }, ...D.map(([e, n]) => _.createElement("button", {
 		type: "button",
 		key: e,
 		disabled: !h.editable,
