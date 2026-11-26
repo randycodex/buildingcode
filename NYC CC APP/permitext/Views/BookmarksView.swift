@@ -267,6 +267,17 @@ struct BookmarksView: View {
                 .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
         }
+        .overlay {
+            if showsProjectsSection && projectFolders.isEmpty {
+                Text("Use + to create a Project for your notes, evidence, and Assistant conversations.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, contentHorizontalInset)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .ignoresSafeArea(.container, edges: .vertical)
+            }
+        }
         .background { CodeAppBackdrop(accent: accentColor).ignoresSafeArea() }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
@@ -391,7 +402,7 @@ struct BookmarksView: View {
 
     @ViewBuilder
     private var savedScreenContent: some View {
-        if showsProjectsSection { projectTilesSection }
+        if showsProjectsSection { folderGrid(projectFolders) }
         else if let onOpenLibrary {
             Button(action: onOpenLibrary) {
                 CodeSurface(accent: accentColor, showsBorder: false) {
@@ -597,20 +608,6 @@ private var filteredSavedEmptyState: some View {
 
     private var referenceFolders: [CodeFolder] {
         library.folders.filter { $0.folderType == .reference }
-    }
-
-    @ViewBuilder
-    private var projectTilesSection: some View {
-        if !projectFolders.isEmpty {
-            folderGrid(projectFolders)
-        } else {
-            CodeEmptyStateCard(
-                title: "Create your first Project",
-                systemImage: "folder.badge.plus",
-                description: "Use + to create a Project for your notes, evidence, and Assistant conversations.",
-                accent: accentColor
-            )
-        }
     }
 
     private var referenceTilesSection: some View {
