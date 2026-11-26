@@ -504,6 +504,7 @@ struct ProjectContextView: View {
                         .padding(.top, CodeScreenMetrics.topTitlePadding)
                         .accessibilityIdentifier("project-context-text")
                 }
+                .scrollIndicators(.hidden)
                 .codeSoftTopScrollEdges()
                 .codeTransparentBottomScrollEdge()
             }
@@ -579,6 +580,8 @@ private struct ProjectContextEditor: UIViewRepresentable {
         view.textContainer.lineFragmentPadding = 0
         view.contentInsetAdjustmentBehavior = .never
         view.keyboardDismissMode = .interactive
+        view.showsVerticalScrollIndicator = false
+        view.showsHorizontalScrollIndicator = false
         if #available(iOS 26.0, *) {
             view.topEdgeEffect.style = .soft
             view.bottomEdgeEffect.isHidden = true

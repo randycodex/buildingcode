@@ -1362,6 +1362,7 @@ private struct ProjectFactsView: View {
             .padding(.top, CodeScreenMetrics.topTitlePadding)
             .padding(.bottom, CodeScreenMetrics.tabBarClearance)
         }
+        .scrollIndicators(.hidden)
         .codeSoftTopScrollEdges()
         .codeTransparentBottomScrollEdge()
         .scrollDismissesKeyboard(.interactively)
