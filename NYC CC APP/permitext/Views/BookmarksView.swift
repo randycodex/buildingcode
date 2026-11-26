@@ -2173,7 +2173,7 @@ struct ProjectView: View {
                 projectSectionCard("Evidence", systemImage: "bookmark",
                     count: count.map { "\($0) saved" },
                     preview: projectBookmarks.first.map { "\($0.sectionNumber) · \($0.displayTitle)" }
-                        ?? (count == nil ? "Open Evidence" : "No saved evidence yet."),
+                        ?? (count == nil ? "Open Evidence" : ""),
                     compact: compact, expands: expands)
             }
             .accessibilityIdentifier("project-section-evidence")
