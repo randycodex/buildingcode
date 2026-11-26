@@ -152,3 +152,69 @@
 .permitext-notebook-editor .notebook-format-link-form label { display: grid; gap: 4px; }
 .permitext-notebook-editor .notebook-format-link-form input { box-sizing: border-box; width: 100%; min-height: 30px; color: inherit; background: transparent; border: 1px solid var(--border, #ccc); font: inherit; }
 .permitext-notebook-editor .notebook-format-link-form p { margin: 0; font-size: 12px; }
+.permitext-notebook-editor .ProseMirror :is(td, th):has(> .notebook-resize-handle) {
+  position: relative;
+}
+
+.permitext-notebook-editor .notebook-resize-handle {
+  display: none;
+}
+
+.permitext-notebook-editor .ProseMirror[contenteditable="true"] .notebook-resize-handle {
+  display: grid;
+  place-items: center;
+  position: absolute;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--bn-colors-editor-text);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.permitext-notebook-editor .notebook-resize-handle::before {
+  content: "";
+  display: block;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: .55;
+  pointer-events: none;
+}
+
+.permitext-notebook-editor .notebook-resize-handle[data-dragging]::before,
+.permitext-notebook-editor .notebook-resize-handle:hover::before {
+  opacity: 1;
+}
+
+.permitext-notebook-editor .notebook-resize-column {
+  inset-inline-end: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 28px;
+  cursor: col-resize;
+}
+
+.permitext-notebook-editor .notebook-resize-column::before {
+  width: 3px;
+  height: 16px;
+  transform: translateX(var(--notebook-resize-offset, 0px));
+}
+
+.permitext-notebook-editor .notebook-resize-row {
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 16px;
+  cursor: row-resize;
+}
+
+.permitext-notebook-editor .notebook-resize-row::before {
+  width: 16px;
+  height: 3px;
+  transform: translateY(var(--notebook-resize-offset, 0px));
+}

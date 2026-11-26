@@ -2496,6 +2496,50 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(nativeNotebookBodyValue(body)?.contains("Table cell draft survives autosave") == true)
     }
 
+    func testNativeNotebookResizesRowsAndColumnsByTouch() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
+                               "--native-notebook-reference-fixture", "--native-notebook-save-diagnostics",
+                               "--native-notebook-layout-diagnostics"]
+        app.launch()
+        let body = nativeNotebookBody(in: app)
+        XCTAssertTrue(body.waitForExistence(timeout: 30))
+        body.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.04)).tap()
+        app.buttons["Table"].tap()
+        app.buttons["Insert 2 × 2 table"].tap()
+
+        let column = app.webViews.buttons["Resize column"]
+        let row = app.webViews.buttons["Resize row"]
+        XCTAssertTrue(column.waitForExistence(timeout: 8))
+        XCTAssertTrue(row.waitForExistence(timeout: 8))
+        func drag(_ handle: XCUIElement, dx: Double = 0, dy: Double = 0) {
+            let start = handle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: dx, dy: dy)),
+                        withVelocity: .slow, thenHoldForDuration: 0)
+        }
+        let layout = app.staticTexts["native-notebook-layout-diagnostics"]
+        func cellSize(_ axis: String) -> Double {
+            let data = Data(((layout.value as? String) ?? "").utf8)
+            let metrics = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+            return (metrics?["firstTableCell"] as? [String: Double])?[axis] ?? 0
+        }
+        let startWidth = cellSize("width")
+        XCTAssertGreaterThan(startWidth, 0)
+        drag(column, dx: 45)
+        let wider = cellSize("width")
+        XCTAssertGreaterThan(wider, startWidth + 25)
+        drag(column, dx: -25)
+        XCTAssertLessThan(cellSize("width"), wider - 12)
+
+        let startHeight = cellSize("height")
+        drag(row, dy: 60)
+        let taller = cellSize("height")
+        XCTAssertGreaterThan(taller, startHeight + 20)
+        drag(row, dy: -30)
+        XCTAssertLessThan(cellSize("height"), taller - 12)
+        XCTAssertTrue(waitForValue("saved", on: element(in: app, identifier: "native-notebook-save-status"), timeout: 12))
+    }
+
     func testNativeNotebookListsLinksAndUndoRemainInOneDocument() {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture"]

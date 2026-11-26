@@ -18,6 +18,11 @@ import { TableHandlesExtension } from '@blocknote/core/extensions';
 import { TextSelection } from "@tiptap/pm/state";
 import { addColumnAfter, addRowAfter, deleteColumn, deleteRow, selectedRect } from "@tiptap/pm/tables";
 import { notebookTablePasteHTML } from "../public/notebook-html-paste.js";
+import {
+  notebookBlocksWithTableHeights,
+  notebookTableResize,
+  restoreNotebookTableHeights
+} from "./notebook-table-resize.js";
 export { createReportFormatting } from "./report-text-editor.js";
 import { en } from "@blocknote/core/locales";
 import {
@@ -341,9 +346,14 @@ export function applyNotebookTableAction(editor, action) {
     });
   }
   switch (action) {
-    case "header":
-      editor.updateBlock(block, {content: {...block.content, headerRows: block.content.headerRows ? 0 : 1}});
+    case "header": {
+      const table = notebookBlocksWithTableHeights(editor);
+      editor.transact(transaction => {
+        editor.updateBlock(block, {content: {...block.content, headerRows: block.content.headerRows ? 0 : 1}});
+        restoreNotebookTableHeights(transaction, table, block.id);
+      });
       break;
+    }
     case "remove-table":
       editor.removeBlocks([block]);
       break;
@@ -582,6 +592,13 @@ function wrappedDocument(blocks) {
   });
 }
 
+function replaceNotebookBlocks(editor, blocks) {
+  editor.transact(transaction => {
+    editor.replaceBlocks(editor.document, blocks);
+    restoreNotebookTableHeights(transaction, blocks);
+  });
+}
+
 function preferredNotebookTheme() {
   const explicitTheme = document.documentElement.dataset.theme;
   if (explicitTheme === "dark" || explicitTheme === "light") return explicitTheme;
@@ -596,6 +613,7 @@ function PermitextNotebookEditor({ options, controllerRef }) {
   );
   const editor = useCreateBlockNote({
     schema: permitextNotebookSchema,
+    extensions: [notebookTableResize],
     dictionary: { ...en, placeholders: { ...en.placeholders, default: "", emptyDocument: "" } },
     domAttributes: {
       editor: { "aria-label": options.ariaLabel || "Note body", "aria-multiline": "true" }
@@ -632,6 +650,10 @@ function PermitextNotebookEditor({ options, controllerRef }) {
   }, []);
 
   useEffect(() => {
+    editor.transact(transaction => {
+      restoreNotebookTableHeights(transaction, initialContent);
+      transaction.setMeta("addToHistory", false);
+    });
     controllerRef.current = editor;
     options.onReady?.(editor);
     if (options.autofocus) window.requestAnimationFrame(() => editor.focus());
@@ -644,7 +666,7 @@ function PermitextNotebookEditor({ options, controllerRef }) {
     const incoming = options.document;
     if (!incoming || incoming === lastDocumentRef.current) return;
     lastDocumentRef.current = incoming;
-    editor.replaceBlocks(editor.document, blockNoteBlocksFromNotebookDocument(incoming));
+    replaceNotebookBlocks(editor, blockNoteBlocksFromNotebookDocument(incoming));
   }, [editor, options.document]);
 
   return React.createElement(
@@ -659,7 +681,9 @@ function PermitextNotebookEditor({ options, controllerRef }) {
       slashMenu: false,
       tableHandles: options.tableHandles !== false,
       renderEditor: false,
-      onChange: () => options.onChange?.(options.native ? undefined : wrappedDocument(editor.document)),
+      onChange: () => {
+        if (controllerRef.current) options.onChange?.(options.native ? undefined : wrappedDocument(notebookBlocksWithTableHeights(editor)));
+      },
       "aria-label": options.ariaLabel || "Notebook card"
     },
     options.toolbar !== false && options.editable !== false && React.createElement(PermitextFormattingToolbar, {editor, options}),
@@ -696,7 +720,8 @@ export function mountPermitextNotebookEditor(element, options = {}) {
       root.render(React.createElement(PermitextNotebookEditor, {options: {...mountedOptions}, controllerRef}));
     },
     getDocument() {
-      return wrappedDocument(controllerRef.current?.document || options.document?.document || []);
+      const editor = controllerRef.current;
+      return wrappedDocument(editor ? notebookBlocksWithTableHeights(editor) : options.document?.document || []);
     },
     getEditingPosition() {
       const editor = controllerRef.current?._tiptapEditor;
@@ -719,7 +744,7 @@ export function mountPermitextNotebookEditor(element, options = {}) {
     setDocument(document) {
       const editor = controllerRef.current;
       if (!editor) return;
-      editor.replaceBlocks(editor.document, blockNoteBlocksFromNotebookDocument(document));
+      replaceNotebookBlocks(editor, blockNoteBlocksFromNotebookDocument(document));
     },
     insertImage() {
       const editor = controllerRef.current;
@@ -758,13 +783,13 @@ export function mountPermitextNotebookEditor(element, options = {}) {
           : {}),
         children: (block.children || []).map(replaceBlock)
       });
-      const next = editor.document.map((block) => {
+      const next = notebookBlocksWithTableHeights(editor).map((block) => {
         if (block.type === "image" && block.props?.url === fromURL) changed = true;
         const mapped = replaceBlock(block);
         if (JSON.stringify(mapped) !== JSON.stringify(block)) changed = true;
         return mapped;
       });
-      if (changed) editor.replaceBlocks(editor.document, next);
+      if (changed) replaceNotebookBlocks(editor, next);
       return changed;
     },
     undo() {

@@ -2,6 +2,14 @@ export const notebookSchemaName = "permitext-notebook-card";
 export const notebookSchemaVersion = 2;
 export const notebookDocumentFormat = "blocknote-json";
 
+export const notebookTableMinColumnWidth = 32;
+export const notebookTableMinRowHeight = 24;
+export const notebookTableMaxSize = 4000;
+
+export function isNotebookTableRowHeight(height) {
+  return Number.isInteger(height) && height >= notebookTableMinRowHeight && height <= notebookTableMaxSize;
+}
+
 export const notebookReferenceKinds = Object.freeze([
   "canonicalSection",
   "selectedPassage",

@@ -2,11 +2,14 @@ import { normalizeNotebookQuestions } from "./public/notebook-questions.js";
 import { normalizeNotebookStyles, notebookFontSize, notebookLineSpacings, notebookTextColor } from "./public/notebook-styles.js";
 import {
   emptyNotebookDocument as emptyVersionedNotebookDocument,
+  isNotebookTableRowHeight,
   notebookBlockTypes,
   notebookDocumentFormat,
   notebookReferenceKinds,
   notebookSchemaName,
   notebookSchemaVersion,
+  notebookTableMaxSize,
+  notebookTableMinColumnWidth,
   plainTextToBlockNote,
   tiptapDocumentToBlockNote
 } from "./src/notebook-schema.js";
@@ -329,7 +332,9 @@ function canonicalBlock(node, state, depth = 0) {
     if (table?.type !== 'tableContent' || !Array.isArray(table.rows) || !table.rows.length || table.rows.length > 500) throw new Error('Invalid Notebook table rows.');
     const rows = table.rows.map(row => {
       if (!Array.isArray(row.cells) || !row.cells.length || row.cells.length > 100) throw new Error('Invalid Notebook table columns.');
-      return {cells: row.cells.map(cell => {
+      const height = row.height;
+      if (height != null && !isNotebookTableRowHeight(height)) throw new Error('Invalid Notebook table height.');
+      const cells = row.cells.map(cell => {
         if (Array.isArray(cell)) return canonicalInlineContent(cell, state);
         if (cell?.type !== 'tableCell') throw new Error('Invalid Notebook table cell.');
         const props = {backgroundColor:'default', textColor:'default', textAlignment:'left'};
@@ -339,14 +344,15 @@ function canonicalBlock(node, state, depth = 0) {
           props[name] = count;
         }
         return {type:'tableCell', props, content:canonicalInlineContent(cell.content, state)};
-      })};
+      });
+      return {cells, ...(height == null ? {} : {height})};
     });
     const columns = Math.max(...rows.map(row => row.cells.reduce((total, cell) => total + (cell.props?.colspan || 1), 0)));
     if (columns > 100) throw new Error('Notebook table has too many columns.');
     const columnWidths = Array.from({length:columns}, (_, index) => {
       const value = table.columnWidths?.[index];
       if (value == null) return undefined;
-      if (!Number.isFinite(value) || value < 32 || value > 4000) throw new Error('Invalid Notebook table width.');
+      if (!Number.isFinite(value) || value < notebookTableMinColumnWidth || value > notebookTableMaxSize) throw new Error('Invalid Notebook table width.');
       return value;
     });
     block.content = {type:'tableContent', columnWidths, rows};

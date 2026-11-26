@@ -136,6 +136,7 @@ function equivalentDocuments(left, right) {
 function layoutDiagnostics() {
   const round = value => Math.round(value * 100) / 100;
   const elements = [...document.querySelectorAll("html, body, #notebook, .bn-container, .bn-editor, .bn-block-content, .bn-inline-content, .notebook-reference-chip")].slice(0, 18);
+  const firstTableCell = mount.querySelector("table tr > :is(th, td)")?.getBoundingClientRect();
   return {
     innerWidth: window.innerWidth, devicePixelRatio: window.devicePixelRatio,
     viewportWidth: window.visualViewport?.width ?? null, viewportScale: window.visualViewport?.scale ?? null,
@@ -144,6 +145,7 @@ function layoutDiagnostics() {
     tables: [...mount.querySelectorAll("table")].map(table => ({
       rows: table.rows.length, columns: table.rows[0]?.cells.length ?? 0
     })),
+    firstTableCell: firstTableCell ? { width: round(firstTableCell.width), height: round(firstTableCell.height) } : null,
     elements: elements.map(element => {
       const rect = element.getBoundingClientRect();
       const css = getComputedStyle(element);

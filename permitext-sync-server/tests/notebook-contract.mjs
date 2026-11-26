@@ -49,6 +49,33 @@ assert.match(html, /data-reference-kind="canonicalSection"/);
 assert.match(html, /AC § 28-103\.30\.2/);
 assert.match(html, /<strong>Verify <\/strong>/);
 
+const resizedTableDocument = {
+  ...emptyNotebookDocument(),
+  document: [{
+    type: "table",
+    content: {
+      type: "tableContent",
+      columnWidths: [178, null],
+      rows: [{ height: 92, cells: [[], []] }, { cells: [[], []] }]
+    }
+  }]
+};
+const tableAfterSync = validateNotebookDocument(
+  JSON.parse(JSON.stringify(resizedTableDocument))
+).document.document[0].content;
+assert.equal(tableAfterSync.columnWidths[0], 178);
+assert.equal(tableAfterSync.rows[0].height, 92);
+assert.ok(!Object.hasOwn(tableAfterSync.rows[1], "height"));
+assert.deepEqual(validateNotebookDocument({ ...resizedTableDocument, document: [{
+  type: "table",
+  content: tableAfterSync
+}] }).document.document[0].content, tableAfterSync);
+for (const height of [23, 4001, 92.5, "92"]) {
+  const invalid = structuredClone(resizedTableDocument);
+  invalid.document[0].content.rows[0].height = height;
+  assert.throws(() => validateNotebookDocument(invalid), /Invalid Notebook table height/);
+}
+
 const linkedNoteDocument = {
   ...emptyNotebookDocument(),
   document: [{
