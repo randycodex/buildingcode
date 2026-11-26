@@ -17,6 +17,15 @@ struct NativeWorkspaceSelection: Codable, Sendable {
     static let cacheProject = "workspace-navigation"
 }
 
+struct ProjectSearchActivity: Codable, Sendable {
+    var recentSearches: [String] = []
+    var pinnedSearches: [String] = []
+    var recentlyViewed: [RecentlyViewedEntry] = []
+
+    static let cacheProject = "workspace-navigation"
+    static let cacheScope = "project-search-activity"
+}
+
 struct ContinuityStore {
     static let shared = ContinuityStore()
 

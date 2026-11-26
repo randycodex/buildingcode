@@ -529,7 +529,7 @@ struct ResearchView: View {
                             scopedProjectID: projectFolderID.flatMap { library.backendProjectID(for: $0) },
                             projectSessionID: library.projectWorkspaceSessionID,
                             cacheDirectoryURL: cacheDirectoryURL)
-            .id("\(library.privateSessionID):\(projectFolderID.map(String.init) ?? "all")")
+            .id("\(library.privateSessionID):\(projectFolderID == nil ? "all" : library.projectWorkspaceSessionID.uuidString)")
     }
 }
 
@@ -1899,12 +1899,13 @@ private struct ResearchSessionView: View {
     private var isCurrentOwner: Bool {
         owner != nil && owner == library.privateRequestIdentity &&
             (projectFolderID == nil ||
-             (library.openProjectID == projectFolderID && library.activeBackendProjectID == scopedProjectID &&
+             (scopedProjectID != nil && library.openProjectID == projectFolderID &&
+              library.activeBackendProjectID == scopedProjectID &&
               library.projectWorkspaceSessionID == projectSessionID))
     }
 
     private func acceptsConversation(_ value: ResearchConversation) -> Bool {
-        projectFolderID == nil || value.primaryProjectID == scopedProjectID
+        projectFolderID == nil || (scopedProjectID != nil && value.primaryProjectID == scopedProjectID)
     }
 
     private func returnToProjectHistory() {
@@ -2019,7 +2020,8 @@ private struct ResearchSessionView: View {
         do {
             let page = try await library.researchConversationPage(limit: NativeResearchHistory.pageSize, cursor: cursor, query: "", projectID: historyProjectID)
             guard isCurrentOwner, historyLoadID == loadID, historyFilterKey == filterKey, !Task.isCancelled else { return }
-            summaries = NativeResearchHistory.appending(page.conversations, to: summaries)
+            let loaded = NativeResearchHistory.filtered(page.conversations, query: "", projectID: historyProjectID)
+            summaries = NativeResearchHistory.appending(loaded, to: summaries)
             historyNextCursor = page.nextCursor
             historyHasMore = page.hasMore == true && page.nextCursor != nil && page.nextCursor != cursor
             cacheHistory(summaries, accountID: owner.accountID, replacingAll: page.hasMore == false)

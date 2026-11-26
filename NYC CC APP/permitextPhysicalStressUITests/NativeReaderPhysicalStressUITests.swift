@@ -219,6 +219,78 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testNewProjectStartsWithItsOwnSearchAndAssistantHistory() throws {
+#if !DEBUG
+        throw XCTSkip("Project navigation uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        let original = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+            "saved-folder-", "Acceptance Project")).firstMatch
+        XCTAssertTrue(original.waitForExistence(timeout: 10))
+        original.tap()
+
+        let research = app.buttons["main-tab-research"]
+        let search = app.buttons["main-tab-search"]
+        let projects = app.buttons["main-tab-saved"]
+        let newConversation = app.buttons["New conversation"]
+        let historyRow = app.buttons.matching(identifier: "research-history-row").firstMatch
+        research.tap()
+        XCTAssertTrue(newConversation.waitForExistence(timeout: 15))
+        newConversation.tap()
+        let back = app.buttons["Assistant history"]
+        XCTAssertTrue(back.waitForExistence(timeout: 15))
+        back.tap()
+        XCTAssertTrue(historyRow.waitForExistence(timeout: 15))
+
+        search.tap()
+        let field = app.textFields["Search codes"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        field.tap()
+        field.typeText("FC 403.1\n")
+        let result = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+            "search-result-", "403.1 General.")).firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 35))
+
+        func returnToProjects() {
+            projects.tap()
+            XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+            projects.tap()
+            XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
+        }
+
+        returnToProjects()
+        let newProject = app.buttons["New project"]
+        XCTAssertTrue(newProject.waitForExistence(timeout: 10))
+        newProject.tap()
+        let name = app.textFields["e.g. Bronx R-2 Passive House"]
+        XCTAssertTrue(name.waitForExistence(timeout: 10))
+        name.tap()
+        name.typeText("Search Isolation Project")
+        app.navigationBars.firstMatch.buttons["Save"].tap()
+        XCTAssertTrue(app.staticTexts["project-workspace-name"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.staticTexts["project-workspace-name"].label, "Search Isolation Project")
+
+        research.tap()
+        XCTAssertTrue(app.staticTexts["No conversations yet"].waitForExistence(timeout: 15))
+        XCTAssertFalse(historyRow.exists)
+        search.tap()
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        XCTAssertTrue(["", "Search codes"].contains(field.value as? String ?? ""))
+        XCTAssertFalse(result.exists)
+
+        returnToProjects()
+        original.tap()
+        search.tap()
+        XCTAssertTrue(result.waitForExistence(timeout: 35))
+        XCTAssertEqual(field.value as? String, "FC 403.1")
+        research.tap()
+        XCTAssertTrue(historyRow.waitForExistence(timeout: 15))
+#endif
+    }
+
     func testProjectCardsReorderWithPressAndDrag() throws {
 #if !DEBUG
         throw XCTSkip("Project navigation uses the isolated Debug fixture.")

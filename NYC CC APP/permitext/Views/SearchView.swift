@@ -32,31 +32,38 @@ struct SearchSessionSnapshot: Codable, Equatable, Sendable {
     }
 }
 
+struct SearchWorkspaceScope: Hashable, Sendable {
+    let accountID: String
+    let projectID: String?
+
+    var storageID: String { projectID.map { "project:\($0)" } ?? "all-installed-editions" }
+}
+
 @MainActor
 enum RunningSearchSessions {
-    static var snapshots: [String: SearchSessionSnapshot] = [:]
+    static var snapshots: [SearchWorkspaceScope: SearchSessionSnapshot] = [:]
     static var nextRevision: UInt64 = 0
     static var deletionGenerations: [String: UInt64] = [:]
 
-    static func save(_ snapshot: SearchSessionSnapshot, accountID: String, scope: String, historyPositionChanged: Bool) {
+    static func save(_ snapshot: SearchSessionSnapshot, scope: SearchWorkspaceScope, historyPositionChanged: Bool) {
         snapshots[scope] = snapshot
         guard historyPositionChanged else { return }
         nextRevision &+= 1
         let revision = nextRevision
-        Task { await SearchSessionPersistence.shared.save(snapshot, accountID: accountID, revision: revision) }
+        Task { await SearchSessionPersistence.shared.save(snapshot, scope: scope, revision: revision) }
     }
 
-    static func flush(accountID: String, scope: String) {
+    static func flush(scope: SearchWorkspaceScope) {
         guard let snapshot = snapshots[scope] else { return }
         nextRevision &+= 1
         let revision = nextRevision
-        Task { await SearchSessionPersistence.shared.save(snapshot, accountID: accountID,
+        Task { await SearchSessionPersistence.shared.save(snapshot, scope: scope,
             revision: revision, flushImmediately: true) }
     }
 
     static func remove(accountID: String) {
         deletionGenerations[accountID, default: 0] &+= 1
-        snapshots = snapshots.filter { !$0.key.hasPrefix("\(accountID)|") }
+        snapshots = snapshots.filter { $0.key.accountID != accountID }
     }
 }
 
@@ -65,37 +72,36 @@ enum RunningSearchSessions {
 actor SearchSessionPersistence {
     static let shared = SearchSessionPersistence()
     private let cache: ProjectHubOfflineCache
-    private var revisions: [String: UInt64] = [:]
-    private var pending: [String: SearchSessionSnapshot] = [:]
-    private static let version = "all-installed-editions"
+    private var revisions: [SearchWorkspaceScope: UInt64] = [:]
+    private var pending: [SearchWorkspaceScope: SearchSessionSnapshot] = [:]
 
     init(cache: ProjectHubOfflineCache = ProjectHubOfflineCache()) { self.cache = cache }
 
-    func load(accountID: String) -> SearchSessionSnapshot {
-        guard !cache.isAccountDeleted(accountID: accountID) else { return SearchSessionSnapshot() }
-        if let snapshot = pending[accountID] {
+    func load(scope: SearchWorkspaceScope) -> SearchSessionSnapshot {
+        guard !cache.isAccountDeleted(accountID: scope.accountID) else { return SearchSessionSnapshot() }
+        if let snapshot = pending[scope] {
             return SearchSessionSnapshot(historyPositionID: snapshot.historyPositionID)
         }
-        return (try? SearchSessionSnapshot.load(cache: cache, accountID: accountID, version: Self.version)) ?? SearchSessionSnapshot()
+        return (try? SearchSessionSnapshot.load(cache: cache, accountID: scope.accountID, version: scope.storageID)) ?? SearchSessionSnapshot()
     }
 
     func flush() {
-        for (accountID, snapshot) in pending {
-            try? snapshot.save(cache: cache, accountID: accountID, version: Self.version)
+        for (scope, snapshot) in pending {
+            try? snapshot.save(cache: cache, accountID: scope.accountID, version: scope.storageID)
         }
         pending.removeAll()
     }
 
-    func save(_ snapshot: SearchSessionSnapshot, accountID: String, revision: UInt64, flushImmediately: Bool = false) async {
-        guard revision > (revisions[accountID] ?? 0) else { return }
-        revisions[accountID] = revision
-        pending[accountID] = snapshot
+    func save(_ snapshot: SearchSessionSnapshot, scope: SearchWorkspaceScope, revision: UInt64, flushImmediately: Bool = false) async {
+        guard revision > (revisions[scope] ?? 0) else { return }
+        revisions[scope] = revision
+        pending[scope] = snapshot
         // Coalesce rapid scroll updates to the recent passages list.
         if !flushImmediately { try? await Task.sleep(for: .milliseconds(100)) }
-        guard revisions[accountID] == revision, pending[accountID] != nil else { return }
-        defer { pending.removeValue(forKey: accountID) }
+        guard revisions[scope] == revision, pending[scope] != nil else { return }
+        defer { pending.removeValue(forKey: scope) }
         // The cache's deletion tombstone rejects writes after account deletion.
-        try? snapshot.save(cache: cache, accountID: accountID, version: Self.version)
+        try? snapshot.save(cache: cache, accountID: scope.accountID, version: scope.storageID)
     }
 }
 
@@ -270,7 +276,7 @@ struct SearchView: View {
     @State private var openingRoute: SearchReaderRoute?
     @State private var openingQuery: String?
     @State private var openingFilters: Set<Int64>?
-    @State private var openingScope: String?
+    @State private var openingScope: SearchWorkspaceScope?
     @State private var openingSourceRevision: UUID?
     @State private var openingTask: Task<Void, Never>?
     @State private var openingTimeoutTask: Task<Void, Never>?
@@ -295,7 +301,7 @@ struct SearchView: View {
     @State private var isSearchRequestPending = false
     @State private var searchDebounceTask: Task<Void, Never>?
     @State private var submittedSearchTaskID: String?
-    @State private var restoredSessionScope: String?
+    @State private var restoredSessionScope: SearchWorkspaceScope?
     @State private var queryEditGeneration: UInt64 = 0
     @State private var sessionStorageMessage: String?
     @State private var lastSavedSession = SearchSessionSnapshot()
@@ -309,8 +315,10 @@ struct SearchView: View {
     @FocusState private var isSearchFieldFocused: Bool
 
 
-    private var sessionAccountID: String { library.signedInAccount?.appUserID ?? "permitext-signed-out-search" }
-    private var sessionScope: String { "\(sessionAccountID)|all-installed-editions" }
+    private var sessionScope: SearchWorkspaceScope {
+        SearchWorkspaceScope(accountID: library.signedInAccount?.appUserID ?? "permitext-signed-out-search",
+                             projectID: library.searchWorkspaceProjectID)
+    }
 
     private let tabBarClearance: CGFloat = CodeScreenMetrics.searchTabBarClearance
 
@@ -325,7 +333,7 @@ struct SearchView: View {
     }
 
     private var searchTaskID: String {
-        "\(sessionScope):\(restoredSessionScope ?? ""):\(library.activeCodeSourceRevision.uuidString):\(library.searchContentRevision.uuidString): \(library.selectedVersionFileName):\(library.selectedCodeSectionID ?? 0):\(library.isInitialContentLoaded):\(query)"
+        "\(sessionScope):\(restoredSessionScope == sessionScope):\(library.activeCodeSourceRevision.uuidString):\(library.searchContentRevision.uuidString): \(library.selectedVersionFileName):\(library.selectedCodeSectionID ?? 0):\(library.isInitialContentLoaded):\(query)"
     }
 
     private var isHistoryVisible: Bool { query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
@@ -373,12 +381,12 @@ struct SearchView: View {
             .onDisappear {
                 cancelReaderOpening()
                 persistSearchSession()
-                RunningSearchSessions.flush(accountID: sessionAccountID, scope: sessionScope)
+                if let restoredSessionScope { RunningSearchSessions.flush(scope: restoredSessionScope) }
             }
             .onChange(of: scenePhase) { _, phase in
                 if phase != .active {
                     persistSearchSession()
-                    RunningSearchSessions.flush(accountID: sessionAccountID, scope: sessionScope)
+                    if let restoredSessionScope { RunningSearchSessions.flush(scope: restoredSessionScope) }
                 }
             }
             .task(id: sessionScope) {
@@ -480,7 +488,7 @@ struct SearchView: View {
                 persistSearchSession()
             }
         }
-        .onChange(of: library.recentlyViewedSections) { _, _ in
+        .onChange(of: library.workspaceRecentlyViewedSections) { _, _ in
             rebuildJumpBackInCache()
         }
         .onChange(of: library.searchTabRetapCount) { _, _ in
@@ -496,6 +504,8 @@ struct SearchView: View {
         }
         .onChange(of: sessionScope) { _, _ in
             resultPreviews.removeAll()
+            historyCollection = nil
+            rebuildJumpBackInCache()
             if let openingScope, openingScope != sessionScope { cancelReaderOpening() }
         }
         .onChange(of: library.activeCodeSourceRevision) { _, revision in
@@ -720,14 +730,14 @@ struct SearchView: View {
     private func restoreSearchSession() async {
         guard restoredSessionScope != sessionScope else { return }
         // Initial appearance may already have opened a pending deep link.
-        // Only discard navigation when replacing an existing account/edition.
+        // Only discard navigation when replacing an existing workspace.
         if restoredSessionScope != nil {
             passageDetail = nil
             pendingPassageDetail = nil
             searchNavigationPath = NavigationPath()
         }
         let requestedScope = sessionScope
-        let requestedAccountID = sessionAccountID
+        let requestedAccountID = requestedScope.accountID
         let originalQuery = query
         let originalQueryGeneration = queryEditGeneration
         let originalOpeningGeneration = openingGeneration
@@ -744,7 +754,7 @@ struct SearchView: View {
         if let running = RunningSearchSessions.snapshots[requestedScope] {
             saved = running
         } else {
-            saved = await SearchSessionPersistence.shared.load(accountID: requestedAccountID)
+            saved = await SearchSessionPersistence.shared.load(scope: requestedScope)
         }
         guard !Task.isCancelled, sessionScope == requestedScope,
               RunningSearchSessions.deletionGenerations[requestedAccountID, default: 0] == deletionGeneration else { return }
@@ -763,7 +773,7 @@ struct SearchView: View {
         searchFilterCodeSectionIDs = []
         lastSavedSession = saved
         resultPositionID = saved.resultPositionID
-        let visibleHistoryIDs = Set(library.recentlyViewedSections.map { "history:\($0.historyIdentity)" })
+        let visibleHistoryIDs = Set(library.workspaceRecentlyViewedSections.map { "history:\($0.historyIdentity)" })
         historyPositionID = saved.historyPositionID.flatMap { visibleHistoryIDs.contains($0) ? $0 : nil }
         selectedResultID = saved.selectedResultID
         selectedResultIdentity = saved.selectedResultIdentity
@@ -784,7 +794,7 @@ struct SearchView: View {
         let snapshot = SearchSessionSnapshot(query: query, codeSectionIDs: searchFilterCodeSectionIDs,
             resultPositionID: resultPositionID, historyPositionID: historyPositionID, selectedResultID: selectedResultID, selectedResultIdentity: selectedResultIdentity)
         guard snapshot != lastSavedSession else { return }
-        RunningSearchSessions.save(snapshot, accountID: sessionAccountID, scope: sessionScope,
+        RunningSearchSessions.save(snapshot, scope: sessionScope,
             historyPositionChanged: snapshot.historyPositionID != lastSavedSession.historyPositionID)
         lastSavedSession = snapshot
         sessionStorageMessage = nil
@@ -873,7 +883,7 @@ struct SearchView: View {
     }
 
     private func rebuildJumpBackInCache() {
-        cachedRecentEntries = recentlyOpenedOrder.ordered(library.recentlyViewedSections)
+        cachedRecentEntries = recentlyOpenedOrder.ordered(library.workspaceRecentlyViewedSections)
     }
 
     private var searchResultSummary: some View {
@@ -1060,8 +1070,8 @@ struct SearchView: View {
     }
 
     private var hasSearchHistoryContent: Bool {
-        !library.recentlyViewedSections.isEmpty ||
-            !library.pinnedSearches.isEmpty ||
+        !library.workspaceRecentlyViewedSections.isEmpty ||
+            !library.workspacePinnedSearches.isEmpty ||
             !unpinnedRecentSearches.isEmpty
     }
 
@@ -1181,7 +1191,7 @@ struct SearchView: View {
     }
 
     private var unpinnedRecentSearches: [String] {
-        library.recentSearches.filter { !library.isSearchPinned($0) }
+        library.workspaceRecentSearches.filter { !library.isSearchPinned($0) }
     }
 
     private var pinnedSearchSection: some View {
@@ -1189,7 +1199,7 @@ struct SearchView: View {
             searchHistorySectionHeader("Pinned")
 
             LazyVStack(spacing: 0) {
-                ForEach(library.pinnedSearches, id: \.self) { pinnedSearch in
+                ForEach(library.workspacePinnedSearches, id: \.self) { pinnedSearch in
                     searchHistoryRow(
                         pinnedSearch,
                         leadingSystemImage: "pin.fill",
@@ -1803,11 +1813,6 @@ private struct SearchChapterReaderDestination: View {
         .onReceive(NotificationCenter.default.publisher(for: .permitextSavedWorkDidChange)) { notification in
             guard (notification.object as? CodeLibraryViewModel) !== library else { return }
             library.reconcileExternalSavedWorkChange(scheduleAccountSync: false)
-        }
-        .onChange(of: library.recentlyViewedSections) { _, entries in
-            guard library.signedInAccount?.appUserID == sharedLibrary.signedInAccount?.appUserID,
-                  let entry = entries.first, entry.sourceVersion != nil else { return }
-            sharedLibrary.recordRecentlyViewed(entry)
         }
         .onChange(of: library.pendingResearchSelections) { _, selections in
             guard !selections.isEmpty else { return }

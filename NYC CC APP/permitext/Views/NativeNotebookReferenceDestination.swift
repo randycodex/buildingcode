@@ -283,11 +283,6 @@ private struct NativeNotebookSourceReader: View {
             .onChange(of: sharedLibrary.activeCodeSourceRevision) { _, _ in library.synchronizeIndependentReaderSession(from: sharedLibrary) }
             .onChange(of: sharedLibrary.bookmarkRevision) { _, _ in library.reconcileExternalSavedWorkChange(scheduleAccountSync: false) }
             .onChange(of: library.bookmarkRevision) { _, _ in sharedLibrary.reconcileExternalSavedWorkChange(from: library, scheduleAccountSync: true) }
-            .onChange(of: library.recentlyViewedSections) { _, entries in
-                guard library.signedInAccount?.appUserID == sharedLibrary.signedInAccount?.appUserID,
-                      let entry = entries.first, entry.sourceVersion != nil else { return }
-                sharedLibrary.recordRecentlyViewed(entry)
-            }
             .onChange(of: library.pendingResearchSelections) { _, selections in
                 guard !selections.isEmpty else { return }
                 for selection in selections { sharedLibrary.sendToResearch(selection) }

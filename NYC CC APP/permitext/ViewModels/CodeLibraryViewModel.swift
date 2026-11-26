@@ -188,6 +188,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var recentSearches: [String] = []
     @Published private(set) var pinnedSearches: [String] = []
     @Published private(set) var recentlyViewedSections: [RecentlyViewedEntry] = []
+    @Published private var projectSearchActivity: [String: ProjectSearchActivity] = [:]
     @Published private(set) var searchTabRetapCount = 0
     @Published private(set) var bookmarks: [BookmarkedSection] = []
     @Published private(set) var removedSavedPassages: [SavedPassageRemoval] = []
@@ -256,6 +257,7 @@ final class CodeLibraryViewModel: ObservableObject {
             readerSaveDestinationChoice = NativeReaderSaveDestination.load(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
             activeProjectID = nil
             openProjectID = nil
+            loadProjectSearchActivity()
             researchHistoryProjectFilter = "all"
             researchHistoryIsPresented = false
             projectSaveRequest = nil
@@ -637,6 +639,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let continuityContext = continuityStore.load()
         self.recentlyViewedSections = continuityContext.recentlyViewedSections
         self.activeProjectID = continuityContext.activeProjectID
+        loadProjectSearchActivity()
         reloadActiveCodeSourcePreferences()
         restoreWorkspaceSelection()
         // Independent Readers use the owner's sync pipeline. Opening a passage
@@ -1129,6 +1132,7 @@ final class CodeLibraryViewModel: ObservableObject {
         else { return }
         if openProjectID != folderID {
             projectWorkspaceSessionID = UUID()
+            searchAllEditions(query: "")
             if activeResearchConversationID != nil { activeResearchConversationID = nil }
             if !pendingResearchSelections.isEmpty { pendingResearchSelections = [] }
             pendingResearchPrompt = nil
@@ -1155,6 +1159,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let owner = sharedAccountLibrary ?? self
         if owner !== self { owner.closeProjectWorkspace(); return }
         projectWorkspaceSessionID = UUID()
+        if openProjectID != nil { searchAllEditions(query: "") }
         openProjectID = nil
         activeResearchConversationID = nil
         pendingResearchSelections = []
@@ -1195,6 +1200,16 @@ final class CodeLibraryViewModel: ObservableObject {
     func recordRecentlyViewed(_ incoming: RecentlyViewedEntry) {
         var entry = incoming
         if entry.sourceVersion == nil { entry.sourceVersion = selectedVersion?.codeVersion }
+        if let owner = sharedAccountLibrary, owner !== self {
+            guard signedInAccount?.appUserID == owner.signedInAccount?.appUserID else { return }
+            owner.recordRecentlyViewed(entry)
+            if owner.searchWorkspaceProjectID != nil { return }
+        }
+        if updateProjectSearchActivity({ activity in
+            activity.recentlyViewed.removeAll { $0.historyIdentity == entry.historyIdentity }
+            activity.recentlyViewed.insert(entry, at: 0)
+            activity.recentlyViewed = Array(activity.recentlyViewed.prefix(50))
+        }) { return }
         var updated = recentlyViewedSections.filter { $0.historyIdentity != entry.historyIdentity }
         updated.insert(entry, at: 0)
         recentlyViewedSections = Array(updated.prefix(50))
@@ -2200,8 +2215,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func recentEntry(for codeSectionID: Int64?) -> RecentlyViewedEntry? {
-        guard let codeSectionID else { return recentlyViewedSections.first }
-        return recentlyViewedSections.first { entry in
+        let entries = searchWorkspaceProjectID == nil ? recentlyViewedSections : workspaceRecentlyViewedSections
+        guard let codeSectionID else { return entries.first }
+        return entries.first { entry in
             entry.codeSectionID == codeSectionID
         }
     }
@@ -3069,24 +3085,81 @@ final class CodeLibraryViewModel: ObservableObject {
         return normalizedTitle.isEmpty ? reference : "\(reference) — \(normalizedTitle)"
     }
 
+    /// Search follows the open workspace. The Reader's Evidence save
+    /// destination can point to a different Project while in the Code Library.
+    var searchWorkspaceProjectID: String? {
+        let owner = sharedAccountLibrary ?? self
+        guard let folderID = owner.openProjectID else { return nil }
+        return owner.backendProjectID(for: folderID) ?? "local-folder:\(folderID)"
+    }
+
+    var workspaceRecentSearches: [String] {
+        guard let projectID = searchWorkspaceProjectID else { return recentSearches }
+        return projectSearchActivity[projectID]?.recentSearches ?? []
+    }
+
+    var workspacePinnedSearches: [String] {
+        guard let projectID = searchWorkspaceProjectID else { return pinnedSearches }
+        return projectSearchActivity[projectID]?.pinnedSearches ?? []
+    }
+
+    var workspaceRecentlyViewedSections: [RecentlyViewedEntry] {
+        if let owner = sharedAccountLibrary, owner !== self { return owner.workspaceRecentlyViewedSections }
+        guard let projectID = searchWorkspaceProjectID else { return recentlyViewedSections }
+        return projectSearchActivity[projectID]?.recentlyViewed ?? []
+    }
+
+    private func loadProjectSearchActivity() {
+        guard ownsAccountSync, let accountID = signedInAccount?.appUserID else {
+            projectSearchActivity = [:]
+            return
+        }
+        projectSearchActivity = (try? projectHubOfflineCache.load(
+            [String: ProjectSearchActivity].self, accountID: accountID,
+            projectID: ProjectSearchActivity.cacheProject, scope: ProjectSearchActivity.cacheScope
+        ))?.value ?? [:]
+    }
+
+    private func persistProjectSearchActivity() {
+        guard ownsAccountSync, let accountID = signedInAccount?.appUserID else { return }
+        try? projectHubOfflineCache.store(projectSearchActivity, accountID: accountID,
+            projectID: ProjectSearchActivity.cacheProject, scope: ProjectSearchActivity.cacheScope)
+    }
+
+    @discardableResult
+    private func updateProjectSearchActivity(_ update: (inout ProjectSearchActivity) -> Void) -> Bool {
+        guard let projectID = searchWorkspaceProjectID else { return false }
+        update(&projectSearchActivity[projectID, default: ProjectSearchActivity()])
+        persistProjectSearchActivity()
+        return true
+    }
+
     func recordRecentSearch(_ query: String) {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
-        var updated = recentSearches.filter { $0.caseInsensitiveCompare(trimmed) != .orderedSame }
+        var updated = workspaceRecentSearches.filter { $0.caseInsensitiveCompare(trimmed) != .orderedSame }
         updated.insert(trimmed, at: 0)
-        recentSearches = Array(updated.prefix(50))
+        updated = Array(updated.prefix(50))
+        if updateProjectSearchActivity({ $0.recentSearches = updated }) { return }
+        recentSearches = updated
         preferencesDefaults.set(recentSearches, forKey: recentSearchesDefaultsKey)
         queueContinuityContextForSync()
     }
 
     func removeRecentSearch(_ query: String) {
+        if updateProjectSearchActivity({ $0.recentSearches.removeAll { $0.caseInsensitiveCompare(query) == .orderedSame } }) { return }
         recentSearches.removeAll { $0.caseInsensitiveCompare(query) == .orderedSame }
         preferencesDefaults.set(recentSearches, forKey: recentSearchesDefaultsKey)
         queueContinuityContextForSync()
     }
 
     func clearRecentSearches() {
+        for projectID in Array(projectSearchActivity.keys) {
+            projectSearchActivity[projectID]?.recentSearches = []
+            projectSearchActivity[projectID]?.recentlyViewed = []
+        }
+        persistProjectSearchActivity()
         recentSearches = []
         recentlyViewedSections = []
         preferencesDefaults.removeObject(forKey: recentSearchesDefaultsKey)
@@ -3098,8 +3171,9 @@ final class CodeLibraryViewModel: ObservableObject {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, !isSearchPinned(trimmed) else { return }
 
-        var updated = pinnedSearches.filter { $0.caseInsensitiveCompare(trimmed) != .orderedSame }
+        var updated = workspacePinnedSearches.filter { $0.caseInsensitiveCompare(trimmed) != .orderedSame }
         updated.insert(trimmed, at: 0)
+        if updateProjectSearchActivity({ $0.pinnedSearches = updated }) { return }
         pinnedSearches = updated
         persistPinnedSearches()
     }
@@ -3107,6 +3181,7 @@ final class CodeLibraryViewModel: ObservableObject {
     func unpinSearch(_ query: String) {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
+        if updateProjectSearchActivity({ $0.pinnedSearches.removeAll { $0.caseInsensitiveCompare(trimmed) == .orderedSame } }) { return }
 
         pinnedSearches.removeAll { $0.caseInsensitiveCompare(trimmed) == .orderedSame }
         persistPinnedSearches()
@@ -3115,7 +3190,7 @@ final class CodeLibraryViewModel: ObservableObject {
     func isSearchPinned(_ query: String) -> Bool {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return false }
-        return pinnedSearches.contains { $0.caseInsensitiveCompare(trimmed) == .orderedSame }
+        return workspacePinnedSearches.contains { $0.caseInsensitiveCompare(trimmed) == .orderedSame }
     }
 
     private func persistPinnedSearches() {

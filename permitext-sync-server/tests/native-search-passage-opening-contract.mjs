@@ -32,6 +32,7 @@ const methods = [
   // explicit captures adapt the View struct's binding to that test class.
   .replace('Binding(get: { scrollTargetID }, set: { value in', 'Binding(get: { [self] in scrollTargetID }, set: { [self] value in');
 const fixture = String.raw`
+${declaration('struct SearchWorkspaceScope:')}
 struct Binding<Value> { let get: () -> Value; let set: (Value) -> Void }
 struct NavigationPath { }
 enum Tab { case search, reader }
@@ -51,21 +52,22 @@ struct RecentEntry { let historyIdentity: String }
  var selectedTab = Tab.search
  var activeCodeSourceRevision = UUID()
  var isSearchInProgress = false
- var recentlyViewedSections: [RecentEntry] = []
+ var searchWorkspaceProjectID: String?
+ var workspaceRecentlyViewedSections: [RecentEntry] = []
  func captureCodeSourceNavigationContext() -> String? { signedInAccount?.appUserID }
  func synchronizeIndependentReaderSession(from: CodeLibraryViewModel) { }
 }
 @MainActor enum RunningSearchSessions {
- static var snapshots: [String: SearchSessionSnapshot] = [:]
+ static var snapshots: [SearchWorkspaceScope: SearchSessionSnapshot] = [:]
  static var deletionGenerations: [String: UInt64] = [:]
- static func save(_ snapshot: SearchSessionSnapshot, accountID: String, scope: String, historyPositionChanged: Bool) { snapshots[scope] = snapshot }
+ static func save(_ snapshot: SearchSessionSnapshot, scope: SearchWorkspaceScope, historyPositionChanged: Bool) { snapshots[scope] = snapshot }
 }
 actor SearchSessionPersistence {
  static let shared = SearchSessionPersistence()
  var snapshot = SearchSessionSnapshot()
  var reads = 0
  var pending: CheckedContinuation<SearchSessionSnapshot, Never>?
- func load(accountID: String) async -> SearchSessionSnapshot {
+ func load(scope: SearchWorkspaceScope) async -> SearchSessionSnapshot {
   reads += 1
   return await withCheckedContinuation { pending = $0 }
  }
@@ -99,13 +101,13 @@ actor SearchSessionPersistence {
  var query = ""
  var cachedFilteredResults: [Int] = []
  var isSearchRequestPending = false
- var restoredSessionScope: String? = "A|all-installed-editions"
+ var restoredSessionScope: SearchWorkspaceScope? = .init(accountID: "A", projectID: nil)
  var searchFilterCodeSectionIDs: Set<Int64> = []
  var preparedDestinations: [SearchReaderRoute: PreparedSearchReaderDestination] = [:]
  var openingRoute: SearchReaderRoute? = nil
  var openingQuery: String? = nil
  var openingFilters: Set<Int64>? = nil
- var openingScope: String? = nil
+ var openingScope: SearchWorkspaceScope? = nil
  var openingSourceRevision: UUID? = nil
  var openingTask: Task<Void, Never>? = nil
  var openingTimeoutTask: Task<Void, Never>? = nil
@@ -131,8 +133,7 @@ actor SearchSessionPersistence {
  var searchNavigationPath = NavigationPath()
  var lastSavedSession = SearchSessionSnapshot()
  var sessionStorageMessage: String? = nil
- var sessionAccountID: String { library.signedInAccount?.appUserID ?? "permitext-signed-out-search" }
- var sessionScope: String { "\(sessionAccountID)|all-installed-editions" }
+ ${declaration('    private var sessionScope:').replace('private ', '')}
  func dismissKeyboard() { }
  func scheduleSearch() { }
  func openPendingDeepLinkedSectionIfNeeded() { }
@@ -204,13 +205,14 @@ actor SearchSessionPersistence {
   precondition(double.passageDetail == nil)
   await finish(5, double)
   precondition(double.passageDetail?.route == current)
-  for invalidation in ["cancel", "account", "sources", "tab"] {
+  for invalidation in ["cancel", "account", "project", "sources", "tab"] {
    let stale = SearchProbe(); stale.isHistorySheetPresented = true
    let index = PreparedSearchReaderDestination.requests.count
    stale.open(old); await settle(); await finish(index, stale)
    switch invalidation {
    case "cancel": stale.cancel()
    case "account": stale.library.signedInAccount = .init(appUserID: "B")
+   case "project": stale.library.searchWorkspaceProjectID = "other-project"
    case "sources": stale.library.activeCodeSourceRevision = UUID()
    default: stale.library.selectedTab = .reader
    }
@@ -236,6 +238,7 @@ actor SearchSessionPersistence {
 
   // Normal restoration still retains the query, selected result and return position.
   let restored = SearchProbe(); restored.restoredSessionScope = nil
+  restored.library.searchWorkspaceProjectID = "original-project"
   saved.query = "concrete"
   saved.resultPositionID = "result:2022:7"; saved.selectedResultID = 7
   saved.selectedResultIdentity = "2022:7"
@@ -244,6 +247,15 @@ actor SearchSessionPersistence {
   precondition(restored.query == saved.query && restored.selectedResultIdentity == "2022:7")
   precondition(restored.resultPositionID == "result:2022:7" && restored.pendingScrollTargetID == "result:2022:7")
 
+  let newProject = SearchProbe(); newProject.restoredSessionScope = nil
+  newProject.library.searchWorkspaceProjectID = "new-project"
+  let readCount = await SearchSessionPersistence.shared.reads
+  let restoringNewProject = Task { await newProject.restore() }
+  while await SearchSessionPersistence.shared.reads == readCount { await Task.yield() }
+  await SearchSessionPersistence.shared.finish(SearchSessionSnapshot())
+  await restoringNewProject.value
+  precondition(newProject.query.isEmpty && newProject.selectedResultIdentity == nil && newProject.resultPositionID == nil)
+
   // Result openings share the same detachment while preserving history separately.
   let result = SearchProbe(); result.query = "concrete"; result.cachedFilteredResults = [1]
   result.historyPositionID = "history:2014:7"; result.scrollTargetID = "result:2022:7"
@@ -251,7 +263,7 @@ actor SearchSessionPersistence {
   precondition(result.resultPositionID == "result:2022:7" && result.historyPositionID == "history:2014:7")
   await finish(PreparedSearchReaderDestination.requests.count - 1, result)
   precondition(result.passageDetail?.route == current)
-  print("PASS: Search recent/result opening, stable scroll position, item replacement, fast/slow history dismissal, cancellation/session/source guards and cold restoration race")
+  print("PASS: Search passage opening, stable scroll position, history dismissal, project isolation and cold restoration")
  }
 }
 `;
