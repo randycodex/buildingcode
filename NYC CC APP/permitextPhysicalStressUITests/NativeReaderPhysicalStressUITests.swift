@@ -1445,12 +1445,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let sourceToggle = app.buttons["Source information"]
         let sourceDetails = app.staticTexts["Synthetic fixture"]
         let taxLotLabel = app.staticTexts["Tax Lot Area"]
-        let taxLotValue = app.staticTexts["5,000 Sq Ft"]
+        let taxLotValue = app.staticTexts["5,000 sq ft"]
         XCTAssertTrue(taxLotValue.waitForExistence(timeout: 5))
         XCTAssertLessThan(taxLotLabel.frame.midX, taxLotValue.frame.midX)
         XCTAssertEqual(taxLotLabel.frame.midY, taxLotValue.frame.midY, accuracy: 4)
-        XCTAssertTrue(app.staticTexts["6000 Sq Ft"].exists)
-        XCTAssertTrue(app.staticTexts["9,600 gross Sq Ft above grade"].exists)
+        XCTAssertTrue(app.staticTexts["6000"].exists)
+        XCTAssertTrue(app.staticTexts["9,600 gross sq ft above grade"].exists)
         XCTAssertTrue(app.staticTexts["46 ft to main roof"].exists)
         XCTAssertTrue(app.staticTexts["R7-2, R7A"].exists)
         XCTAssertTrue(app.staticTexts["No mapped intersection found"].exists)

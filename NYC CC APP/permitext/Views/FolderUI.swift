@@ -668,11 +668,6 @@ struct ProjectStructuredFactRow: View {
     let fact: ProjectStructuredFact
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    private static let areaFields: Set<String> = [
-        "tax-lot-area", "zoning-lot-area", "lot-area", "building-area",
-        "floor-area", "gross-floor-area", "net-floor-area"
-    ]
-
     private var statusLabel: String? {
         switch fact.status.lowercased() {
         case "sourced", "stated": return nil
@@ -680,21 +675,6 @@ struct ProjectStructuredFactRow: View {
         case "rejected": return "Rejected"
         default: return "Unknown"
         }
-    }
-
-    private var displayValue: String {
-        let value = fact.value.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !value.isEmpty else { return "Not provided" }
-        let labelKey = fact.label.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: "-")
-        guard Self.areaFields.contains(fact.key) || Self.areaFields.contains(labelKey) else { return value }
-        if value.range(of: #"^[+-]?(?:[0-9]+|[0-9]{1,3}(?:,[0-9]{3})+)(?:\.[0-9]+)?$"#,
-                       options: .regularExpression) != nil {
-            return value + " Sq Ft"
-        }
-        return value.replacingOccurrences(
-            of: #"[ \t]*(?<![a-z])(?:sq\.?[ \t]*ft\.?|square[ \t]+(?:feet|foot)|sf|ft(?:²|\^2))(?![a-z0-9])"#,
-            with: " Sq Ft", options: [.caseInsensitive, .regularExpression]
-        ).trimmingCharacters(in: .whitespaces)
     }
 
     var body: some View {
@@ -709,7 +689,7 @@ struct ProjectStructuredFactRow: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             VStack(alignment: stacksVertically ? .leading : .trailing, spacing: 4) {
-                Text(displayValue)
+                Text(fact.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Not provided" : fact.value)
                     .font(.subheadline)
                     .fixedSize(horizontal: false, vertical: true)
                 if let statusLabel {

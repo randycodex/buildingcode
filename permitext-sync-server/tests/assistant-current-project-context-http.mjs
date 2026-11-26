@@ -35,9 +35,15 @@ try{
  await post('/admin/lifetime-grants/grant',{userID},200,process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
  token=(await post('/account/sign-in',{credential:{provider:'apple',providerUserID:'synthetic-current-context',email:'context@example.test',displayName:'Synthetic context test'}})).account.backendSessionToken;
  const project={id:'current-context-record',clientID:projectID,userID,name:'Current context QA',address:'Synthetic address',codeVersion:'2022-construction',colorHex:'#334455',sortOrder:0};
+ const measurements = [
+  { key: 'building-height', label: 'Building Height', value: "85'-0\" ft." },
+  { key: 'tax-lot-area', label: 'Tax Lot Area', value: '5,000 sq. ft.' },
+  { key: 'lot-width', label: 'Lot Width', value: '50' }
+ ];
  let update=0;
  const change=async(description,value,status)=>post('/sync/push',{batch:{user:{id:userID},mutations:[{project:{...project,description,
-  structuredFacts:[{id:'current-stories',key:'stories-above-grade',label:'Stories Above Grade',value,status,source:'user',sourceText:'Synthetic field survey; verify independently.'}],
+  structuredFacts:[{id:'current-stories',key:'stories-above-grade',label:'Stories Above Grade',value,status,source:'user',sourceText:'Synthetic field survey; verify independently.'},
+    ...measurements.map(fact => ({...fact, id:fact.key, status:'stated', source:'user'}))],
   updatedAt:new Date(Date.now()+1000*++update).toISOString()}}]}});
  await change('CONTEXT_ALPHA: proposed office renovation.','3','stated');
  let conversation=(await post('/research/conversations/create',{projectID,analysisMode:'conversation_only',requestID:'create-default-context'},201)).conversation;
@@ -60,6 +66,11 @@ try{
  assert.equal(snapshot.projectInformation.structuredFacts.find(f=>f.id==='current-stories').status,'stated');
  assert.equal(snapshot.projectInformation.structuredFacts.find(f=>f.id==='current-stories').sourceText,'Synthetic field survey; verify independently.');
  assert.equal(packets.length,1);assert(packets.every(packet=>JSON.stringify(packet).includes('CONTEXT_ALPHA')&&!JSON.stringify(packet).includes('CONTEXT_BETA')),'Writer and reviewer use the same frozen input during live edits');
+ const suppliedFacts = JSON.parse(packets[0][0].content).projectContext.projectInformation.structuredFacts;
+ for (const { key, value } of measurements) {
+  assert.equal(snapshot.projectInformation.structuredFacts.find(fact => fact.key === key)?.value, value);
+  assert.equal(suppliedFacts.find(fact => fact.key === key)?.value, value);
+ }
  const replay=await post('/research/conversations/message',{conversationID:conversation.id,question:'Summarize the recorded Project facts.',requestID:'current-alpha',researchEngine:'v2',analysisMode:'conversation_only'});
  assert.equal(replay.conversation.messages.at(-1).id,first.id);assert.equal(packets.length,1,'Successful replay cannot generate with new facts');
  const second=await send('current-beta'),beta=second.answer.inputSnapshot.projectContextSnapshot;
