@@ -1264,6 +1264,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Is the survey current? Discard"].exists)
         tabs.buttons["Checklist"].tap()
         XCTAssertEqual(app.tabBars.buttons.count, 4)
+        XCTAssertFalse(app.staticTexts["No records yet."].exists)
+        XCTAssertTrue(app.buttons["project-workflow-add"].isHittable)
         app.buttons["project-checklist-suggested"].tap()
         let status = app.buttons["project-record-status-0"]
         XCTAssertTrue(status.waitForExistence(timeout: 5))

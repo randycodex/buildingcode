@@ -195,8 +195,6 @@ struct ProjectWorkflowView: View {
                 }
                 .textFieldStyle(.plain)
             }
-        } else if savedRecords.isEmpty {
-            Text("No records yet.").foregroundStyle(.secondary)
         } else {
             ForEach(Array(savedRecords.enumerated()), id: \.element.id) { index, record in
                 HStack(alignment: .top, spacing: 12) {
