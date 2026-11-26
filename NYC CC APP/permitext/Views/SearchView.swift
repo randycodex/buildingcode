@@ -246,6 +246,7 @@ struct PreparedSearchReaderDestination: Identifiable {
 struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.dismiss) private var dismiss
     @State private var historyCollection: HistoryCollection?
@@ -509,7 +510,8 @@ struct SearchView: View {
     }
 
     private var searchResultsScroll: some View {
-        ScrollView {
+        let familyBackground = colorScheme == .dark ? Color.clear : Color(uiColor: .secondarySystemGroupedBackground)
+        return ScrollView {
             VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
 
                 if showsGlobalOpeningProgress, let openingRoute {
@@ -563,7 +565,7 @@ struct SearchView: View {
                                 .accessibilityIdentifier("search-family-\(family.id)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.top, 16)
-                                .background(Color(uiColor: .secondarySystemGroupedBackground),
+                                .background(familyBackground,
                                     in: UnevenRoundedRectangle(topLeadingRadius: 22, topTrailingRadius: 22, style: .continuous))
                                 .id("family:\(family.id)")
                             ForEach(family.groups) { group in
@@ -571,15 +573,15 @@ struct SearchView: View {
                                     sectionGroupHeader(group)
                                     Divider()
                                 }
-                                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                                .background(familyBackground)
                                 if expandedSearchGroups.contains(group.id) {
                                     ForEach(group.results, id: \.searchIdentity) { result in
                                         searchResultLink(result, groupID: group.id)
-                                            .background(Color(uiColor: .secondarySystemGroupedBackground))
+                                            .background(familyBackground)
                                     }
                                 }
                             }
-                            Color(uiColor: .secondarySystemGroupedBackground)
+                            familyBackground
                                 .frame(height: 16)
                                 .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 22, bottomTrailingRadius: 22, style: .continuous))
                                 .padding(.bottom, 12)

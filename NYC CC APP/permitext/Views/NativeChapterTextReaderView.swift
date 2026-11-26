@@ -48,12 +48,15 @@ struct NativeChapterTextReaderView: View {
     @State private var isJumpPickerPresented = false
     @State private var isSearchPresented = false
     @State private var searchQuery = ""
-    @State private var searchMatches: [NativeReaderSearchMatch] = []
+    @State private var searchMatches: [NativeReaderChapterFindHit] = []
     @State private var searchMatchesByBlock: [String: [NativeReaderSearchMatch]] = [:]
     @State private var appliedSearchQuery: String?
     @State private var appliedSearchRouteID: String?
     @State private var isChapterSearchInProgress = false
     @State private var activeSearchMatchID: String?
+    @State private var isFindListPresented = false
+    @State private var findListSelection: NativeReaderChapterFindHit?
+    @State private var pendingFindSubmission: String?
     @State private var lastRecordedSectionTargetID: String?
     @State private var settledScrollTask: Task<Void, Never>?
     @State private var nearbyMediaPrefetchTask: Task<Void, Never>?
@@ -150,6 +153,7 @@ struct NativeChapterTextReaderView: View {
         }
         .onChange(of: isBrowserTabActive) { _, isActive in
             guard !isActive else { return }
+            scrollState.findNavigationTask?.cancel()
             scrollState.chapterSelection.clear()
             let canPersist = pendingInitialBlockID == nil
                 && (scrollState.restorationLease.map(restorationHasArrived) ?? true)
@@ -169,10 +173,12 @@ struct NativeChapterTextReaderView: View {
         .onChange(of: dynamicTypeSize) { _, _ in releaseRestorationLease(reason: "dynamic-type") }
         .onChange(of: library.readerTheme) { _, _ in releaseRestorationLease(reason: "theme") }
         .onChange(of: route.id) { _, _ in
+            scrollState.findNavigationTask?.cancel()
             scrollState.chapterSelection.clear()
             releaseRestorationLease(reason: "route")
         }
         .onDisappear {
+            scrollState.findNavigationTask?.cancel()
             scrollState.chapterSelection.clear()
             releaseRestorationLease(reason: "disappear")
             settledScrollTask?.cancel()
@@ -224,6 +230,15 @@ struct NativeChapterTextReaderView: View {
         .task(id: "\(route.id)|\(searchQuery)|\(isBrowserTabActive)") {
             await updateChapterSearch()
         }
+        .onChange(of: searchQuery) { _, query in
+            if !query.isEmpty { scrollState.findNavigationTask?.cancel() }
+            if pendingFindSubmission != query { pendingFindSubmission = nil }
+        }
+        .onChange(of: appliedSearchQuery) { _, applied in
+            guard let applied, applied == searchQuery, applied == pendingFindSubmission else { return }
+            pendingFindSubmission = nil
+            navigateSearchMatch(offset: 0, proxy: proxy, document: document)
+        }
         .task(id: "\(route.id)|\(pendingInitialBlockID ?? "")|\(isBrowserTabActive)") {
             guard isBrowserTabActive else { return }
             await restoreInitialPosition(document: document, proxy: proxy)
@@ -235,11 +250,32 @@ struct NativeChapterTextReaderView: View {
                 activeIndex: searchMatches.firstIndex(where: { $0.id == activeSearchMatchID }),
                 isSearching: isChapterSearchInProgress || appliedSearchQuery != searchQuery,
                 onPrevious: { navigateSearchMatch(offset: -1, proxy: proxy, document: document) },
-                onNext: { navigateSearchMatch(offset: activeSearchMatchID == nil ? 0 : 1, proxy: proxy, document: document) },
-                onSubmit: { navigateSearchMatch(offset: 0, proxy: proxy, document: document) },
+                onNext: { navigateSearchMatch(offset: 1, proxy: proxy, document: document) },
+                onSubmit: {
+                    if appliedSearchQuery == searchQuery {
+                        navigateSearchMatch(offset: 0, proxy: proxy, document: document)
+                    } else {
+                        pendingFindSubmission = searchQuery
+                    }
+                },
                 onClose: closeChapterSearch,
-                usesReaderBottomBar: usesReaderBottomBar
+                usesReaderBottomBar: usesReaderBottomBar,
+                onShowMatches: { isFindListPresented = true }
             )
+            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
+                scrollState.findBar = (frame, usesReaderBottomBar)
+            }
+        }
+        .sheet(isPresented: $isFindListPresented, onDismiss: {
+            if let hit = findListSelection {
+                findListSelection = nil
+                activateSearchMatch(hit, proxy: proxy, document: document)
+            }
+        }) {
+            ChapterFindMatchesSheet(rows: chapterFindRows()) { id in
+                findListSelection = searchMatches.first { $0.id == id }
+                isFindListPresented = false
+            }
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -251,7 +287,11 @@ struct NativeChapterTextReaderView: View {
                 isJumpPickerPresented = true
             } onSearch: {
                 if isSearchPresented { closeChapterSearch() }
-                else { isSearchPresented = true }
+                else {
+                    scrollState.chapterSelection.clear()
+                    textLayout.prewarmFindIndex()
+                    isSearchPresented = true
+                }
             }
         }
         .sheet(isPresented: $isJumpPickerPresented) {
@@ -260,6 +300,7 @@ struct NativeChapterTextReaderView: View {
     }
 
     private func closeChapterSearch() {
+        pendingFindSubmission = nil
         searchQuery = ""
         isSearchPresented = false
     }
@@ -287,11 +328,11 @@ struct NativeChapterTextReaderView: View {
         do { try await Task.sleep(for: .milliseconds(120)) } catch { return }
         guard !Task.isCancelled, isBrowserTabActive,
               searchQuery == requestedQuery, route.id == requestedRoute else { return }
-        let matches = await NativeReaderSearchIndex.matchesAsync(query: requestedQuery, in: displayBlocks)
+        let matches = await textLayout.findMatches(query: requestedQuery)
         guard !Task.isCancelled, isBrowserTabActive,
               searchQuery == requestedQuery, route.id == requestedRoute else { return }
         searchMatches = matches
-        searchMatchesByBlock = Dictionary(grouping: matches, by: \.blockID)
+        searchMatchesByBlock = Dictionary(grouping: matches.flatMap(\.highlights), by: \.blockID)
         appliedSearchQuery = requestedQuery
         appliedSearchRouteID = requestedRoute
         isChapterSearchInProgress = false
@@ -439,7 +480,7 @@ struct NativeChapterTextReaderView: View {
     private func chapterRows(document: NativeReaderRuntimeDocument, proxy: ScrollViewProxy) -> some View {
         let projectID = library.readerSaveDestinationProject?.id
         let evidence = library.readerEvidence
-        if !textLayout.groups.isEmpty && searchQuery.isEmpty {
+        if !textLayout.groups.isEmpty {
             ForEach(textLayout.groups) { group in
                 if group.rows.count == 1 || group.rows.dropFirst().contains(where: { scrollState.exactLayoutBlockIDs.contains($0.id) }) {
                     readerBlocks(Array(group.rows), document: document, proxy: proxy, tracksOffsets: true, projectID: projectID, evidence: evidence)
@@ -448,10 +489,12 @@ struct NativeChapterTextReaderView: View {
                     let target = index.map { sectionTargets[$0] }
                     // Only paragraphs receive definition links. The heading may carry its own source ID.
                     let sectionID = group.rows.first(where: { $0.block.kind == .paragraph })?.block.sectionID ?? ""
+                    let highlights = group.rows.flatMap { searchMatchesByBlock[$0.id] ?? [] }
                     NativeReaderGroupedTextView(
                         group: group, routeID: route.id, theme: library.readerTheme,
                         accent: library.accentColor(for: chapter.codeSectionID),
                         saved: savedText(for: index, projectID: projectID, evidence: evidence), selection: scrollState.chapterSelection,
+                        highlights: highlights, activeSearchMatchID: highlights.contains { $0.id == activeSearchMatchID } ? activeSearchMatchID : nil,
                         onOpenLink: { handleLink($0, document: document, proxy: proxy) },
                         onResearch: { sendSelectionToResearch($0, target: target) }
                     )
@@ -490,6 +533,7 @@ struct NativeChapterTextReaderView: View {
         } ?? false
         return ForEach(blocks) { displayBlock in
             let location = navigationIndex[displayBlock.id]
+            let matches = searchMatchesByBlock[displayBlock.id] ?? []
             let target = location?.sectionTargetIndex.map { sectionTargets[$0] }
             NativeReaderTextBlockView(
                 block: displayBlock.block,
@@ -511,9 +555,9 @@ struct NativeChapterTextReaderView: View {
                 onMediaFailure: { message in
                     requestFallbackToHTML(message)
                 },
-                searchQuery: searchQuery,
-                searchMatches: searchMatchesByBlock[displayBlock.id] ?? [],
-                activeSearchMatchID: activeSearchMatchID,
+                searchQuery: matches.isEmpty ? "" : appliedSearchQuery ?? "",
+                searchMatches: matches,
+                activeSearchMatchID: matches.contains { $0.id == activeSearchMatchID } ? activeSearchMatchID : nil,
                 saved: savedText(for: location?.sectionTargetIndex, projectID: projectID, evidence: evidence),
                 blockIndex: location?.displayIndex ?? 0,
                 chapterSelectionTarget: tracksOffsets ? location.map {
@@ -627,6 +671,10 @@ struct NativeChapterTextReaderView: View {
         hasRequestedFallback = false
         expandedMedia = nil
         searchQuery = ""
+        isSearchPresented = false
+        isFindListPresented = false
+        findListSelection = nil
+        pendingFindSubmission = nil
         searchMatches = []
         searchMatchesByBlock = [:]
         appliedSearchQuery = nil
@@ -1156,19 +1204,116 @@ struct NativeChapterTextReaderView: View {
     }
 
     private func navigateSearchMatch(offset: Int, proxy: ScrollViewProxy, document: NativeReaderRuntimeDocument) {
-        guard !searchMatches.isEmpty else { return }
-        let current = searchMatches.firstIndex(where: { $0.id == activeSearchMatchID }) ?? 0
-        let next = (current + offset + searchMatches.count) % searchMatches.count
-        activateSearchMatch(searchMatches[next], proxy: proxy, document: document)
+        guard !searchMatches.isEmpty, appliedSearchQuery == searchQuery else { return }
+        let next: Int
+        if let current = searchMatches.firstIndex(where: { $0.id == activeSearchMatchID }) {
+            next = (current + offset + searchMatches.count) % searchMatches.count
+        } else {
+            let literalMatches = searchMatches.indices.filter {
+                searchMatches[$0].kind.rawValue < NativeReaderChapterFindHit.Kind.keywords.rawValue
+            }
+            let candidates = literalMatches.isEmpty ? Array(searchMatches.indices) : literalMatches
+            let visible = scrollState.visibleBlockID.flatMap { navigationIndex[$0]?.displayIndex } ?? 0
+            if offset < 0 {
+                next = candidates.last { searchMatches[$0].displayIndex <= visible } ?? candidates[candidates.count - 1]
+            } else {
+                next = candidates.first { searchMatches[$0].displayIndex >= visible } ?? candidates[0]
+            }
+        }
+        activateSearchMatch(searchMatches[next], proxy: proxy, document: document, keepsReadingContext: offset != 0)
+    }
+
+    private func chapterFindRows() -> [ChapterFindMatchRow] {
+        searchMatches.map { hit in
+            let title = hit.sectionIndex.flatMap { sectionTargets.indices.contains($0) ? sectionTargets[$0].menuLabel : nil }
+            let detail: String? = switch hit.kind {
+            case .sectionNumber: "Section number"
+            case .keywords: "Matching words"
+            case .similar: "Similar match"
+            case .definition, .phrase: nil
+            }
+            return ChapterFindMatchRow(id: hit.id, title: title ?? chapter.displayLabel, snippet: hit.anchor.snippet, detail: detail)
+        }
     }
 
     private func activateSearchMatch(
-        _ match: NativeReaderSearchMatch,
+        _ hit: NativeReaderChapterFindHit,
         proxy: ScrollViewProxy,
-        document: NativeReaderRuntimeDocument
+        document: NativeReaderRuntimeDocument,
+        keepsReadingContext: Bool = false
     ) {
-        activeSearchMatchID = match.id
-        scroll(to: match.blockID, proxy: proxy, document: document)
+        guard appliedSearchQuery == searchQuery, searchMatches.contains(where: { $0.id == hit.id }) else { return }
+        activeSearchMatchID = hit.id
+        scrollState.chapterSelection.clear()
+        releaseRestorationLease(reason: "find-match")
+        settledScrollTask?.cancel()
+        settledScrollTask = nil
+        pendingInitialBlockID = nil
+        scrollState.findNavigationTask?.cancel()
+        let group = textLayout.groups.first { $0.rows.indices.contains(hit.displayIndex) }
+        let groupIsSplit = group?.rows.dropFirst().contains { scrollState.exactLayoutBlockIDs.contains($0.id) } ?? false
+        let scrollID = groupIsSplit ? hit.anchor.blockID : group?.id ?? hit.anchor.blockID
+        let isTextMatch = displayBlocks[hit.displayIndex].block.kind.isTextOnly
+        scrollState.findNavigationTask = Task { @MainActor in
+            await Task.yield()
+            let address = NativeChapterSelectionAddress(block: hit.displayIndex)
+            let start = NativeChapterSelectionPosition(address: address, offset: hit.anchor.range.location)
+            let end = NativeChapterSelectionPosition(address: address, offset: max(start.offset, NSMaxRange(hit.anchor.range) - 1))
+            var didReposition = false
+            var alignedPasses = 0
+            for _ in 0..<24 {
+                guard !Task.isCancelled, let view = scrollState.scrollView,
+                      !view.isDragging, !view.isTracking else { return }
+                let viewport = keepsReadingContext ? findViewport(in: view) : nil
+                let matchRect = scrollState.chapterSelection.findTextRect(at: start, in: view)
+                let blockY = !isTextMatch && keepsReadingContext
+                    ? scrollState.viewportY(for: scrollID).map { view.bounds.minY + $0 } : nil
+                if let matchY = matchRect?.minY ?? blockY {
+                    if let viewport, !didReposition {
+                        let endY = end == start ? matchRect?.maxY : scrollState.chapterSelection.findTextRect(at: end, in: view)?.maxY
+                        let margin = min(24, (viewport.upperBound - viewport.lowerBound) / 6)
+                        if matchY >= viewport.lowerBound + margin, (endY ?? matchY) <= viewport.upperBound - margin {
+                            scheduleSettledScrollWork(around: scrollState.visibleBlockID, document: document)
+                            return
+                        }
+                    }
+                    let landingY = viewport.map { $0.lowerBound + ($0.upperBound - $0.lowerBound) / 3 }
+                        ?? (view.bounds.minY + view.adjustedContentInset.top + CodeScreenMetrics.topTitlePadding)
+                    let offset = boundedOffset(view.contentOffset.y + matchY - landingY, in: view)
+                    if abs(view.contentOffset.y - offset) < 1 {
+                        alignedPasses += 1
+                        if alignedPasses == 3 { break }
+                    } else {
+                        didReposition = true
+                        alignedPasses = 0
+                        view.setContentOffset(CGPoint(x: view.contentOffset.x, y: offset), animated: false)
+                    }
+                } else if !didReposition || scrollState.viewportY(for: scrollID) == nil {
+                    let anchor = keepsReadingContext ? UnitPoint(x: 0.5, y: 1.0 / 3) : .top
+                    proxy.scrollTo(scrollID, anchor: anchor)
+                    didReposition = true
+                }
+                try? await Task.sleep(for: .milliseconds(16))
+            }
+            guard !Task.isCancelled else { return }
+            scrollState.visibleBlockID = scrollID
+            updateCurrentSectionPresentation(targetIndex: hit.sectionIndex)
+            scheduleSettledScrollWork(around: scrollID, document: document)
+        }
+    }
+
+    private func findViewport(in view: UIScrollView) -> ClosedRange<CGFloat>? {
+        var top = view.bounds.minY + view.adjustedContentInset.top
+        var bottom = view.bounds.maxY - view.adjustedContentInset.bottom
+        if isSearchPresented, let findBar = scrollState.findBar {
+            let bar = view.convert(findBar.frame, from: view.window)
+            if findBar.isBottom {
+                bottom = min(bottom, bar.minY)
+            } else {
+                top = max(top, bar.maxY)
+            }
+        }
+        return top < bottom ? top...bottom : nil
     }
 
     private func scroll(
@@ -1176,6 +1321,7 @@ struct NativeChapterTextReaderView: View {
         proxy: ScrollViewProxy,
         document: NativeReaderRuntimeDocument
     ) {
+        scrollState.findNavigationTask?.cancel()
         releaseRestorationLease(reason: "new-navigation")
         settledScrollTask?.cancel()
         explicitNavigation = true
@@ -1274,6 +1420,8 @@ private struct NativeReaderRestorationLease {
 @MainActor
 private final class NativeReaderScrollState: ObservableObject {
     var exactLayoutBlockIDs: Set<String> = []
+    var findNavigationTask: Task<Void, Never>?
+    var findBar: (frame: CGRect, isBottom: Bool)?
     @Published var pendingInitialBlockID: String? {
         didSet { if let pendingInitialBlockID { exactLayoutBlockIDs.insert(pendingInitialBlockID) } }
     }
@@ -1731,6 +1879,11 @@ enum NativeReaderSearchIndex {
     }
 
     static func ranges(of query: String, in text: String) -> [NSRange] {
+        let ranges = exactRanges(of: query, in: text)
+        return ranges.isEmpty ? fuzzyRanges(of: query, in: text) : ranges
+    }
+
+    static func exactRanges(of query: String, in text: String) -> [NSRange] {
         let normalizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
         let source = text as NSString
         guard !normalizedQuery.isEmpty, source.length > 0 else { return [] }
@@ -1750,7 +1903,13 @@ enum NativeReaderSearchIndex {
             guard nextLocation < source.length else { break }
             searchRange = NSRange(location: nextLocation, length: source.length - nextLocation)
         }
-        if !ranges.isEmpty { return ranges }
+        return ranges
+    }
+
+    static func fuzzyRanges(of query: String, in text: String) -> [NSRange] {
+        let normalizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let source = text as NSString
+        guard !normalizedQuery.isEmpty, source.length > 0 else { return [] }
         // Fall back to consecutive words with at most two edits for words of eight letters,
         // or one edit for shorter words. Never fuzz short words or numbers.
         let expression = wordExpression
@@ -1758,6 +1917,7 @@ enum NativeReaderSearchIndex {
             .map { (normalizedQuery as NSString).substring(with: $0.range).lowercased() }
         let words = expression.matches(in: text, range: NSRange(location: 0, length: source.length))
         guard !queryWords.isEmpty, words.count >= queryWords.count else { return [] }
+        var ranges: [NSRange] = []
         for start in 0...(words.count - queryWords.count) {
             guard !Task.isCancelled else { return [] }
             let window = Array(words[start..<(start + queryWords.count)])
@@ -1810,7 +1970,7 @@ enum NativeReaderSearchIndex {
         [item] + item.children.flatMap(flatten)
     }
 
-    private static func snippet(in text: String, around range: NSRange) -> String {
+    static func snippet(in text: String, around range: NSRange) -> String {
         let source = text as NSString
         let start = max(0, range.location - 48)
         let end = min(source.length, range.location + range.length + 72)
@@ -2370,7 +2530,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
             role: role,
             accentColor: accentColor,
             highlightRanges: searchMatches.map(\.range),
-            activeHighlightRange: searchMatches.first(where: { $0.id == activeSearchMatchID })?.range,
+            activeHighlightRanges: searchMatches.filter { $0.id == activeSearchMatchID }.map(\.range),
             onOpenLink: onOpenLink,
             onResearchSelection: onResearchSelection,
             saved: saved, address: .init(block: blockIndex),
@@ -3288,49 +3448,6 @@ final class NativeReaderAttributedTextCache: @unchecked Sendable {
         }
     }
 
-    func attributedText(
-        cacheKey: String,
-        runs: [NativeReaderRuntimeTextRun],
-        fallbackText: String,
-        theme: ReaderTheme,
-        role: NativeReaderTypographyRole,
-        accentColor: UIColor,
-        highlightRanges: [NSRange],
-        activeHighlightRange: NSRange?
-    ) async throws -> NSAttributedString {
-        let key = cacheKey as NSString
-        if let cached = cache.object(forKey: key) {
-            return cached.value
-        }
-
-        let work = Task.detached(priority: .userInitiated) {
-            try Task.checkCancellation()
-            let value = NativeReaderAttributedTextBuilder.attributedText(
-                runs: runs,
-                fallbackText: fallbackText,
-                theme: theme,
-                role: role,
-                accentColor: accentColor,
-                highlightRanges: highlightRanges,
-                activeHighlightRange: activeHighlightRange
-            )
-            try Task.checkCancellation()
-            return CachedNativeReaderAttributedText(value)
-        }
-        let prepared = try await withTaskCancellationHandler {
-            try await work.value
-        } onCancel: {
-            work.cancel()
-        }
-        let value = prepared.value
-        cache.setObject(
-            CachedNativeReaderAttributedText(value),
-            forKey: key,
-            cost: max(value.length * 4, fallbackText.utf8.count)
-        )
-        return value
-    }
-
     func removeAll() {
         cache.removeAllObjects()
     }
@@ -3344,7 +3461,7 @@ private struct NativeReaderPreparedAttributedTextView: View {
     let role: NativeReaderTypographyRole
     let accentColor: UIColor
     let highlightRanges: [NSRange]
-    var activeHighlightRange: NSRange? = nil
+    var activeHighlightRanges: [NSRange] = []
     let onOpenLink: (URL) -> Void
     let onResearchSelection: (String) -> Void
     var saved: NativeReaderSavedText = .none
@@ -3352,11 +3469,10 @@ private struct NativeReaderPreparedAttributedTextView: View {
     var chapterSelectionTarget: NativeChapterSelectionTarget? = nil
 
     @Environment(\.readerDefinitionContext) private var definitionContext
-    @State private var attributedText: NSAttributedString?
-
     var body: some View {
+        let source = saved.applying(to: baseAttributedText, address: address, accent: accentColor)
         AttributedTextView(
-            attributedText: saved.applying(to: attributedText ?? baseAttributedText, address: address, accent: accentColor),
+            attributedText: NativeReaderFindTint.applying(to: source, ranges: highlightRanges, activeRanges: activeHighlightRanges),
             onOpenLink: onOpenLink,
             onResearchSelection: onResearchSelection,
             chapterSelectionTarget: chapterSelectionTarget,
@@ -3364,29 +3480,6 @@ private struct NativeReaderPreparedAttributedTextView: View {
         )
         .environment(\.readerDefinitionContext, allowsDefinitionLinks ? definitionContext : nil)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .task(id: taskID) {
-            guard hasHighlights else {
-                attributedText = nil
-                return
-            }
-            attributedText = nil
-            do {
-                attributedText = try await NativeReaderAttributedTextCache.shared.attributedText(
-                    cacheKey: taskID,
-                    runs: runs,
-                    fallbackText: fallbackText,
-                    theme: theme,
-                    role: role,
-                    accentColor: accentColor,
-                    highlightRanges: highlightRanges,
-                    activeHighlightRange: activeHighlightRange
-                )
-            } catch is CancellationError {
-                return
-            } catch {
-                attributedText = nil
-            }
-        }
     }
 
     private var allowsDefinitionLinks: Bool {
@@ -3407,10 +3500,6 @@ private struct NativeReaderPreparedAttributedTextView: View {
         )
     }
 
-    private var hasHighlights: Bool {
-        !highlightRanges.isEmpty || activeHighlightRange != nil
-    }
-
     private var baseTaskID: String {
         NativeReaderAttributedTextCacheKey.base(
             cacheID: cacheID,
@@ -3419,10 +3508,21 @@ private struct NativeReaderPreparedAttributedTextView: View {
         )
     }
 
-    private var taskID: String {
-        let highlights = highlightRanges.map { "\($0.location):\($0.length)" }.joined(separator: ",")
-        let active = activeHighlightRange.map { "\($0.location):\($0.length)" } ?? "none"
-        return "\(cacheID)|\(theme.hashValue)|\(accentColor.hash)|\(highlights)|\(active)"
+}
+
+enum NativeReaderFindTint {
+    static func applying(to text: NSAttributedString, ranges: [NSRange], activeRanges: [NSRange]) -> NSAttributedString {
+        guard !ranges.isEmpty else { return text }
+        let tinted = NSMutableAttributedString(attributedString: text)
+        let active = Set(activeRanges)
+        for range in ranges where range.length > 0 && NSMaxRange(range) <= text.length {
+            let isActive = active.contains(range)
+            tinted.addAttribute(.backgroundColor, value: UIColor.systemYellow.withAlphaComponent(isActive ? 0.54 : 0.24), range: range)
+            if isActive {
+                tinted.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
+            }
+        }
+        return tinted
     }
 }
 
@@ -3682,6 +3782,7 @@ private final class NativeReaderTextGroupStore: ObservableObject {
     private var prepared: NativeReaderPreparedDocument?
     private var textByTarget: [Int: NativeReaderPassageText] = [:]
     private var savedByTarget: [Int: (evidence: ReaderEvidenceText, saved: NativeReaderSavedText)] = [:]
+    private var findIndex: Task<NativeReaderChapterFindIndex, Never>?
 
     init(prepared: NativeReaderPreparedDocument? = nil) {
         if let prepared { prepare(prepared) }
@@ -3689,9 +3790,27 @@ private final class NativeReaderTextGroupStore: ObservableObject {
 
     func prepare(_ document: NativeReaderPreparedDocument) {
         prepared = document
+        findIndex?.cancel()
+        findIndex = nil
         textByTarget.removeAll()
         savedByTarget.removeAll()
         groups = NativeReaderTextGroup.isEnabled ? NativeReaderTextGroup.plan(document) : []
+    }
+
+    func prewarmFindIndex() {
+        guard findIndex == nil, let prepared else { return }
+        findIndex = Task.detached(priority: .userInitiated) { NativeReaderChapterFindIndex(prepared) }
+    }
+
+    func findMatches(query: String) async -> [NativeReaderChapterFindHit] {
+        prewarmFindIndex()
+        guard let index = await findIndex?.value, !Task.isCancelled else { return [] }
+        let matching = Task.detached(priority: .userInitiated) { index.matches(query) }
+        return await withTaskCancellationHandler {
+            await matching.value
+        } onCancel: {
+            matching.cancel()
+        }
     }
 
     func passage(_ target: Int) -> NativeReaderPassageText? {
@@ -3767,19 +3886,22 @@ struct NativeReaderGroupedTextView: View, Equatable {
     let accent: UIColor
     let saved: NativeReaderSavedText
     let selection: NativeChapterSelectionController
+    let highlights: [NativeReaderSearchMatch]
+    let activeSearchMatchID: String?
     let onOpenLink: (URL) -> Void
     let onResearch: (String) -> Void
 
     @Environment(\.readerDefinitionContext) private var definitionContext
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @StateObject private var composition = NativeReaderGroupedTextComposition()
 
     static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.group == rhs.group && lhs.saved == rhs.saved && lhs.selection === rhs.selection && lhs.routeID == rhs.routeID && lhs.theme == rhs.theme && lhs.accent.isEqual(rhs.accent)
+        lhs.group == rhs.group && lhs.saved == rhs.saved && lhs.selection === rhs.selection && lhs.routeID == rhs.routeID
+            && lhs.theme == rhs.theme && lhs.accent.isEqual(rhs.accent) && lhs.highlights == rhs.highlights
+            && lhs.activeSearchMatchID == rhs.activeSearchMatchID
     }
 
     var body: some View {
-        // Dynamic Type invalidates the scaled fonts inside the source blocks.
-        let _ = dynamicTypeSize
         let first = group.rows.first!
         let last = group.rows.last!
         let heading = first.block.kind == .heading ? NativeReaderHeadingPresentation(block: first.block) : nil
@@ -3788,8 +3910,12 @@ struct NativeReaderGroupedTextView: View, Equatable {
         case .majorSection: 20
         default: 0
         }
-        let content = compose()
-        AttributedTextView(attributedText: content.text, onOpenLink: onOpenLink, onResearchSelection: onResearch,
+        let content = composition.content(for: .init(group: group, routeID: routeID, theme: theme,
+            accent: accent, saved: saved, definitionContext: definitionContext, dynamicTypeSize: dynamicTypeSize),
+            build: compose)
+        let matches = searchRanges(components: content.components)
+        let text = NativeReaderFindTint.applying(to: content.text, ranges: matches.ranges, activeRanges: matches.active)
+        AttributedTextView(attributedText: text, onOpenLink: onOpenLink, onResearchSelection: onResearch,
                            chapterSelectionTarget: NativeChapterSelectionTarget(controller: selection,
                                address: .init(block: group.rows.startIndex), components: content.components),
                            supportsInlineImages: false, definitionsAlreadyApplied: true)
@@ -3812,7 +3938,10 @@ struct NativeReaderGroupedTextView: View, Equatable {
             .padding(.top, topInset)
             .padding(.bottom, gap(after: last))
             .accessibilityIdentifier("native-reader-text-group-\(group.id)")
-            .accessibilityValue(group.rows.indices.contains(where: saved.contains(block:)) ? "Saved text" : "")
+            .accessibilityValue([
+                group.rows.indices.contains(where: saved.contains(block:)) ? "Saved text" : "",
+                highlights.isEmpty ? "" : "\(Set(highlights.map(\.id)).count) search matches"
+            ].filter { !$0.isEmpty }.joined(separator: ", "))
     }
 
     private func compose() -> (text: NSAttributedString, components: [NSRange]) {
@@ -3863,6 +3992,20 @@ struct NativeReaderGroupedTextView: View, Equatable {
         return (text.copy() as! NSAttributedString, components)
     }
 
+    private func searchRanges(components: [NSRange]) -> (ranges: [NSRange], active: [NSRange]) {
+        var ranges: [NSRange] = []
+        var active: [NSRange] = []
+        for hit in highlights {
+            guard let index = group.rows.firstIndex(where: { $0.id == hit.blockID }) else { continue }
+            let component = components[index - group.rows.startIndex]
+            guard NSMaxRange(hit.range) <= component.length else { continue }
+            let shifted = NSRange(location: component.location + hit.range.location, length: hit.range.length)
+            ranges.append(shifted)
+            if hit.id == activeSearchMatchID { active.append(shifted) }
+        }
+        return (ranges, active)
+    }
+
     private func baseText(for row: NativeReaderDisplayBlock, role: NativeReaderTypographyRole) -> NSAttributedString {
         let id = NativeReaderAttributedTextCacheKey.block(routeID: routeID, blockID: row.id, role: role)
         return NativeReaderAttributedTextCache.shared.baseAttributedText(
@@ -3876,5 +4019,28 @@ struct NativeReaderGroupedTextView: View, Equatable {
             return NativeReaderHeadingPresentation(block: row.block).level <= 2 ? 14 : 8
         }
         return max(CGFloat(theme.paragraphSpacing), row.usesCompactSpacing ? 12 : 8)
+    }
+}
+
+@MainActor
+private final class NativeReaderGroupedTextComposition: ObservableObject {
+    struct Key: Equatable {
+        let group: NativeReaderTextGroup
+        let routeID: String
+        let theme: ReaderTheme
+        let accent: UIColor
+        let saved: NativeReaderSavedText
+        let definitionContext: ReaderDefinitionContext?
+        let dynamicTypeSize: DynamicTypeSize
+    }
+
+    private var cached: (key: Key, text: NSAttributedString, components: [NSRange])?
+
+    func content(for key: Key, build: () -> (text: NSAttributedString, components: [NSRange]))
+        -> (text: NSAttributedString, components: [NSRange]) {
+        if let cached, cached.key == key { return (cached.text, cached.components) }
+        let content = build()
+        cached = (key, content.text, content.components)
+        return content
     }
 }

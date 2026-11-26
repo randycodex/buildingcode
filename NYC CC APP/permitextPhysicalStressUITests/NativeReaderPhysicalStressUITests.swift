@@ -1,4 +1,5 @@
 import XCTest
+import Vision
 
 final class NativeReaderPhysicalStressUITests: XCTestCase {
     private let bookmarkIdentifier = "reader-current-section-bookmark"
@@ -3217,6 +3218,86 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(saved.waitForExistence(timeout: 10), app.debugDescription)
     }
 
+    func testReaderFindKeepsGroupedTextAndJumpsFromMatchList() {
+        let app = launchFixtureProjectReader()
+        let scope = app.textViews.matching(NSPredicate(format: "label CONTAINS %@", "The provisions of this code shall apply")).firstMatch
+        XCTAssertTrue(scope.waitForExistence(timeout: 15), app.debugDescription)
+        let groupID = scope.identifier
+        XCTAssertTrue(groupID.hasPrefix("native-reader-text-group-"))
+
+        app.buttons["Search this chapter"].tap()
+        let field = app.textFields["Find in this chapter"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        field.typeText("maintenance demolition")
+        let matches = app.buttons["Show chapter matches"]
+        XCTAssertTrue(matches.waitForExistence(timeout: 10))
+        XCTAssertEqual(scope.identifier, groupID, "Typing a query must retain the grouped text view.")
+        matches.tap()
+        XCTAssertTrue(app.navigationBars["Chapter matches"].waitForExistence(timeout: 10))
+        let scopeResult = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "101.2")).firstMatch
+        XCTAssertTrue(scopeResult.waitForExistence(timeout: 8))
+        scopeResult.tap()
+        XCTAssertTrue(waitForNonexistence(app.navigationBars["Chapter matches"]))
+        XCTAssertTrue(waitForNonexistence(app.keyboards.firstMatch))
+        XCTAssertTrue(waitForValueContaining("search matches", on: scope))
+        XCTAssertTrue(scope.isHittable)
+        XCTAssertEqual(scope.identifier, groupID, "Jumping to a result must retain the grouped text view.")
+        app.buttons["Close chapter find"].tap()
+        XCTAssertTrue(waitForNonexistence(field))
+        XCTAssertEqual(scope.identifier, groupID)
+
+        app.buttons["Search this chapter"].tap()
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        field.typeText("code")
+        XCTAssertTrue(matches.waitForExistence(timeout: 10))
+        let total = String((matches.value as? String ?? "").prefix(while: \.isNumber))
+        XCTAssertGreaterThan(Int(total) ?? 0, 2)
+        matches.tap()
+        let first = app.buttons["chapter-find-match-1"]
+        let second = app.buttons["chapter-find-match-2"]
+        XCTAssertTrue(first.waitForExistence(timeout: 8))
+        XCTAssertTrue(first.label.hasPrefix("1."))
+        XCTAssertTrue(second.label.hasPrefix("2."))
+        XCTAssertTrue(first.label.contains("101.1") && second.label.contains("101.1"),
+                      "Two occurrences in the same provision must have separate numbered rows.")
+        second.tap()
+        XCTAssertTrue(waitForValueContaining("2 of \(total)", on: matches))
+
+        app.swipeDown()
+        let titlePassage = app.textViews.matching(NSPredicate(format: "label BEGINSWITH %@", "101.1 Title.")).firstMatch
+        XCTAssertTrue(titlePassage.isHittable)
+        let titleY = titlePassage.frame.minY
+        XCTAssertGreaterThan(titleY, app.frame.height * 0.20)
+        let next = app.buttons["Next match"]
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"),
+                                                                  object: next)], timeout: 8), .completed)
+        next.tap()
+        XCTAssertTrue(waitForValueContaining("3 of \(total)", on: matches))
+        XCTAssertEqual(titlePassage.frame.minY, titleY, accuracy: 2)
+        app.buttons["Previous match"].tap()
+        XCTAssertTrue(waitForValueContaining("2 of \(total)", on: matches))
+        XCTAssertEqual(titlePassage.frame.minY, titleY, accuracy: 2)
+
+        app.buttons["Close chapter find"].tap()
+        XCTAssertTrue(waitForNonexistence(field))
+        app.buttons["Search this chapter"].tap()
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        field.typeText("101.4.5")
+        XCTAssertTrue(matches.waitForExistence(timeout: 10))
+        matches.tap()
+        app.navigationBars["Chapter matches"].buttons["Done"].tap()
+        XCTAssertTrue(waitForNonexistence(app.keyboards.firstMatch))
+        next.tap()
+        XCTAssertTrue(waitForValueContaining("1 of 1", on: matches))
+        let firePrevention = app.textViews.matching(NSPredicate(format: "label BEGINSWITH %@", "101.4.5 Fire prevention.")).firstMatch
+        let landsWithContext = NSPredicate { _, _ in
+            guard firePrevention.exists, firePrevention.isHittable else { return false }
+            let position = firePrevention.frame.minY / app.frame.height
+            return (0.25...0.53).contains(position)
+        }
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: landsWithContext, object: nil)], timeout: 8), .completed)
+    }
+
     func testReaderSavedColorAndSelectionOnlyActions() {
         let app = launchFixtureProjectReader()
         let passage = app.textViews.matching(NSPredicate(format: "label CONTAINS %@", "The other codes listed")).firstMatch
@@ -4801,7 +4882,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(attachment)
     }
 
-    func testPlumbingFixtureFootnoteOpens2022BuildingCodeProvision() {
+    func testPlumbingFixtureFootnoteOpens2022BuildingCodeProvision() throws {
         let app = XCUIApplication()
         app.launchArguments += [
             "--native-reader-universal-plumbing-test", "--native-reader-plumbing-footnote",
@@ -4814,23 +4895,33 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let field = app.textFields["Find in this chapter"]
         XCTAssertTrue(field.waitForExistence(timeout: 10))
         field.typeText("Exception 2 of the")
-        let next = app.buttons["Next match"]
-        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"),
-                                                                  object: next)], timeout: 15), .completed)
-        let keyboardSearch = app.keyboards.buttons["Search"]
-        if keyboardSearch.exists && keyboardSearch.isHittable { keyboardSearch.tap() }
-        next.tap()
+        let matches = app.buttons["Show chapter matches"]
+        XCTAssertTrue(matches.waitForExistence(timeout: 15))
+        keepScreenshot(named: "Plumbing chapter Find controls", from: app)
+        matches.tap()
+        let result = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", "Exception 2 of the")).firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 10))
+        result.tap()
+        XCTAssertTrue(waitForNonexistence(app.navigationBars["Chapter matches"]))
         app.buttons["Close chapter find"].tap()
-        let footnote = app.textViews.matching(NSPredicate(format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@",
-                                                          "Exception 2 of the", "Exception 2 of the")).firstMatch
-        XCTAssertTrue(footnote.waitForExistence(timeout: 10) && footnote.isHittable)
         keepScreenshot(named: "2022 Plumbing Code Table 403.1 footnote j", from: app)
         let link = app.links.matching(NSPredicate(format: "label CONTAINS[c] %@", "Section 303.1")).firstMatch
         if link.isHittable {
             link.tap()
         } else {
-            // The attributed citation follows "with" on the fifth line.
-            footnote.coordinate(withNormalizedOffset: CGVector(dx: 0.24, dy: 0.56)).tap()
+            // The grouped text view exposes its full text to accessibility.
+            // Locate the visible citation instead of assuming its line wraps.
+            let recognition = VNRecognizeTextRequest()
+            recognition.recognitionLevel = .accurate
+            recognition.usesLanguageCorrection = false
+            try VNImageRequestHandler(data: app.screenshot().pngRepresentation).perform([recognition])
+            let citation = try XCTUnwrap(recognition.results?.compactMap { observation in
+                observation.topCandidates(1).first.flatMap { candidate -> CGRect? in
+                    guard let range = candidate.string.range(of: "Section 303.1") else { return nil }
+                    return (try? candidate.boundingBox(for: range))?.boundingBox
+                }
+            }.first, "The footnote citation should be visible after Find.")
+            app.coordinate(withNormalizedOffset: CGVector(dx: citation.midX, dy: 1 - citation.midY)).tap()
         }
         XCTAssertTrue(passageHeading(for: "303.1.2", in: app).waitForExistence(timeout: 10))
         keepScreenshot(named: "2022 Building Code 303.1.2 from Plumbing footnote", from: app)

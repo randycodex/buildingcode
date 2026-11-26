@@ -465,16 +465,20 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         handle.isHidden = false
     }
 
-    private func caretGeometry(at endpoint: NativeChapterSelectionPosition,
-                               in scrollView: UIScrollView) -> (rect: CGRect, color: UIColor)? {
+    func findTextRect(at position: NativeChapterSelectionPosition, in scrollView: UIScrollView) -> CGRect? {
+        caretGeometry(at: position, in: scrollView, requiresVisible: false)?.rect
+    }
+
+    private func caretGeometry(at endpoint: NativeChapterSelectionPosition, in scrollView: UIScrollView,
+                               requiresVisible: Bool = true) -> (rect: CGRect, color: UIColor)? {
         guard let view = mountedText[endpoint.address]?.view ?? mountedText.values.first(where: {
             $0.view?.chapterSelectionTarget?.localOffset(endpoint) != nil
         })?.view, let local = view.chapterSelectionTarget?.localOffset(endpoint), view.window === scrollView.window,
-              view.convert(view.bounds, to: scrollView).intersects(scrollView.bounds),
+              !requiresVisible || view.convert(view.bounds, to: scrollView).intersects(scrollView.bounds),
               let position = view.position(from: view.beginningOfDocument, offset: local) else { return nil }
         let caret = view.convert(view.caretRect(for: position), to: scrollView)
         guard !caret.isNull, caret.height > 0, caret.midX.isFinite, caret.midY.isFinite,
-              scrollView.bounds.minY...scrollView.bounds.maxY ~= caret.midY else { return nil }
+              !requiresVisible || scrollView.bounds.minY...scrollView.bounds.maxY ~= caret.midY else { return nil }
         return (caret, view.tintColor)
     }
 

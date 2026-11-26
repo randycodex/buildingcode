@@ -6,6 +6,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 const source = await readFile(new URL('../../NYC CC APP/permitext/Views/NativeChapterTextReaderView.swift',import.meta.url),'utf8');
 const findControls = await readFile(new URL('../../NYC CC APP/permitext/Views/ChapterSearchSheet.swift',import.meta.url),'utf8');
+const preparedIndex = await readFile(new URL('../../NYC CC APP/permitext/Views/NativeReaderChapterFindIndex.swift',import.meta.url),'utf8');
 const baseline = await readFile(new URL('./fixtures/native-chapter-search-before-smooth.swift',import.meta.url),'utf8');
 const current = source.slice(source.indexOf('enum NativeReaderSearchIndex {'),source.indexOf('\nenum NativeReaderReferenceKind:'));
 const matchStart = source.indexOf('struct NativeReaderSearchMatch:');
@@ -18,34 +19,56 @@ assert.match(source, /\.task\(id: "[^"\n]*route.id[^"\n]*searchQuery[^"\n]*isBro
 assert.match(source, /\.chapterFindBar\(isPresented: isSearchPresented\) \{ usesReaderBottomBar in\s*ChapterFindControls/, 'Find uses the chapter search placement');
 assert.match(findControls, /if let readerOwner \{\s*content\.overlay\(alignment: \.bottom\)/, 'Find fills the bottom Reader controls area when hosted in the Reader tab');
 assert.doesNotMatch(source, /NativeReaderSearchSheet|presentedInSearchSheet/, 'Find must not depend on a covered Reader task');
+assert.doesNotMatch(source, /if !textLayout\.groups\.isEmpty && searchQuery/, 'Find must keep grouped paragraphs mounted');
 const fixture = `import Foundation
 struct NativeReaderRuntimeListItem: Sendable { var plainText: String; var children: [Self] = [] }
 struct Cell: Sendable { var plainText: String }
 struct Table: Sendable { var caption: String?; var cells: [Cell] = []; var footnotes: [String] = [] }
 struct Media: Sendable { var accessibilityText: String?; var caption: String? }
 struct NativeReaderRuntimeBlock: Sendable {
- enum Kind: Sendable { case paragraph, orderedList, unorderedList, table, image, figure }
+ enum Kind: Sendable {
+  case paragraph, orderedList, unorderedList, table, image, figure
+  var isTextOnly: Bool { self == .paragraph }
+ }
+ struct Run: Sendable { let text: String }
  var kind: Kind = .paragraph; var plainText: String = ""; var listItems: [NativeReaderRuntimeListItem] = []
  var table: Table?; var media: [Media] = []; var caption: String?
+ var runs: [Run] = []
 }
 struct NativeReaderDisplayBlock: Sendable { var id: String; var sourceBlockID: String; var block: NativeReaderRuntimeBlock }
+struct NativeReaderPreparedDocument: Sendable {
+ struct Section: Sendable { let blockID: String; let sectionNumber: String? }
+ struct Location: Sendable { let displayIndex: Int; let sectionTargetIndex: Int? }
+ let displayBlocks: [NativeReaderDisplayBlock]
+ let sectionTargets: [Section]
+ let navigationIndex: [String: Location]
+}
 ${match}
 ${baseline}
 ${current}
+${preparedIndex}
+@MainActor final class SearchLayout {
+ var blocks: [NativeReaderDisplayBlock]
+ init(_ blocks: [NativeReaderDisplayBlock]) { self.blocks = blocks }
+ func findMatches(query: String) async -> [NativeReaderChapterFindHit] {
+  let index = NativeReaderChapterFindIndex(.init(displayBlocks: blocks, sectionTargets: [], navigationIndex: [:]))
+  return index.matches(query)
+ }
+}
 @MainActor final class SearchHarness {
  struct Route { var id = "chapter-a" }
  var route = Route()
  var isBrowserTabActive = true
  var isSearchPresented = false
  var searchQuery = "concrete"
- var displayBlocks: [NativeReaderDisplayBlock]
- var searchMatches: [NativeReaderSearchMatch] = []
+ var textLayout: SearchLayout
+ var searchMatches: [NativeReaderChapterFindHit] = []
  var searchMatchesByBlock: [String: [NativeReaderSearchMatch]] = [:]
  var appliedSearchQuery: String?
  var appliedSearchRouteID: String?
  var isChapterSearchInProgress = false
  var activeSearchMatchID: String?
- init(_ blocks: [NativeReaderDisplayBlock]) { displayBlocks = blocks }
+ init(_ blocks: [NativeReaderDisplayBlock]) { textLayout = SearchLayout(blocks) }
  ${updateMethod}
 }
 @main struct Main {
@@ -73,13 +96,14 @@ ${current}
   cancelled.cancel()
   let cancelledResult = await cancelled.value
   precondition(cancelledResult.isEmpty,"Cancelled query must not publish matches")
-  let expected = NativeReaderSearchIndex.matches(query: "concrete", in: blocks)
+  // Native Reader navigation now follows document order regardless of ranking.
+  let expected = NativeReaderChapterFindIndex(.init(displayBlocks: blocks, sectionTargets: [], navigationIndex: [:])).matches("concrete")
   let sheet = SearchHarness(blocks)
   sheet.isSearchPresented = true
   await sheet.updateChapterSearch()
   precondition(sheet.searchMatches == expected && !sheet.isChapterSearchInProgress, "Visible Reader publishes chapter-scoped matches")
   precondition(sheet.activeSearchMatchID == nil, "Typing must not claim a passage was visited before navigation")
-  sheet.displayBlocks = []
+  sheet.textLayout.blocks = []
   sheet.isSearchPresented = false
   await sheet.updateChapterSearch()
   precondition(sheet.searchMatches == expected, "Closing controls must not rescan completed query")
@@ -112,7 +136,27 @@ ${current}
    await h.updateChapterSearch()
    precondition(h.searchMatches == expected && h.appliedSearchRouteID == h.route.id && !h.isChapterSearchInProgress)
   }
-  print("PASS: frozen exact/fuzzy/Unicode/list/table/media/duplicate-ID parity, background matching and cancellation; actual update method covers inline ownership, first navigation, applied-cache reuse, empty reset, A-B-A, route and tab changes")
+  let provisions = ["101.1 Title.", "🪟 Keep the windows clear.", "Lot lines have setbacks.",
+                    "101.2 Scope.", "The exact phrase windows lot lines occurs here.", "The words windows recur.",
+                    "101.3 Intent.", "Another reference to lot lines only."].enumerated().map {
+   NativeReaderDisplayBlock(id: "block-\\($0.offset)", sourceBlockID: "source-\\($0.offset)", block: .init(plainText: $0.element))
+  }
+  let headings = [0, 3, 6]
+  let navigation = Dictionary(uniqueKeysWithValues: provisions.enumerated().map { item in
+   (item.element.id, NativeReaderPreparedDocument.Location(displayIndex: item.offset,
+     sectionTargetIndex: headings.lastIndex(where: { $0 <= item.offset })))
+  })
+  let index = NativeReaderChapterFindIndex(.init(displayBlocks: provisions,
+    sectionTargets: headings.enumerated().map { .init(blockID: provisions[$0.element].id, sectionNumber: "101.\\($0.offset + 1)") },
+    navigationIndex: navigation))
+  let loose = index.matches("windows lot lines")
+  precondition(loose.map(\\.kind) == [.keywords, .phrase], "Arrows travel in reading order and keyword hits stay in their provision")
+  precondition(loose.first?.highlights.map(\\.blockID) == ["block-1","block-2","block-2"])
+  precondition(loose.first?.anchor.range.location == "🪟 Keep the ".utf16.count)
+  precondition(index.matches("§ 101.2").first?.kind == .sectionNumber)
+  precondition(index.matches("BC 101.2").first?.anchor.blockID == "block-3")
+  precondition(index.matches("windows setbacks intent").isEmpty)
+  print("PASS: legacy search parity, Find index offsets, keyword boundaries, section jumps, stale-query cancellation, and cached matching")
  }
 }
 `;

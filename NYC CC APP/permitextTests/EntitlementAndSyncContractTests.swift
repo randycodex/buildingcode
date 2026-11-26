@@ -8318,7 +8318,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertFalse(nativeReaderSource.contains(".scrollPosition($scrollPosition)"))
         XCTAssertTrue(nativeReaderSource.contains(".equatable()"))
         XCTAssertTrue(nativeReaderSource.contains("NativeReaderTextBlockView: View, Equatable"))
-        XCTAssertTrue(nativeReaderSource.contains("attributedText: saved.applying(to: attributedText ?? baseAttributedText"))
+        XCTAssertTrue(nativeReaderSource.contains("let source = saved.applying(to: baseAttributedText"))
+        XCTAssertTrue(nativeReaderSource.contains("NativeReaderFindTint.applying(to: content.text"))
         XCTAssertTrue(nativeReaderSource.contains("supportsInlineImages: false"))
         XCTAssertTrue(nativeReaderSource.contains("cache.countLimit = 256"))
         XCTAssertTrue(nativeReaderSource.contains("cache.totalCostLimit = 24 * 1024 * 1024"))
@@ -8383,6 +8384,43 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             XCTAssertTrue(group.rows.allSatisfy { prepared.navigationIndex[$0.id]?.sectionTargetIndex == targetIndex },
                           "Section \(number) must keep its own passage and citation target.")
         }
+    }
+
+    func testPreparedChapterFindUsesEnactedTextAndExactSectionTargets() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let source = corpusRootURL.appendingPathComponent("2022-construction-codes/code-sections/building-code/chapters/1.html")
+        let resolved = await store.debugRoute(for: source)
+        let document = try await store.loadPreparedDocument(for: XCTUnwrap(resolved))
+        let index = NativeReaderChapterFindIndex(document)
+        let scope = try XCTUnwrap(document.sectionTargets.firstIndex { $0.sectionNumber == "101.2" })
+        let jump = index.matches("Section BC 101.2")
+        XCTAssertEqual(jump.map(\.sectionIndex), [scope])
+        XCTAssertEqual(jump.map(\.kind), [.sectionNumber])
+        XCTAssertEqual(jump.first?.anchor.blockID, document.sectionTargets[scope].blockID)
+
+        let words = try XCTUnwrap(index.matches("maintenance demolition").first { $0.sectionIndex == scope })
+        XCTAssertEqual(words.kind, .keywords)
+        XCTAssertEqual(words.highlights.count, 2)
+        let highlights = try words.highlights.map { match in
+            let block = try XCTUnwrap(document.displayBlocks.first { $0.id == match.blockID }).block
+            let text = block.runs.isEmpty ? block.plainText : block.runs.map(\.text).joined()
+            return (text as NSString).substring(with: match.range)
+        }
+        XCTAssertEqual(highlights, ["maintenance", "demolition"])
+    }
+
+    @MainActor
+    func testReaderFindTintPreservesSavedEvidenceForeground() {
+        let content = NSAttributedString(string: "This code", attributes: [.foregroundColor: UIColor.label])
+        let range = NSRange(location: 5, length: 4)
+        let address = NativeChapterSelectionAddress(block: 1)
+        let saved = NativeReaderSavedText.ranges([address: [range]])
+            .applying(to: content, address: address, accent: .systemOrange)
+        let tinted = NativeReaderFindTint.applying(to: saved, ranges: [range], activeRanges: [range])
+        XCTAssertEqual(tinted.string, content.string)
+        XCTAssertEqual(tinted.attribute(.foregroundColor, at: 5, effectiveRange: nil) as? UIColor, .systemOrange)
+        XCTAssertNotNil(tinted.attribute(.backgroundColor, at: 5, effectiveRange: nil))
+        XCTAssertNil(saved.attribute(.backgroundColor, at: 5, effectiveRange: nil))
     }
 
     @MainActor

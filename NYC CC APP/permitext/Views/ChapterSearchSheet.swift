@@ -60,6 +60,8 @@ struct ChapterSearchSheet: View {
     var usesReaderBottomBar = false
     var onClose: (() -> Void)? = nil
     @State private var activeResultID: String?
+    @State private var showsMatchList = false
+    @State private var selectedListResult: ChapterSearchResult?
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var library: CodeLibraryViewModel
@@ -112,7 +114,8 @@ struct ChapterSearchSheet: View {
                     onNext: { navigateResult(offset: activeResultID == nil ? 0 : 1) },
                     onSubmit: { navigateResult(offset: 0) },
                     onClose: { query = ""; onClose?() },
-                    usesReaderBottomBar: usesReaderBottomBar
+                    usesReaderBottomBar: usesReaderBottomBar,
+                    onShowMatches: { showsMatchList = true }
                 )
             } else {
                 VStack(spacing: 0) {
@@ -126,13 +129,31 @@ struct ChapterSearchSheet: View {
         }
         .task(id: entries) { await loadIndexIfNeeded() }
         .onChange(of: query) { _, _ in activeResultID = nil }
+        .sheet(isPresented: $showsMatchList, onDismiss: {
+            if let result = selectedListResult {
+                selectedListResult = nil
+                selectResult(result)
+            }
+        }) {
+            let matches = results
+            ChapterFindMatchesSheet(rows: matches.map { result in
+                ChapterFindMatchRow(id: result.id, title: "\(result.sectionNumber) \(result.title)",
+                                    snippet: result.snippet, detail: nil)
+            }) { id in
+                selectedListResult = matches.first { $0.id == id }
+                showsMatchList = false
+            }
+        }
     }
 
     private func navigateResult(offset: Int) {
         let matches = results
         guard !matches.isEmpty else { return }
         let index = matches.firstIndex(where: { $0.id == activeResultID }) ?? 0
-        let result = matches[(index + offset + matches.count) % matches.count]
+        selectResult(matches[(index + offset + matches.count) % matches.count])
+    }
+
+    private func selectResult(_ result: ChapterSearchResult) {
         activeResultID = result.id
         onSelect(ChapterSearchSourceEntry(sectionID: result.sectionID, sectionNumber: result.sectionNumber,
             title: result.title, anchorID: result.anchorID))
@@ -433,7 +454,9 @@ struct ChapterFindControls: View {
     let onSubmit: () -> Void
     let onClose: () -> Void
     var usesReaderBottomBar = false
+    var onShowMatches: (() -> Void)? = nil
     @FocusState private var isFocused: Bool
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         Group {
@@ -456,33 +479,74 @@ struct ChapterFindControls: View {
     }
 
     private var controls: some View {
-        HStack(spacing: 0) {
-            TextField("Find in chapter", text: $query)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .submitLabel(.search)
-                .focused($isFocused)
-                .accessibilityLabel("Find in this chapter")
-                .onSubmit { isFocused = false; onSubmit() }
-                .padding(.leading, 12)
-                .frame(minWidth: 60)
-            if !query.isEmpty {
-                if isSearching {
-                    ProgressView().controlSize(.small).padding(.horizontal, 4)
-                        .accessibilityLabel("Searching this chapter")
-                } else {
-                    Text(activeIndex.map { "\($0 + 1) of \(matchCount)" } ?? "\(matchCount) matches")
-                        .font(.caption.monospacedDigit())
-                        .foregroundStyle(.secondary)
-                        .fixedSize()
-                        .padding(.horizontal, 4)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize, !query.isEmpty {
+                VStack(spacing: 0) {
+                    HStack(spacing: 0) { queryField; closeButton }
+                    HStack(spacing: 0) { Spacer(minLength: 0); matchControls; Spacer(minLength: 0) }
                 }
-                findButton("Previous match", icon: "chevron.up", disabled: matchCount == 0 || isSearching) { onPrevious() }
-                findButton("Next match", icon: "chevron.down", disabled: matchCount == 0 || isSearching) { onNext() }
+            } else {
+                HStack(spacing: 0) {
+                    queryField
+                    if !query.isEmpty { matchControls }
+                    closeButton
+                }
             }
-            findButton("Close chapter find", icon: "xmark") { onClose() }
         }
         .font(.subheadline)
+    }
+
+    private var queryField: some View {
+        TextField("Find in chapter", text: $query)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+            .submitLabel(.search)
+            .focused($isFocused)
+            .accessibilityLabel("Find in this chapter")
+            .onSubmit { isFocused = false; onSubmit() }
+            .padding(.leading, 12)
+            .frame(minWidth: 60, minHeight: 44)
+    }
+
+    private var closeButton: some View {
+        findButton("Close chapter find", icon: "xmark", action: onClose)
+    }
+
+    private var matchLabel: String {
+        if let activeIndex { return "\(activeIndex + 1) of \(matchCount)" }
+        return matchCount == 1 ? "1 match" : "\(matchCount) matches"
+    }
+
+    private var matchControls: some View {
+        HStack(spacing: 0) {
+            if isSearching {
+                ProgressView().controlSize(.small).padding(.horizontal, 4)
+                    .accessibilityLabel("Searching this chapter")
+            } else if let onShowMatches, matchCount > 0 {
+                Button {
+                    isFocused = false
+                    onShowMatches()
+                } label: {
+                    Label(matchLabel, systemImage: "list.bullet")
+                        .font(.caption.monospacedDigit())
+                        .fixedSize()
+                        .padding(.horizontal, 5)
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Show chapter matches")
+                .accessibilityValue(matchLabel)
+            } else {
+                Text(matchLabel)
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .fixedSize()
+                    .padding(.horizontal, 4)
+            }
+            findButton("Previous match", icon: "chevron.up", disabled: matchCount == 0 || isSearching, action: onPrevious)
+            findButton("Next match", icon: "chevron.down", disabled: matchCount == 0 || isSearching, action: onNext)
+        }
     }
 
     private func findButton(_ title: String, icon: String, disabled: Bool = false, action: @escaping () -> Void) -> some View {
@@ -492,6 +556,61 @@ struct ChapterFindControls: View {
         .buttonStyle(.plain)
         .disabled(disabled)
         .accessibilityLabel(title)
+    }
+}
+
+struct ChapterFindMatchRow: Identifiable {
+    let id: String
+    let title: String
+    let snippet: String
+    let detail: String?
+}
+
+struct ChapterFindMatchesSheet: View {
+    let rows: [ChapterFindMatchRow]
+    let onSelect: (String) -> Void
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dismiss) private var dismiss
+    @ScaledMetric(relativeTo: .caption) private var numberWidth = 26.0
+
+    var body: some View {
+        NavigationStack {
+            List(Array(rows.enumerated()), id: \.element.id) { index, row in
+                Button { onSelect(row.id) } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: 12) {
+                        Text("\(index + 1).")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                            .frame(minWidth: numberWidth, alignment: .trailing)
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(row.title).font(.subheadline.weight(.semibold))
+                            if !row.snippet.isEmpty {
+                                Text(row.snippet).font(.subheadline).foregroundStyle(.secondary).lineLimit(3)
+                            }
+                            if let detail = row.detail {
+                                Text(detail).font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(.vertical, 4)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("chapter-find-match-\(index + 1)")
+                .listRowBackground(Color.clear)
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .navigationTitle("Chapter matches")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
+            }
+        }
+        .presentationBackground(colorScheme == .dark ? Color(white: 0.09) : CodeAppBackdrop.color)
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 }
 
