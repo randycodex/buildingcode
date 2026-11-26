@@ -32,7 +32,8 @@ const folder={id:'synthetic',name:'Synthetic ZoLa Project',address:'1760 Jerome 
 let syntheticSaveAttempts=0;
 const updateProjectFolder=async(_folder,details)=>{syntheticSaveAttempts++;const failure=new URL(location.href).searchParams.get('saveFailure');if(syntheticSaveAttempts===1&&failure==='false')return false;if(syntheticSaveAttempts===1&&failure==='throw')throw new Error('Synthetic save failure');Object.assign(folder,details);document.querySelector('#state').textContent='Saved '+folder.structuredFacts.length+' facts. Manual occupancy: '+folder.structuredFacts.find(f=>f.key==='occupancy').value;return true;};
 ${editor}
-appendSavedProjectFactEditor(document.querySelector('#editor'),folder,{...folder});
+appendSavedProjectFactEditor(document.querySelector('#editor'),folder,{...folder},
+  {section: new URLSearchParams(location.search).get('section')});
 </script></body></html>`;
 const server = createServer(async (request, response) => {
   try {

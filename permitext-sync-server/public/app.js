@@ -18,7 +18,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-zoning-value-wrap-v2705";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-zoning-address-v2708";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -180,7 +180,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261126-zoning-value-wrap-v2705";
+} from "./offline-storage.js?v=20261126-zoning-address-v2708";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -39925,32 +39925,51 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     const row = document.createElement("article");
     row.className = "saved-project-structured-fact";
     row.dataset.factKey = key;
-    const label = document.createElement("label");
+    const displaysAddress = factsOnly && projectAddress;
+    const label = document.createElement(displaysAddress ? "span" : "label");
     label.className = "saved-project-structured-fact-label";
     label.textContent = fieldLabel;
-    const value = document.createElement(factsOnly ? "textarea" : "input");
-    value.className = "saved-project-structured-fact-value";
-    value.value = projectAddress ? address.value : factsByKey.get(key)?.value || "";
-    const valueWrapper = factsOnly ? document.createElement("div") : null;
-    if (valueWrapper) {
-      valueWrapper.className = "saved-project-structured-fact-control";
-      valueWrapper.dataset.value = value.value;
-      valueWrapper.append(value);
-      value.rows = 1;
-      value.addEventListener("keydown", event => {
-        if (event.key !== "Enter" || event.isComposing) return;
-        event.preventDefault();
-        value.blur();
-      });
-    } else {
-      value.type = "text";
-    }
-    if (factsOnly && projectAddress) value.readOnly = true;
-    value.setAttribute("aria-label", fieldLabel);
     const fact = factsByKey.get(key);
-    if (fact?.sourceText) value.title = fact.sourceText;
-    label.htmlFor = value.id = `project-structured-${safeAnnotationIDPart(projectRecordID(folder))}-${key}`;
-    row.append(label, valueWrapper || value);
+    row.append(label);
+    if (displaysAddress) {
+      const value = document.createElement("span");
+      const text = address.value.trim();
+      value.className = "saved-project-structured-fact-display";
+      if (!text) value.classList.add("is-empty");
+      value.textContent = text || "Not recorded";
+      if (fact?.sourceText) value.title = fact.sourceText;
+      row.append(value);
+    } else {
+      const value = document.createElement(factsOnly ? "textarea" : "input");
+      value.className = "saved-project-structured-fact-value";
+      value.value = projectAddress ? address.value : fact?.value || "";
+      value.setAttribute("aria-label", fieldLabel);
+      if (fact?.sourceText) value.title = fact.sourceText;
+      label.htmlFor = value.id = `project-structured-${safeAnnotationIDPart(projectRecordID(folder))}-${key}`;
+      const valueWrapper = factsOnly ? document.createElement("div") : null;
+      if (valueWrapper) {
+        valueWrapper.className = "saved-project-structured-fact-control";
+        valueWrapper.dataset.value = value.value;
+        valueWrapper.append(value);
+        value.rows = 1;
+        value.addEventListener("keydown", event => {
+          if (event.key !== "Enter" || event.isComposing) return;
+          event.preventDefault();
+          value.blur();
+        });
+      } else {
+        value.type = "text";
+      }
+      value.addEventListener("input", () => {
+        if (valueWrapper) valueWrapper.dataset.value = value.value;
+        if (projectAddress) address.value = value.value;
+        else replaceFact(key, fieldLabel, value.value);
+        scheduleStructuredSave();
+      });
+      value.addEventListener("blur", save);
+      if (identity.sharedOnly) value.disabled = true;
+      row.append(valueWrapper || value);
+    }
     if (fact && (fact.status !== "sourced" || fact.source !== "nyc-planning")) {
       const review = document.createElement("small");
       review.className = "project-fact-review-status";
@@ -39959,14 +39978,6 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
       if (fact.sourceText) review.title = fact.sourceText;
       row.append(review);
     }
-    value.addEventListener("input", () => {
-      if (valueWrapper) valueWrapper.dataset.value = value.value;
-      if (projectAddress) address.value = value.value;
-      else replaceFact(key, fieldLabel, value.value);
-      scheduleStructuredSave();
-    });
-    value.addEventListener("blur", save);
-    if (identity.sharedOnly) value.disabled = true;
     list.append(row);
   };
 
@@ -40181,7 +40192,6 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     const zoningAddress = structuredBody.querySelector('.saved-project-structured-fact-value[aria-label="Address"]');
     if (zoningAddress && zoningAddress !== document.activeElement) {
       zoningAddress.value = address.value;
-      if (factsOnly) zoningAddress.parentElement.dataset.value = zoningAddress.value;
     }
   });
   address.addEventListener("blur", save);

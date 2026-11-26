@@ -10957,6 +10957,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   pointer-events: none;
 }
 
+.saved-project-structured-fact-display,
 .saved-project-structured-fact-control > .saved-project-structured-fact-value,
 .saved-project-structured-fact-control::after {
   grid-area: 1 / 1;
@@ -10971,6 +10972,15 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   text-align: right;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+.saved-project-structured-fact-display {
+  grid-area: auto;
+  color: var(--text-primary);
+}
+
+.saved-project-structured-fact-display.is-empty {
+  color: var(--text-secondary);
 }
 
 .saved-project-structured-fact-control > .saved-project-structured-fact-value {

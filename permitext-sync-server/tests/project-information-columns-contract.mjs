@@ -286,7 +286,10 @@ const contextRoot = element("section"), factsRoot = element("section");
 const contextEditor = e.appendSavedProjectFactEditor(contextRoot, alpha, alpha, { section: "context" });
 const factsEditor = e.appendSavedProjectFactEditor(factsRoot, alpha, alpha, { section: "facts" });
 await contextEditor.flush(); assert.equal(patches.length,0);
-assert.equal(find(factsRoot,node=>node.attributes['aria-label']==='Address').readOnly,true,'Address edits belong to the Overview editor.');
+const addressDisplay = root => find(root, node => node.className.split(" ").includes("saved-project-structured-fact-display"));
+assert.equal(addressDisplay(factsRoot).textContent, "Original address");
+assert.equal(find(factsRoot, node => node.attributes["aria-label"] === "Address"), undefined,
+  "Zoning displays the address as text. Address edits belong to the Overview editor.");
 assert.equal(factMotionCalls.length, 0, "Standalone Facts ignores stored collapsed state and has no accordions.");
 assert.equal(find(factsRoot,node=>node.tag==='details'||node.tag==='summary'),undefined,'Facts groups have no native collapse controls.');
 for (const label of ["Property", "Building", "Work & code basis", "Zoning", "Special designations"]) {
@@ -316,7 +319,9 @@ assert.equal(patches[1].structuredFacts[0].value, "R-2");
 assert.equal(typeof factsEditor.refreshZoLa, "function");
 assert.equal(factsEditor.isRefreshing(), false);
 assert.equal(factsEditor.refresh({...alpha,address:'Updated address',structuredFacts:[]}),true,'Identity address changes refresh Facts in place.');
-assert.equal(find(factsRoot,node=>node.attributes['aria-label']==='Address').value,'Updated address');
+assert.equal(addressDisplay(factsRoot).textContent, "Updated address");
+assert.equal(factsEditor.refresh({ ...alpha, address: "" }), true);
+assert.equal(addressDisplay(factsRoot).textContent, "Not recorded");
 const refreshedOccupancy = find(factsRoot,node=>node.attributes['aria-label']==='Occupancy');
 refreshedOccupancy.value='R-3'; refreshedOccupancy.handlers.input();
 assert.equal(factsEditor.refresh({...alpha,address:'Do not overwrite'}),false,'A refresh preserves pending fact edits.');
