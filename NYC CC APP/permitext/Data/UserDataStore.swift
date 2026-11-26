@@ -62,7 +62,10 @@ protocol UserContentRepository {
     func reorderProjects(ids: [Int64]) throws
     func deleteFolder(id: Int64, codeVersion: String) throws
     func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, selectedExcerpts: [String]) throws
-    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws
+    func folderSectionEvidence(sectionID: Int64, folderID: Int64, codeVersion: String) throws -> ReaderEvidenceText?
+    func restoreSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, evidence: ReaderEvidenceText) throws
+    @discardableResult
+    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws -> ReaderEvidenceText?
     func removeSectionFromAllFolders(sectionID: Int64, codeVersion: String) throws
     func clearAllFolders(codeVersion: String) throws
     func clearAllFolders() throws
@@ -605,11 +608,13 @@ final class UserDataStore: UserContentRepository {
                 ])
             }
             let target = FolderSectionSyncTarget(folderID: projectID, folderClientID: clientID, folderType: .project)
+            let intents = try latestFolderSectionIntents()
             for (sectionID, excerpts) in excerptsBySectionID.sorted(by: { $0.key < $1.key }) {
                 if try !isBookmarked(sectionID: sectionID, codeVersion: codeVersion) {
                     try insertBookmark(sectionID: sectionID, codeVersion: codeVersion)
                 }
-                let existing = try folderSectionEvidence(sectionID: sectionID, folderID: target.folderID, codeVersion: codeVersion)
+                let existing = try folderSectionEvidence(sectionID: sectionID, folderID: projectID, codeVersion: codeVersion,
+                                                         intents: intents)
                 var saved = existing ?? ReaderEvidenceText(excerpts: [])
                 saved.excerpts = mergeFolderSectionExcerpts(existing?.excerpts, excerpts)
                 saved.addOccurrences(occurrences[sectionID] ?? [:])
@@ -2655,9 +2660,23 @@ final class UserDataStore: UserContentRepository {
     }
 
     func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String, selectedExcerpts: [String])] {
+        try evidenceReferences(inFolder: folderID, intents: latestFolderSectionIntents())
+    }
+
+    func evidenceReferences(inFolders folderIDs: [Int64]) throws -> [Int64: [(sectionID: Int64, codeVersion: String, selectedExcerpts: [String])]] {
+        guard !folderIDs.isEmpty else { return [:] }
+        let intents = try latestFolderSectionIntents()
+        return try Dictionary(uniqueKeysWithValues: folderIDs.map {
+            ($0, try evidenceReferences(inFolder: $0, intents: intents))
+        })
+    }
+
+    private func evidenceReferences(
+        inFolder folderID: Int64, intents: [FolderSectionIdentity: LocalSyncIntent]
+    ) throws -> [(sectionID: Int64, codeVersion: String, selectedExcerpts: [String])] {
         let statement = try connection.prepare(
             """
-            SELECT section_id, code_version, selected_excerpts_json
+            SELECT section_id, code_version, selected_excerpts_json, updated_at
             FROM folder_sections
             WHERE folder_id = ?;
             """
@@ -2667,9 +2686,14 @@ final class UserDataStore: UserContentRepository {
 
         var references: [(sectionID: Int64, codeVersion: String, selectedExcerpts: [String])] = []
         while try connection.step(statement) == SQLITE_ROW {
+            let sectionID = connection.int64(at: 0, in: statement)
+            let codeVersion = connection.string(at: 1, in: statement)
+            guard folderSectionIsVisible(folderID: folderID, sectionID: sectionID, codeVersion: codeVersion,
+                                        rowUpdatedAt: dateFromDatabase(connection.string(at: 3, in: statement)),
+                                        intents: intents) else { continue }
             references.append((
-                sectionID: connection.int64(at: 0, in: statement),
-                codeVersion: connection.string(at: 1, in: statement),
+                sectionID: sectionID,
+                codeVersion: codeVersion,
                 selectedExcerpts: ServerProjectSectionRecord.decodeExcerpts(connection.stringOrNil(at: 2, in: statement)) ?? []
             ))
         }
@@ -2741,17 +2765,23 @@ final class UserDataStore: UserContentRepository {
     }
 
     func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, selectedExcerpts: [String] = []) throws {
+        try restoreSection(sectionID, toFolder: folderID, codeVersion: codeVersion, evidence: .init(excerpts: selectedExcerpts))
+    }
+
+    func restoreSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, evidence: ReaderEvidenceText) throws {
         try performTransaction {
             let target = FolderSectionSyncTarget(
                 folderID: folderID,
                 folderClientID: try folderClientID(id: folderID, codeVersion: codeVersion),
                 folderType: try folderType(id: folderID, codeVersion: codeVersion)
             )
-            let existing = try folderSectionEvidence(sectionID: sectionID, folderID: folderID, codeVersion: codeVersion)
-            let combined = mergeFolderSectionExcerpts(existing?.excerpts, selectedExcerpts)
-            try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion,
-                                    saved: .init(excerpts: combined, occurrences: existing?.occurrences ?? [:]),
-                                    added: .init(excerpts: selectedExcerpts))
+            let existing = try folderSectionEvidence(sectionID: sectionID, folderID: folderID, codeVersion: codeVersion,
+                                                     intents: latestFolderSectionIntents())
+            var saved = existing ?? ReaderEvidenceText(excerpts: [])
+            saved.excerpts = mergeFolderSectionExcerpts(saved.excerpts, evidence.excerpts)
+            saved.offsets.merge(evidence.offsets, uniquingKeysWith: { current, _ in current })
+            saved.addOccurrences(evidence.occurrences)
+            try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion, saved: saved, added: evidence)
         }
     }
 
@@ -2761,15 +2791,24 @@ final class UserDataStore: UserContentRepository {
             occurrences: ServerProjectSectionRecord.decodeOccurrences(occurrences) ?? [:])
     }
 
-    private func folderSectionEvidence(sectionID: Int64, folderID: Int64, codeVersion: String) throws -> ReaderEvidenceText? {
+    func folderSectionEvidence(sectionID: Int64, folderID: Int64, codeVersion: String) throws -> ReaderEvidenceText? {
+        try folderSectionEvidence(sectionID: sectionID, folderID: folderID, codeVersion: codeVersion, intents: nil)
+    }
+
+    private func folderSectionEvidence(
+        sectionID: Int64, folderID: Int64, codeVersion: String, intents: [FolderSectionIdentity: LocalSyncIntent]?
+    ) throws -> ReaderEvidenceText? {
         let statement = try connection.prepare(
-            "SELECT selected_excerpts_json, reader_excerpt_offsets, selected_excerpt_occurrences FROM folder_sections WHERE folder_id = ? AND code_version = ? AND section_id = ?;"
+            "SELECT selected_excerpts_json, reader_excerpt_offsets, selected_excerpt_occurrences, updated_at FROM folder_sections WHERE folder_id = ? AND code_version = ? AND section_id = ?;"
         )
         defer { connection.finalize(statement) }
         sqlite3_bind_int64(statement, 1, folderID)
         try connection.bind(text: codeVersion, index: 2, to: statement)
         sqlite3_bind_int64(statement, 3, sectionID)
         guard try connection.step(statement) == SQLITE_ROW else { return nil }
+        if let intents, !folderSectionIsVisible(folderID: folderID, sectionID: sectionID, codeVersion: codeVersion,
+                                                rowUpdatedAt: dateFromDatabase(connection.string(at: 3, in: statement)),
+                                                intents: intents) { return nil }
         return decodeReaderEvidence(excerpts: connection.stringOrNil(at: 0, in: statement),
                                     offsets: connection.stringOrNil(at: 1, in: statement), occurrences: connection.stringOrNil(at: 2, in: statement))
     }
@@ -2786,9 +2825,9 @@ final class UserDataStore: UserContentRepository {
             """
             INSERT INTO folder_sections (
                 client_id, owner_id, visibility, sync_state, folder_id,
-                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json, selected_excerpt_occurrences
+                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json, selected_excerpt_occurrences, reader_excerpt_offsets
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?)
             ON CONFLICT(folder_id, code_version, section_id) DO UPDATE SET
                 client_id = excluded.client_id,
                 owner_id = excluded.owner_id,
@@ -2797,8 +2836,9 @@ final class UserDataStore: UserContentRepository {
                 added_at = excluded.added_at,
                 updated_at = excluded.updated_at,
                 deleted_at = NULL,
-                selected_excerpts_json = COALESCE(excluded.selected_excerpts_json, folder_sections.selected_excerpts_json),
-                selected_excerpt_occurrences = COALESCE(excluded.selected_excerpt_occurrences, folder_sections.selected_excerpt_occurrences);
+                selected_excerpts_json = excluded.selected_excerpts_json,
+                selected_excerpt_occurrences = excluded.selected_excerpt_occurrences,
+                reader_excerpt_offsets = excluded.reader_excerpt_offsets;
             """
         )
         defer { connection.finalize(statement) }
@@ -2818,6 +2858,9 @@ final class UserDataStore: UserContentRepository {
         if !saved.occurrences.isEmpty {
             try connection.bind(text: String(decoding: try JSONEncoder().encode(saved.occurrences), as: UTF8.self), index: 11, to: statement)
         }
+        if !saved.offsets.isEmpty {
+            try connection.bind(text: String(decoding: try JSONEncoder().encode(saved.offsets), as: UTF8.self), index: 12, to: statement)
+        }
         // Send only this action: a concurrent remote delete/re-save may have
         // invalidated earlier selections still present in our local snapshot.
         var values = ["folderClientID": target.folderClientID, "folderType": target.folderType.rawValue]
@@ -2835,10 +2878,13 @@ final class UserDataStore: UserContentRepository {
         )
     }
 
-    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws {
+    @discardableResult
+    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws -> ReaderEvidenceText? {
         let folderClientID = try folderClientID(id: folderID, codeVersion: codeVersion)
         let folderType = try folderType(id: folderID, codeVersion: codeVersion)
+        var removed: ReaderEvidenceText?
         try performTransaction {
+            removed = try folderSectionEvidence(sectionID: sectionID, folderID: folderID, codeVersion: codeVersion)
             let statement = try connection.prepare(
                 """
                 DELETE FROM folder_sections
@@ -2864,6 +2910,7 @@ final class UserDataStore: UserContentRepository {
                 )
             )
         }
+        return removed
     }
 
     /// Removes a section from every folder it belongs to. Called by
@@ -3913,6 +3960,20 @@ final class UserDataStore: UserContentRepository {
             }
         default:
             break
+        }
+    }
+
+    func withReadSnapshot<T>(_ read: () throws -> T) throws -> T {
+        try connection.withExclusiveAccess {
+            try connection.execute("BEGIN DEFERRED TRANSACTION;")
+            do {
+                let snapshot = try read()
+                try connection.execute("COMMIT;")
+                return snapshot
+            } catch {
+                try? connection.execute("ROLLBACK;")
+                throw error
+            }
         }
     }
 

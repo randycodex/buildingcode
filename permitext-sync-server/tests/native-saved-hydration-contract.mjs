@@ -37,8 +37,10 @@ actor Builder {
  var folders:[Int]=[], availableVersions:[Int]=[]
  let projectPresentationSnapshotBuilder=SnapshotBuilder()
  let projectPresentationBuilder=Builder()
- var projectBookmarksByFolderID:[Int:[Int]]=[:]
- var projectEvidenceRecordCountByFolderID:[Int:Int]=[:]
+ var projectBookmarksByFolderID:[Int:[Int]]=[1:[2]]
+ var projectEvidenceRecordCountByFolderID:[Int:Int]=[1:1]
+ var isPullingUserContent=false
+ var projectPresentationDeferredForPull=false
  var hasDeferredSavedPresentation=true
  var bookmarks=[2], bookmarkRevision=0
  var statusMessage:String?
@@ -47,7 +49,7 @@ actor Builder {
 }
 @main struct Check {
  @MainActor static func main() async throws {
-  for boundary in ["success","account","session","version","mutation","repository","failure"] {
+  for boundary in ["success","account","session","version","mutation","repository","failure","pull"] {
    let model=Model()
    model.scheduleProjectPresentationRefresh(delay:.zero)
    while !(await model.projectPresentationBuilder.ready()) { await Task.yield() }
@@ -58,19 +60,22 @@ actor Builder {
     case "version": model.selectedVersionFileName="2022"
     case "mutation": model.cancelProjectPresentationRefresh(); model.bookmarks=[3]
     case "repository": model.userContentRepository=Repository()
+    case "pull": model.isPullingUserContent=true
     default: break
    }
    await model.projectPresentationBuilder.finish(fail:boundary == "failure")
    await task.value
    if boundary == "success" {
     precondition(model.bookmarks == [9] && model.hasDeferredSavedPresentation && model.bookmarkRevision == 1)
+    precondition(model.projectBookmarksByFolderID == [1:[9]])
    } else {
     precondition(model.bookmarks == (boundary == "mutation" ? [3] : [2]))
     precondition(model.hasDeferredSavedPresentation && model.bookmarkRevision == 0)
-    precondition(model.projectBookmarksByFolderID.isEmpty)
+    precondition(model.projectBookmarksByFolderID == [1:[2]])
+    precondition(model.projectPresentationDeferredForPull == (boundary == "pull"))
    }
   }
-  print("Saved actor publication: success, failure retention, account/session/version/repository/mutation races passed")
+  print("Saved actor publication: success, failure retention, and account/session/version/repository/mutation/pull races passed")
  }
 }
 `);

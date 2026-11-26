@@ -3181,12 +3181,37 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         let a = try store.createFolder(name: "A", address: "", description: "", colorHex: CodeFolder.defaultColorHex, folderType: .project, codeVersion: version)
         let b = try store.createFolder(name: "B", address: "", description: "", colorHex: CodeFolder.defaultColorHex, folderType: .project, codeVersion: version)
         try store.saveSection(1026, toFolderIDs: [a, b], codeVersion: version)
+        let folder = try XCTUnwrap(store.allFolders().first { $0.id == a })
+        let excerpt = "A selected part of the passage"
+        try store.saveSelection([1026: [excerpt]], toProject: a, clientID: folder.clientID,
+                                codeVersion: version, occurrences: [1026: [excerpt: [8, 32]]])
         try store.saveNote(sectionID: 1026, codeVersion: version, body: "Private note")
-        try store.removeSection(1026, fromFolder: a, codeVersion: version)
+        let removal = try XCTUnwrap(store.removeSection(1026, fromFolder: a, codeVersion: version))
+        XCTAssertEqual(removal, ReaderEvidenceText(excerpts: [excerpt], occurrences: [excerpt: [8, 32]]))
         XCTAssertEqual(Set(try store.folderMembership(codeVersion: version)[1026] ?? []), [b])
         XCTAssertTrue(try store.isBookmarked(sectionID: 1026, codeVersion: version))
-        try store.addSection(1026, toFolder: a, codeVersion: version)
+        let delete = try XCTUnwrap(try store.pendingSyncQueueItems(limit: 30).first {
+            $0.entityType == .folderSection && $0.operationType == .delete
+        })
+        try store.markSyncQueueItemSynced(id: delete.id)
+        var stale = ServerProjectSectionRecord(id: "legacy-project-section", userID: "apple:project-undo",
+            codeVersion: UserContentSyncCodeVersion.server(version), folderClientID: folder.clientID,
+            folderType: .project, localFolderID: a, sectionID: 1026, scope: nil,
+            updatedAt: delete.mutationUpdatedAt.addingTimeInterval(-10), deletedAt: nil)
+        stale.selectedExcerpts = [excerpt]
+        stale.selectedExcerptOccurrences = [excerpt: [999]]
+        try store.applyServerUserContentMutation(.projectSection(stale))
+        let references = try store.evidenceReferences(inFolders: [a, b])
+        XCTAssertEqual(references[a]?.map(\.sectionID), [])
+        XCTAssertEqual(references[b]?.map(\.sectionID), [1026])
+        try store.saveSelection([1026: [excerpt]], toProject: a, clientID: folder.clientID,
+                                codeVersion: version, occurrences: [1026: [excerpt: [999]]])
+        XCTAssertEqual(try store.evidenceReferences(inFolder: a).map(\.sectionID), [1026])
+        try store.removeSection(1026, fromFolder: a, codeVersion: version)
+        try store.restoreSection(1026, toFolder: a, codeVersion: version, evidence: removal)
         XCTAssertEqual(Set(try store.folderMembership(codeVersion: version)[1026] ?? []), [a, b])
+        XCTAssertEqual(try store.readerEvidence(codeVersion: version)[1026]?[a], removal)
+        XCTAssertEqual(try store.readerEvidence(codeVersion: version)[1026]?[b], ReaderEvidenceText(excerpts: []))
         XCTAssertEqual(try store.noteBody(sectionID: 1026, codeVersion: version), "Private note")
         XCTAssertEqual(try store.bookmarkCount(codeVersion: version), 1)
     }

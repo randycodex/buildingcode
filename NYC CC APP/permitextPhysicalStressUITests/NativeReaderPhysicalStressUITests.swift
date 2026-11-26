@@ -984,6 +984,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
                                "--native-project-overview-fixture", "--native-project-evidence-toolbar-fixture",
+                               "--native-reader-bookmark-alignment-fixture",
                                "--permitext-disable-clerk"]
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
@@ -1006,19 +1007,27 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let rows = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-bookmark-"))
         let title = rows.matching(NSPredicate(format: "label CONTAINS %@", "101.1")).firstMatch
         let scope = rows.matching(NSPredicate(format: "label CONTAINS %@", "101.2")).firstMatch
+        let intent = rows.matching(NSPredicate(format: "label CONTAINS %@", "101.3")).firstMatch
         XCTAssertTrue(title.waitForExistence(timeout: 10))
         XCTAssertTrue(scope.waitForExistence(timeout: 10))
+        XCTAssertTrue(intent.waitForExistence(timeout: 10))
         XCTAssertLessThan(title.frame.minY, scope.frame.minY)
         XCTAssertFalse(app.staticTexts["Syncing"].exists)
         XCTAssertFalse(app.staticTexts["Saved on this device · Waiting to sync"].exists)
 
         actions.tap()
-        XCTAssertFalse(app.buttons["Export project (2)"].exists)
+        XCTAssertFalse(app.buttons["Export project (3)"].exists)
         XCTAssertFalse(app.buttons["Code Book"].exists)
         app.buttons["Title"].tap()
         XCTAssertLessThan(scope.frame.minY, title.frame.minY)
         keepScreenshot(named: "Evidence sorted by title with a visible selection button", from: app)
 
+        let dragStart = app.coordinate(withNormalizedOffset: .zero)
+            .withOffset(CGVector(dx: app.frame.width * 0.8, dy: scope.frame.midY - app.frame.minY))
+        let dragEnd = dragStart.withOffset(CGVector(dx: -app.frame.width * 0.6, dy: 0))
+        dragStart.press(forDuration: 0.05, thenDragTo: dragEnd, withVelocity: .slow, thenHoldForDuration: 0)
+        XCTAssertFalse(app.buttons["Remove from project"].exists)
+        XCTAssertTrue(selectSections.isHittable)
         selectSections.tap()
         XCTAssertTrue(scope.isHittable)
         scope.tap()
@@ -1028,11 +1037,34 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Remove from project"].isEnabled)
         keepScreenshot(named: "Evidence selection with removal action", from: app)
         app.buttons["Select All"].tap()
-        XCTAssertEqual(app.staticTexts["list-selection-count"].label, "2 selected")
+        XCTAssertEqual(app.staticTexts["list-selection-count"].label, "3 selected")
         app.buttons["Deselect All"].tap()
         XCTAssertEqual(app.staticTexts["list-selection-count"].label, "0 selected")
         app.buttons["Cancel"].tap()
         XCTAssertTrue(selectSections.isHittable)
+
+        selectSections.tap()
+        scope.tap()
+        app.buttons["Remove from project"].tap()
+        let undo = app.buttons["Undo"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 5))
+        XCTAssertFalse(scope.exists)
+        XCTAssertTrue(intent.exists)
+        XCTAssertTrue(title.exists)
+
+        selectSections.tap()
+        title.tap()
+        app.buttons["Remove from project"].tap()
+        XCTAssertFalse(scope.exists)
+        XCTAssertFalse(title.exists)
+        XCTAssertTrue(intent.exists)
+        keepScreenshot(named: "Evidence Undo above the tab bar", from: app)
+
+        undo.tap()
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        XCTAssertTrue(intent.exists)
+        XCTAssertFalse(scope.exists)
+        XCTAssertFalse(undo.exists)
 #endif
     }
 

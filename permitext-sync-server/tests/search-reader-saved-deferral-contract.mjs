@@ -18,7 +18,7 @@ const ownerInitialization = between('        self.activeProjectID = continuityCo
 assert.match(factory, /model\.refreshSearchReaderSavedControls\(\)/);
 assert.match(factory, /model\.sharedSavedSessionID = privateSessionID/);
 assert.doesNotMatch(factory, /model\.refreshBookmarks\(\)/);
-const session = between('    func synchronizeIndependentReaderSession(', '    /// Reconciles a mutation');
+const session = between('    func synchronizeIndependentReaderSession(', '    func makeIndependentReader(');
 assert.match(session, /userContentRepository = sharedLibrary\.userContentRepository/);
 assert.match(session, /sharedSavedSessionID != sharedLibrary\.privateSessionID/);
 assert.match(session, /cancelProjectPresentationRefresh\(\)/);
@@ -106,6 +106,7 @@ final class CodeLibraryViewModel {
  var folderRefreshes: [Bool] = []; var syncCount = 0; var cancelCount = 0
  func refreshFolders(scheduleProjectPresentation: Bool = true) {
   folderRefreshes.append(scheduleProjectPresentation)
+  if userContentRepository == nil { cancelProjectPresentationRefresh() }
   folders = userContentRepository?.ids ?? []
   folderMembership = Dictionary(uniqueKeysWithValues: folders.map { ($0, [$0]) })
  }

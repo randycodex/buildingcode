@@ -102,6 +102,13 @@ final class Repository {
  func requireSavedWorkAccess()->Bool { hasSavedAccess }
  func isBookmarked(sectionID:Int64)->Bool { userContentRepository?.bookmarks.contains(sectionID) == true }
  func refreshBookmarks() { folders=userContentRepository?.folders ?? []; folderMembership=userContentRepository?.members ?? [:] }
+ func removeSection(_ id:Int64,fromFolder folderID:Int64,codeVersion:String) {
+  do {
+   try userContentRepository?.removeSection(id,fromFolder:folderID,codeVersion:codeVersion)
+   refreshBookmarks(); scheduleUserContentAutoSync()
+  } catch { statusMessage=error.localizedDescription }
+ }
+ func searchAllEditions(query:String) {}
  func scheduleUserContentAutoSync() { syncCalls += 1 }
  func saveSection(sectionID:Int64,toFolderIDs:Set<Int64>)->Bool {
   saveCalls += 1; userContentRepository?.bookmarks.insert(sectionID); userContentRepository?.members[sectionID]=Array(toFolderIDs); refreshBookmarks(); return true

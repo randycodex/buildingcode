@@ -212,6 +212,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let noteBody: String?
         var selectedExcerpts: [Int64: [String]] = [:]
         var excerptOccurrences: [Int64: [String: [Int]]] = [:]
+        var evidencePreviews: [BookmarkedSection] = []
     }
     @Published private(set) var projectSaveRequest: ProjectSaveRequest?
     @Published private(set) var currentPlan: AppPlan {
@@ -523,6 +524,8 @@ final class CodeLibraryViewModel: ObservableObject {
     private var savedPresentationRefreshTask: Task<Void, Never>?
     private var projectPresentationRefreshTask: Task<Void, Never>?
     private var projectPresentationRefreshGeneration: UInt64 = 0
+    private var isPullingUserContent = false
+    private var projectPresentationDeferredForPull = false
     private var foregroundAutomaticSyncTask: Task<Void, Never>?
     private var storeKitUpdatesTask: Task<Void, Never>?
     private var researchTurnStoreKitUpdatesTask: Task<Void, Never>?
@@ -3399,9 +3402,15 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             cancelProjectPresentationRefresh()
             statusMessage = error.localizedDescription
-            // A failed refresh is not a deletion. Keep the last committed state
-            // only while reading the same account and edition.
-            if readerEvidenceSession == privateSessionID && readerEvidenceVersion == selectedVersion.codeVersion { return }
+            // Projects span editions. A failed edition read must not clear the
+            // last complete Project list for the current account.
+            if readerEvidenceSession == privateSessionID {
+                if readerEvidenceVersion != selectedVersion.codeVersion {
+                    readerEvidence = [:]
+                    folderMembership = [:]
+                }
+                return
+            }
             readerEvidence = [:]
             folders = []
             folderMembership = [:]
@@ -3448,26 +3457,30 @@ final class CodeLibraryViewModel: ObservableObject {
                     snapshot = try self.projectPresentationSnapshot()
                 }
                 let presentation = try await self.projectPresentationBuilder.build(snapshot)
-                try Task.checkCancellation()
-                guard generation == self.projectPresentationRefreshGeneration,
-                      identity == self.privateRequestIdentity,
-                      sessionID == self.privateSessionID,
-                      versionFileName == self.selectedVersionFileName else { return }
-                // Background presentation may omit an unavailable edition.
-                // Only synchronous hydration clears the export-completeness flag.
-                self.projectBookmarksByFolderID = presentation.rowsByFolderID
-                self.projectEvidenceRecordCountByFolderID = presentation.recordCountByFolderID
                 let allSavedRows = try await self.projectPresentationBuilder.buildSavedRows(snapshot)
                 try Task.checkCancellation()
                 guard generation == self.projectPresentationRefreshGeneration,
                       identity == self.privateRequestIdentity,
                       sessionID == self.privateSessionID,
                       versionFileName == self.selectedVersionFileName else { return }
+                self.projectPresentationRefreshTask = nil
+                // An incoming batch can still be applying while the background
+                // reader assembles a snapshot. Keep the live rows until it finishes.
+                if self.isPullingUserContent {
+                    self.projectPresentationDeferredForPull = true
+                    return
+                }
+                if self.projectBookmarksByFolderID != presentation.rowsByFolderID {
+                    self.projectBookmarksByFolderID = presentation.rowsByFolderID
+                }
+                if self.projectEvidenceRecordCountByFolderID != presentation.recordCountByFolderID {
+                    self.projectEvidenceRecordCountByFolderID = presentation.recordCountByFolderID
+                }
+                // Only synchronous hydration clears the export-completeness flag.
                 if self.bookmarks != allSavedRows {
                     self.bookmarks = allSavedRows
                     self.bookmarkRevision &+= 1
                 }
-                self.projectPresentationRefreshTask = nil
             } catch is CancellationError {
                 return
             } catch {
@@ -3806,8 +3819,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 let remaining = Set(folderMembership[sectionID] ?? []).subtracting([folderID])
                 updateReaderMembership(sectionID: sectionID, folderIDs: remaining)
             }
-            projectBookmarksByFolderID[folderID]?.removeAll { $0.id == sectionID }
-            projectEvidenceRecordCountByFolderID[folderID] = projectBookmarksByFolderID[folderID]?.count ?? 0
+            updateProjectEvidenceRows(inFolder: folderID, removing: [ProjectEvidenceSectionKey(sectionID, targetCodeVersion)])
             scheduleProjectPresentationRefresh()
             scheduleUserContentAutoSync()
         } catch {
@@ -3827,18 +3839,35 @@ final class CodeLibraryViewModel: ObservableObject {
     private func applyOptimisticFolderMembership(sectionID: Int64, folderIDs: Set<Int64>) {
         let previousFolderIDs = Set(folderMembership[sectionID] ?? [])
         updateReaderMembership(sectionID: sectionID, folderIDs: folderIDs)
-        let affectedFolderIDs = previousFolderIDs.union(folderIDs)
-        let sectionRows = ProjectEvidenceConsolidator.consolidated(
-            bookmarks.filter { $0.id == sectionID }
-        )
-
-        for folderID in affectedFolderIDs {
-            projectBookmarksByFolderID[folderID, default: []].removeAll { $0.id == sectionID }
-            if folderIDs.contains(folderID) {
-                projectBookmarksByFolderID[folderID, default: []].append(contentsOf: sectionRows)
-            }
-            projectEvidenceRecordCountByFolderID[folderID] = projectBookmarksByFolderID[folderID]?.count ?? 0
+        guard let version = selectedVersion?.codeVersion else { return }
+        let key = ProjectEvidenceSectionKey(sectionID, version)
+        let sectionRows = ProjectEvidenceConsolidator.consolidated(bookmarks.filter { ProjectEvidenceSectionKey($0) == key })
+        for folderID in previousFolderIDs.subtracting(folderIDs) {
+            updateProjectEvidenceRows(inFolder: folderID, removing: [key])
         }
+        for folderID in folderIDs where !bookmarks(inFolder: folderID).contains(where: { ProjectEvidenceSectionKey($0) == key }) {
+            updateProjectEvidenceRows(inFolder: folderID, adding: sectionRows)
+        }
+    }
+
+    private func updateProjectEvidenceRows(
+        inFolder folderID: Int64, adding additions: [BookmarkedSection] = [],
+        removing keys: Set<ProjectEvidenceSectionKey> = []
+    ) {
+        let previous = bookmarks(inFolder: folderID)
+        var pending = Dictionary(additions.map { (ProjectEvidenceSectionKey($0), $0) }, uniquingKeysWith: { _, latest in latest })
+        var updated = previous.compactMap { row -> BookmarkedSection? in
+            let key = ProjectEvidenceSectionKey(row)
+            guard !keys.contains(key) else { return nil }
+            return pending.removeValue(forKey: key) ?? row
+        }
+        for row in additions {
+            if let remaining = pending.removeValue(forKey: ProjectEvidenceSectionKey(row)) { updated.append(remaining) }
+        }
+        guard updated != previous else { return }
+        let previousCount = projectEvidenceRecordCountByFolderID[folderID] ?? previous.count
+        projectBookmarksByFolderID[folderID] = updated
+        projectEvidenceRecordCountByFolderID[folderID] = updated.isEmpty ? 0 : max(updated.count, previousCount + updated.count - previous.count)
     }
 
     /// All folders that currently contain a given section.
@@ -5725,7 +5754,15 @@ final class CodeLibraryViewModel: ObservableObject {
         guard !isAccountBusy else { return }
         let identity = privateRequestIdentity
         isAccountBusy = true
-        defer { isAccountBusy = false }
+        isPullingUserContent = true
+        defer {
+            isAccountBusy = false
+            isPullingUserContent = false
+            if projectPresentationDeferredForPull {
+                projectPresentationDeferredForPull = false
+                if projectPresentationRefreshTask == nil { scheduleProjectPresentationRefresh() }
+            }
+        }
 
         do {
             let report = try await syncEngine.pullRemoteChanges(
@@ -6696,38 +6733,50 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     /// Restores membership only; other projects and the original Saved record remain untouched.
-    func restoreProjectSections(_ sections: [BookmarkedSection], toFolder folderID: Int64) -> [BookmarkedSection] {
-        guard requireProjectAccess() else { return sections }
-        guard let userContentRepository, folder(id: folderID) != nil else { return sections }
-        var failed: [BookmarkedSection] = []
-        for section in sections {
+    func restoreProjectSections(_ removals: [ProjectEvidenceRemoval], toFolder folderID: Int64) -> [ProjectEvidenceRemoval] {
+        guard requireProjectAccess(), let userContentRepository, folder(id: folderID) != nil else { return removals }
+        var failed: [ProjectEvidenceRemoval] = []
+        var restored: [BookmarkedSection] = []
+        for removal in removals {
+            var section = removal.section
             do {
-                try userContentRepository.addSection(section.id, toFolder: folderID, codeVersion: section.codeVersion,
-                                                     selectedExcerpts: section.selectedExcerpts)
+                try userContentRepository.restoreSection(section.id, toFolder: folderID, codeVersion: section.codeVersion,
+                                                         evidence: removal.evidence)
             } catch {
-                failed.append(section)
+                failed.append(removal)
                 statusMessage = error.localizedDescription
+                continue
             }
+            let persisted = try? userContentRepository.folderSectionEvidence(
+                sectionID: section.id, folderID: folderID, codeVersion: section.codeVersion)
+            section.selectedExcerpts = persisted?.excerpts ?? removal.evidence.excerpts
+            restored.append(section)
         }
-        refreshFolders()
-        scheduleUserContentAutoSync()
+        if !restored.isEmpty {
+            updateProjectEvidenceRows(inFolder: folderID, adding: restored)
+            refreshFolders()
+            scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
+        }
         return failed
     }
 
     @discardableResult
-    func removeSections(_ sections: [BookmarkedSection], fromFolder folderID: Int64) -> [BookmarkedSection] {
+    func removeSections(_ sections: [BookmarkedSection], fromFolder folderID: Int64) -> [ProjectEvidenceRemoval] {
         guard !sections.isEmpty, let userContentRepository else { return [] }
-        var removedSections: [BookmarkedSection] = []
+        var removed: [ProjectEvidenceRemoval] = []
+        var removedKeys: Set<ProjectEvidenceSectionKey> = []
         var firstError: Error?
 
         for section in sections {
             do {
-                try userContentRepository.removeSection(
+                let evidence = try userContentRepository.removeSection(
                     section.id,
                     fromFolder: folderID,
                     codeVersion: section.codeVersion
                 )
-                removedSections.append(section)
+                removedKeys.insert(ProjectEvidenceSectionKey(section))
+                if let evidence { removed.append(ProjectEvidenceRemoval(section: section, evidence: evidence)) }
             } catch {
                 if firstError == nil {
                     firstError = error
@@ -6735,17 +6784,16 @@ final class CodeLibraryViewModel: ObservableObject {
             }
         }
 
-        if !removedSections.isEmpty {
-            // Publish the final collection once so Project evidence rows keep
-            // stable identities instead of disappearing through intermediate
-            // account-wide rebuilds while a multi-selection is removed.
+        if !removedKeys.isEmpty {
+            updateProjectEvidenceRows(inFolder: folderID, removing: removedKeys)
             refreshFolders()
             scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
         }
         if let firstError {
             statusMessage = firstError.localizedDescription
         }
-        return removedSections
+        return removed
     }
 
     // MARK: - PDF export
@@ -6911,23 +6959,38 @@ final class CodeLibraryViewModel: ObservableObject {
             excerpts[sectionID, default: []].append(passage.selectedText)
         }
         guard !excerpts.isEmpty else { return false }
+        let previews = excerpts.keys.sorted().compactMap { makeBookmarkedSection(sectionID: $0, codeVersion: codeVersion) }
         guard let project = readerSaveDestinationProject else {
             owner.projectSaveRequest = ProjectSaveRequest(accountID: owner.signedInAccount?.appUserID,
-                codeVersion: codeVersion, sectionID: nil, blockID: "", noteBody: nil, selectedExcerpts: excerpts, excerptOccurrences: occurrences)
+                codeVersion: codeVersion, sectionID: nil, blockID: "", noteBody: nil, selectedExcerpts: excerpts,
+                excerptOccurrences: occurrences, evidencePreviews: previews)
             return true
         }
-        let saved = owner.storeReaderSelection(excerpts, in: project, codeVersion: codeVersion, occurrences: occurrences)
+        let saved = owner.storeReaderSelection(excerpts, in: project, codeVersion: codeVersion, occurrences: occurrences, previews: previews)
         if saved, owner !== self { refreshFolders(scheduleProjectPresentation: false) }
         return saved
     }
 
-    private func storeReaderSelection(_ excerpts: [Int64: [String]], in project: CodeFolder, codeVersion: String, occurrences: [Int64: [String: [Int]]]) -> Bool {
+    private func storeReaderSelection(
+        _ excerpts: [Int64: [String]], in project: CodeFolder, codeVersion: String,
+        occurrences: [Int64: [String: [Int]]], previews: [BookmarkedSection]
+    ) -> Bool {
         guard requireSavedWorkAccess(), requireProjectAccess(), let userContentRepository else { return false }
         do {
             try userContentRepository.saveSelection(excerpts, toProject: project.id, clientID: project.clientID,
                                                     codeVersion: codeVersion, occurrences: occurrences)
+            let currentRows = Dictionary(bookmarks(inFolder: project.id).map { (ProjectEvidenceSectionKey($0), $0) },
+                                         uniquingKeysWith: { first, _ in first })
+            let savedRows = previews.map { preview in
+                var row = currentRows[ProjectEvidenceSectionKey(preview)] ?? preview
+                let evidence = try? userContentRepository.folderSectionEvidence(
+                    sectionID: row.id, folderID: project.id, codeVersion: codeVersion)
+                row.selectedExcerpts = evidence?.excerpts ?? excerpts[row.id] ?? []
+                return row
+            }
+            updateProjectEvidenceRows(inFolder: project.id, adding: savedRows)
             let previousRevision = bookmarkRevision
-            refreshBookmarks()
+            refreshBookmarks(deferRowHydration: true)
             // Other open readers observe this revision. Adding another excerpt
             // to an existing bookmark can leave every Saved-list row unchanged.
             if previousRevision == bookmarkRevision { bookmarkRevision &+= 1 }
@@ -6954,7 +7017,8 @@ final class CodeLibraryViewModel: ObservableObject {
         let identity = owner.privateRequestIdentity
         owner.selectReaderSaveDestination(.project(project.clientID))
         if !request.selectedExcerpts.isEmpty, let version = request.codeVersion {
-            guard owner.storeReaderSelection(request.selectedExcerpts, in: project, codeVersion: version, occurrences: request.excerptOccurrences) else { return false }
+            guard owner.storeReaderSelection(request.selectedExcerpts, in: project, codeVersion: version,
+                occurrences: request.excerptOccurrences, previews: request.evidencePreviews) else { return false }
             owner.projectSaveRequest = nil
             return true
         }
@@ -7067,11 +7131,9 @@ final class CodeLibraryViewModel: ObservableObject {
                 }
                 let memberships = Set(try userContentRepository.folderMembership(codeVersion: selectedVersion.codeVersion)[sectionID] ?? [])
                 if memberships.contains(project.id) {
-                    try userContentRepository.removeSection(sectionID, fromFolder: project.id, codeVersion: selectedVersion.codeVersion)
-                    refreshBookmarks()
-                    scheduleUserContentAutoSync()
+                    removeSection(sectionID, fromFolder: project.id, codeVersion: selectedVersion.codeVersion)
                     NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
-                    return false
+                    return isSavedToReaderDestination(sectionID: sectionID)
                 }
                 guard requireSavedWorkAccess() else { return false }
                 return saveSection(sectionID: sectionID, toFolderIDs: memberships.union([project.id]))
@@ -7100,29 +7162,7 @@ final class CodeLibraryViewModel: ObservableObject {
             bookmarkedSectionIDs.remove(sectionID)
         }
 
-        let newSectionRow: BookmarkedSection?
-        if isBookmarked,
-           let detail = loadSectionDetail(sectionID: sectionID) {
-            newSectionRow = BookmarkedSection(
-                id: detail.id,
-                codeVersion: codeVersion,
-                codeSectionID: detail.codeSectionID,
-                codeSectionName: codeSectionName(id: detail.codeSectionID),
-                chapterNumber: detail.chapterNumber,
-                chapterTitle: detail.chapterTitle,
-                sectionNumber: detail.sectionNumber,
-                title: detail.title,
-                previewText: detail.officialText.evidenceExcerpt(
-                    sectionNumber: detail.sectionNumber,
-                    title: detail.title
-                ),
-                kind: detail.kind,
-                isBookmarked: true,
-                bookmarkedAt: Date()
-            )
-        } else {
-            newSectionRow = nil
-        }
+        let newSectionRow = isBookmarked ? makeBookmarkedSection(sectionID: sectionID, codeVersion: codeVersion) : nil
 
         bookmarks = BookmarkPresentationReducer.updatedRows(
             bookmarks,
@@ -7140,12 +7180,33 @@ final class CodeLibraryViewModel: ObservableObject {
 
         if !isBookmarked {
             let affectedFolderIDs = folderMembership.removeValue(forKey: sectionID) ?? []
+            let key = ProjectEvidenceSectionKey(sectionID, codeVersion)
             for folderID in affectedFolderIDs {
-                projectBookmarksByFolderID[folderID]?.removeAll { $0.id == sectionID }
-                projectEvidenceRecordCountByFolderID[folderID] = projectBookmarksByFolderID[folderID]?.count ?? 0
+                updateProjectEvidenceRows(inFolder: folderID, removing: [key])
             }
         }
         bookmarkRevision &+= 1
+    }
+
+    private func makeBookmarkedSection(sectionID: Int64, codeVersion: String) -> BookmarkedSection? {
+        guard let detail = loadSectionDetail(sectionID: sectionID) else { return nil }
+        return BookmarkedSection(
+            id: detail.id,
+            codeVersion: codeVersion,
+            codeSectionID: detail.codeSectionID,
+            codeSectionName: codeSectionName(id: detail.codeSectionID),
+            chapterNumber: detail.chapterNumber,
+            chapterTitle: detail.chapterTitle,
+            sectionNumber: detail.sectionNumber,
+            title: detail.title,
+            previewText: detail.officialText.evidenceExcerpt(
+                sectionNumber: detail.sectionNumber,
+                title: detail.title
+            ),
+            kind: detail.kind,
+            isBookmarked: true,
+            bookmarkedAt: Date()
+        )
     }
 
     func isBookmarked(sectionID: Int64) -> Bool {
@@ -8197,6 +8258,25 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 }
 
+struct ProjectEvidenceRemoval {
+    let section: BookmarkedSection
+    let evidence: ReaderEvidenceText
+}
+
+private struct ProjectEvidenceSectionKey: Hashable {
+    let sectionID: Int64
+    let codeVersion: String
+
+    init(_ sectionID: Int64, _ codeVersion: String) {
+        self.sectionID = sectionID
+        self.codeVersion = UserContentSyncCodeVersion.server(codeVersion)
+    }
+
+    init(_ section: BookmarkedSection) {
+        self.init(section.id, section.codeVersion)
+    }
+}
+
 struct ProjectEvidenceVersionSnapshot: Sendable {
     let sectionIDsByFolderID: [Int64: [Int64]]
     let bookmarkedSectionIDs: Set<Int64>
@@ -8227,9 +8307,10 @@ private enum ProjectPresentationSnapshotAssembler {
         var sectionIDsByFolderAndVersion: [Int64: [String: [Int64]]] = [:]
         var excerptsByVersionAndFolder: [String: [Int64: [Int64: [String]]]] = [:]
         var requiredCodeVersions = Set(try repository.savedCodeVersions())
+        let storedReferences = try (repository as? UserDataStore)?.evidenceReferences(inFolders: folders.map(\.id))
         for folder in folders {
             try Task.checkCancellation()
-            let references = try repository.evidenceReferences(inFolder: folder.id)
+            let references = try storedReferences?[folder.id] ?? repository.evidenceReferences(inFolder: folder.id)
             for reference in references {
                 sectionIDsByFolderAndVersion[folder.id, default: [:]][reference.codeVersion, default: []]
                     .append(reference.sectionID)
@@ -8291,11 +8372,9 @@ actor ProjectPresentationSnapshotBuilder {
             },
             uniquingKeysWith: { first, _ in first }
         ).values.sorted { $0.fileName < $1.fileName }
-        return try ProjectPresentationSnapshotAssembler.build(
-            repository: repository,
-            folders: folders,
-            catalog: catalog
-        )
+        return try repository.withReadSnapshot {
+            try ProjectPresentationSnapshotAssembler.build(repository: repository, folders: folders, catalog: catalog)
+        }
     }
 }
 

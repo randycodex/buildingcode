@@ -13,7 +13,8 @@ const [model, chapter, bookmarks, app] = await Promise.all([
   readFile(new URL('PermitextApp.swift', root), 'utf8'),
 ]);
 const pending = model.slice(model.indexOf('    struct ProjectSaveRequest:'), model.indexOf('    @Published private(set) var projectSaveRequest:'));
-const coordinator = model.slice(model.indexOf('    func requestProjectSelection('), model.indexOf('    var readerSaveDestinationProjects:'));
+const coordinator = model.slice(model.indexOf('    func requestProjectSelection('), model.indexOf('    func saveReaderSelectionToEvidence('))
+  + model.slice(model.indexOf('    func completeProjectSelection('), model.indexOf('    var readerSaveDestinationProjects:'));
 const note = model.slice(model.indexOf('    func saveNote(sectionID: Int64, blockID:'), model.indexOf('    func clearAllBookmarks()'));
 assert.match(note, /requestProjectSelection\(sectionID: sectionID, blockID: normalizedBlockID, noteBody: body\)/);
 assert.match(note, /guard saveSection\(sectionID: sectionID, toFolderIDs: ids\)/);
@@ -28,6 +29,7 @@ assert.match(app, /onChange\(of: library.signedInAccount\?\.appUserID\)/);
 const fixture = `import Foundation
 struct Account { let appUserID: String }
 struct Version { let codeVersion: String }
+struct BookmarkedSection {}
 struct CodeFolder { let id: Int64; let clientID: String; let name: String }
 struct Destination { let projectClientID: String?; static func project(_ id:String)->Self { Self(projectClientID:id) } }
 enum NoteSaveResult { case saved, failed(String,String) }
@@ -69,6 +71,8 @@ struct Write { let edition:String; let section:Int64; let projects:Set<Int64>; l
    (sharedAccountLibrary ?? self).savedWrites.append(Write(edition:selectedVersion!.codeVersion,section:sectionID,projects:[],block:blockID,note:body));return .saved
  }
  func reconcileExternalSavedWorkChange(from:CodeLibraryViewModel,scheduleAccountSync:Bool) { reconciliations += 1 }
+ func storeReaderSelection(_ excerpts:[Int64:[String]],in project:CodeFolder,codeVersion:String,
+                           occurrences:[Int64:[String:[Int]]],previews:[BookmarkedSection])->Bool { false }
  ${coordinator}
 }
 @main struct Main {
