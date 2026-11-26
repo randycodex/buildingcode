@@ -1985,7 +1985,6 @@ private struct NotebookCardEditorView: View {
 
     private var noteSyncStatus: String? {
         if requiresConflictReview || errorMessage != nil && !retryAfterReconnect { return "Needs attention" }
-        if isSaving && !retryAfterReconnect { return "Syncing" }
         return nil
     }
 

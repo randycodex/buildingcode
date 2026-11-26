@@ -2625,6 +2625,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let saveStarted = NSPredicate { _, _ in diagnostics.label.contains("saves=1;") }
         XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: saveStarted, object: nil)], timeout: 5), .completed)
         XCTAssertEqual(element(in: app, identifier: "native-notebook-save-status").value as? String, "saving")
+        XCTAssertFalse(app.staticTexts["native-notebook-sync-status"].exists)
         XCTAssertFalse(app.staticTexts["Saving…"].exists)
         let secondInsertion = " second edit"
         title.typeText(secondInsertion)
