@@ -1072,8 +1072,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(editZoning.frame.width, editZoning.frame.height, accuracy: 1)
         editZoning.tap()
         let value = app.textFields["project-fact-value-occupancy"]
+        reveal(value, in: app)
         XCTAssertTrue(value.waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["project-fact-number-occupancy"].label, "2.")
+        XCTAssertEqual(app.staticTexts["project-fact-number-occupancy"].label, "10.")
         XCTAssertEqual(app.buttons["Remove Occupancy"].frame.midY, value.frame.midY, accuracy: 2,
                        "Delete aligns to the value rather than the label")
         XCTAssertFalse(contextTab.isEnabled, "Save or cancel Facts before switching tabs.")
@@ -1458,7 +1459,31 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Stated"].exists)
         XCTAssertFalse(app.staticTexts["Commercial Overlay(s)"].exists)
         XCTAssertFalse(app.staticTexts["Special Purpose District(s)"].exists)
+        XCTAssertFalse(app.staticTexts["Borough"].exists)
+        XCTAssertFalse(app.staticTexts["ZIP Code"].exists)
         keepScreenshot(named: "Zoning fact labels and values", from: app)
+
+        let edit = app.buttons["project-zoning-edit"]
+        let overviewBar = app.navigationBars["Overview"]
+        edit.tap()
+        let borough = app.textFields["project-fact-value-project-fact:borough"]
+        let zip = app.textFields["project-fact-value-project-fact:zip-code"]
+        XCTAssertTrue(borough.waitForExistence(timeout: 5))
+        XCTAssertTrue(zip.exists)
+        borough.tap()
+        borough.typeText("Manhattan")
+        overviewBar.buttons["Save"].tap()
+        XCTAssertTrue(app.staticTexts["Manhattan"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["ZIP Code"].exists)
+
+        edit.tap()
+        XCTAssertTrue(borough.waitForExistence(timeout: 5))
+        XCTAssertEqual(borough.value as? String, "Manhattan")
+        app.buttons["Remove Borough"].tap()
+        XCTAssertTrue(borough.exists, "Clearing a standard field leaves its input in edit mode.")
+        overviewBar.buttons["Save"].tap()
+        XCTAssertFalse(app.staticTexts["Borough"].exists)
+
         reveal(sourceToggle, in: app)
         XCTAssertTrue(sourceToggle.isHittable)
         XCTAssertFalse(sourceDetails.exists)
@@ -1467,9 +1492,13 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         sourceToggle.tap()
         XCTAssertTrue(waitForNonexistence(sourceDetails, timeout: 3))
 
-        app.buttons["project-zoning-edit"].tap()
-        XCTAssertTrue(app.staticTexts["Commercial Overlay(s)"].exists)
-        XCTAssertTrue(app.staticTexts["Special Purpose District(s)"].exists)
+        edit.tap()
+        let commercialOverlay = app.textFields["project-fact-value-commercial-overlays"]
+        let specialDistrict = app.textFields["project-fact-value-special-purpose-districts"]
+        reveal(commercialOverlay, in: app)
+        XCTAssertTrue(commercialOverlay.isHittable)
+        reveal(specialDistrict, in: app)
+        XCTAssertTrue(specialDistrict.isHittable)
     }
 
     private func verifySavedProjectNavigation(largeText: Bool) throws {

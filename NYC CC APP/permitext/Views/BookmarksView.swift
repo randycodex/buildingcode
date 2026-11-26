@@ -1136,56 +1136,136 @@ enum ProjectOverviewTab: String, Hashable {
 }
 
 private enum FactPresentation {
+    typealias Field = (key: String, label: String)
+
     // Matches projectFactPresentationGroups in the web Facts sheet.
-    static let sections: [(title: String, keys: [String])] = [
+    static let sections: [(title: String, fields: [Field])] = [
         ("Property", [
-            "address", "bbl", "borough",
-            "block", "tax-lots", "zip-code",
-            "tax-lot-area", "land-use-code", "community-district"
+            ("address", "Address"),
+            ("bbl", "BBL"),
+            ("borough", "Borough"),
+            ("block", "Block"),
+            ("tax-lots", "Tax Lot(s)"),
+            ("zip-code", "ZIP Code"),
+            ("tax-lot-area", "Tax Lot Area"),
+            ("land-use-code", "Land Use Code"),
+            ("community-district", "Community District")
         ]),
         ("Building", [
-            "occupancy", "construction-type", "stories-above-grade",
-            "levels-below-grade", "building-height", "sprinkler-protection",
-            "building-area", "building-count", "residential-units",
-            "total-units", "year-built", "years-altered",
-            "building-class"
+            ("occupancy", "Occupancy"),
+            ("construction-type", "Construction Type"),
+            ("stories-above-grade", "Stories Above Grade"),
+            ("levels-below-grade", "Levels Below Grade"),
+            ("building-height", "Building Height"),
+            ("sprinkler-protection", "Sprinkler Protection"),
+            ("building-area", "Building Area"),
+            ("building-count", "Number of Buildings"),
+            ("residential-units", "Residential Units"),
+            ("total-units", "Total Units"),
+            ("year-built", "Year Built"),
+            ("years-altered", "Year(s) Altered"),
+            ("building-class", "Building Class")
         ]),
         ("Work & code basis", [
-            "project-status", "work-filing-type", "code-basis"
+            ("project-status", "Project Status"),
+            ("work-filing-type", "Work / Filing Type"),
+            ("code-basis", "Code Basis")
         ]),
         ("Zoning", [
-            "zoning-lot-composition", "zoning-districts", "commercial-overlays",
-            "zoning-map", "zoning-lot-area", "lot-width",
-            "lot-depth", "lot-type", "street-frontages",
-            "transit-zone"
+            ("zoning-lot-composition", "Zoning Lot Composition"),
+            ("zoning-districts", "Zoning District(s)"),
+            ("commercial-overlays", "Commercial Overlay(s)"),
+            ("zoning-map", "Zoning Map"),
+            ("zoning-lot-area", "Zoning Lot Area"),
+            ("lot-width", "Lot Width"),
+            ("lot-depth", "Lot Depth"),
+            ("lot-type", "Lot Type"),
+            ("street-frontages", "Street Frontage(s)"),
+            ("transit-zone", "Transit Zone (Legacy Record)")
         ]),
         ("Special designations", [
-            "special-purpose-district", "special-purpose-subdistrict", "mih-area-options",
-            "affordable-housing-zoning-status", "greater-transit-zone", "parking-geography",
-            "appendix-i-transit-zone", "zoning-for-accessibility", "limited-height-district",
-            "landmark-status", "historic-district", "flood-zone-effective-2007",
-            "flood-zone-preliminary-2015", "environmental-designations", "coastal-zone",
-            "waterfront-status", "lower-density-growth-management-area", "fresh-program-area",
-            "appendix-j-designated-m-district", "adopted-zoning-map-amendments", "pending-zoning-map-amendments"
+            ("special-purpose-district", "Special Purpose District(s)"),
+            ("special-purpose-subdistrict", "Special Purpose Subdistrict / Subarea"),
+            ("mih-area-options", "MIH Area / Applicable Option(s)"),
+            ("affordable-housing-zoning-status", "Affordable Housing Zoning Status"),
+            ("greater-transit-zone", "Greater Transit Zone"),
+            ("parking-geography", "Transit Zones Parking Geography"),
+            ("appendix-i-transit-zone", "Appendix I Transit Zone"),
+            ("zoning-for-accessibility", "Zoning for Accessibility"),
+            ("limited-height-district", "Limited Height District"),
+            ("landmark-status", "Landmark Designations"),
+            ("historic-district", "Historic District"),
+            ("flood-zone-effective-2007", "Flood Zone — Effective FIRM 2007"),
+            ("flood-zone-preliminary-2015", "Flood Zone — Preliminary FIRM 2015"),
+            ("environmental-designations", "Environmental E-Designations"),
+            ("coastal-zone", "Coastal Zone"),
+            ("waterfront-status", "Waterfront Status / Waterfront Access Plan"),
+            ("lower-density-growth-management-area", "Lower Density Growth Management Area"),
+            ("fresh-program-area", "FRESH Program Area"),
+            ("appendix-j-designated-m-district", "Appendix J Designated M District"),
+            ("adopted-zoning-map-amendments", "Adopted Zoning Map Amendments"),
+            ("pending-zoning-map-amendments", "Pending Zoning Map Amendments")
         ]),
         ("Other facts", [])
     ]
 
-    static func position(_ key: String?) -> (Int, Int) {
-        let aliases = ["stories": "stories-above-grade", "sprinkler-status": "sprinkler-protection", "work-type": "work-filing-type"]
-        let canonical = key.flatMap { aliases[$0] ?? $0 }
-        for (section, entry) in sections.enumerated() {
-            if let canonical, let index = entry.keys.firstIndex(of: canonical) { return (section, index) }
+    // The former transit field is only shown for Projects that already have it.
+    static let standardFields = sections.flatMap { $0.fields }.filter { $0.key != "transit-zone" }
+    static let standardKeys = Set(standardFields.map { $0.key })
+    private static let standardKeysByLabel = Dictionary(uniqueKeysWithValues: standardFields.map {
+        ($0.label.lowercased(), $0.key)
+    })
+    private static let aliases = [
+        "stories": "stories-above-grade",
+        "sprinkler-status": "sprinkler-protection",
+        "work-type": "work-filing-type",
+        "special-purpose-districts": "special-purpose-district"
+    ]
+    private static let positions = Dictionary(uniqueKeysWithValues: sections.enumerated().flatMap { section, entry in
+        entry.fields.enumerated().map { index, field in (field.key, (section, index)) }
+    })
+    private static let emptyValues: Set<String> = [
+        "", "-", "–", "—", "unknown", "not provided", "not available", "no information", "no data", "n/a"
+    ]
+
+    static func presentationKey(for fact: ProjectStructuredFact) -> String {
+        if fact.key.hasPrefix("manual-"),
+           let key = standardKeysByLabel[fact.label.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()] {
+            return key
         }
-        return (sections.count - 1, 0)
+        return aliases[fact.key] ?? fact.key
+    }
+
+    static func position(_ key: String?) -> (Int, Int) {
+        key.flatMap { positions[$0] } ?? (sections.count - 1, 0)
+    }
+
+    static func hasRecordedValue(_ fact: ProjectStructuredFact) -> Bool {
+        fact.status.caseInsensitiveCompare("unknown") != .orderedSame &&
+            !emptyValues.contains(fact.value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())
     }
 }
 
 private struct ProjectFactDraft: Identifiable {
     let id: String
+    let key: String?
     var label: String
     var value: String
+    let initialValue: String
     let original: ProjectStructuredFact?
+
+    init(id: String, key: String? = nil, label: String, value: String, original: ProjectStructuredFact? = nil) {
+        self.id = id
+        self.key = key
+        self.label = label
+        self.value = value
+        self.initialValue = value
+        self.original = original
+    }
+
+    var isStandard: Bool {
+        key.map(FactPresentation.standardKeys.contains) ?? false
+    }
 }
 
 private struct ProjectSectionScreen<Content: View>: View {
@@ -1271,8 +1351,11 @@ private struct ProjectFactsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-                if isEditing { factsEditor }
-                else { savedFacts }
+                if isEditing {
+                    LazyVStack(alignment: .leading, spacing: 12) { factsEditor }
+                } else {
+                    savedFacts
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
@@ -1301,19 +1384,18 @@ private struct ProjectFactsView: View {
 
     @ViewBuilder
     private var savedFacts: some View {
-        let facts = (folder?.structuredFacts ?? []).filter { fact in
-            guard fact.status.caseInsensitiveCompare("unknown") != .orderedSame else { return false }
-            let value = fact.value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-            return !["", "-", "–", "—", "unknown", "not provided", "not available", "no information", "no data", "n/a"].contains(value)
-        }
+        let facts = (folder?.structuredFacts ?? []).filter(FactPresentation.hasRecordedValue)
         if facts.isEmpty {
             Text("No facts yet.").font(.subheadline).foregroundStyle(.secondary)
         } else {
             VStack(alignment: .leading, spacing: 0) {
-                let ordered = facts.sorted { FactPresentation.position($0.key) < FactPresentation.position($1.key) }
+                let ordered = facts.sorted {
+                    FactPresentation.position(FactPresentation.presentationKey(for: $0)) <
+                        FactPresentation.position(FactPresentation.presentationKey(for: $1))
+                }
                 ForEach(Array(ordered.enumerated()), id: \.element.id) { index, fact in
-                    let section = FactPresentation.position(fact.key).0
-                    if index == 0 || FactPresentation.position(ordered[index - 1].key).0 != section {
+                    let section = FactPresentation.position(FactPresentation.presentationKey(for: fact)).0
+                    if index == 0 || FactPresentation.position(FactPresentation.presentationKey(for: ordered[index - 1])).0 != section {
                         factHeading(section)
                     }
                     ProjectStructuredFactRow(fact: fact)
@@ -1335,12 +1417,12 @@ private struct ProjectFactsView: View {
     @ViewBuilder
     private var factsEditor: some View {
         let ordered = $factsDraft.sorted {
-            FactPresentation.position($0.wrappedValue.original?.key) < FactPresentation.position($1.wrappedValue.original?.key)
+            FactPresentation.position($0.wrappedValue.key) < FactPresentation.position($1.wrappedValue.key)
         }
         ForEach(Array(ordered.enumerated()), id: \.element.wrappedValue.id) { index, binding in
             let draft = binding.wrappedValue
-            let section = FactPresentation.position(draft.original?.key).0
-            if index == 0 || FactPresentation.position(ordered[index - 1].wrappedValue.original?.key).0 != section {
+            let section = FactPresentation.position(draft.key).0
+            if index == 0 || FactPresentation.position(ordered[index - 1].wrappedValue.key).0 != section {
                 factHeading(section)
             }
             VStack(alignment: .leading, spacing: 2) {
@@ -1348,7 +1430,7 @@ private struct ProjectFactsView: View {
                     Text("\(index + 1).")
                         .monospacedDigit()
                         .accessibilityIdentifier("project-fact-number-\(draft.id)")
-                    if draft.original == nil {
+                    if draft.key == nil {
                         TextField("Fact name", text: binding.label)
                             .accessibilityIdentifier("project-fact-label-\(draft.id)")
                     } else {
@@ -1365,15 +1447,21 @@ private struct ProjectFactsView: View {
                         .frame(minHeight: 44)
                         .accessibilityLabel(draft.label.isEmpty ? "Fact value" : draft.label)
                         .accessibilityIdentifier("project-fact-value-\(draft.id)")
-                    Button(role: .destructive) {
-                        withAnimation(editAnimation) {
-                            factsDraft.removeAll { $0.id == draft.id }
+                    if !draft.isStandard || !draft.value.isEmpty {
+                        Button(role: .destructive) {
+                            if draft.isStandard {
+                                binding.value.wrappedValue = ""
+                            } else {
+                                withAnimation(editAnimation) {
+                                    factsDraft.removeAll { $0.id == draft.id }
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "minus.circle").frame(width: 44, height: 44)
                         }
-                    } label: {
-                        Image(systemName: "minus.circle").frame(width: 44, height: 44)
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Remove \(draft.label.isEmpty ? "fact" : draft.label)")
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Remove \(draft.label.isEmpty ? "fact" : draft.label)")
                 }
             }
             .transition(.opacity)
@@ -1387,7 +1475,7 @@ private struct ProjectFactsView: View {
     private var addFactButton: some View {
         Button {
             withAnimation(editAnimation) {
-                factsDraft.append(ProjectFactDraft(id: UUID().uuidString, label: "", value: "", original: nil))
+                factsDraft.append(ProjectFactDraft(id: UUID().uuidString, label: "", value: ""))
             }
         } label: { Label("Add fact", systemImage: "plus") }
         .font(.subheadline)
@@ -1401,8 +1489,15 @@ private struct ProjectFactsView: View {
         editingFolder = folder
         editingSessionID = library.privateSessionID
         saveError = nil
-        factsDraft = folder.structuredFacts.map {
-            ProjectFactDraft(id: $0.id, label: $0.label, value: $0.value, original: $0)
+        let existingKeys = Set(folder.structuredFacts.map(FactPresentation.presentationKey(for:)))
+        factsDraft = folder.structuredFacts.map { fact in
+            let value = FactPresentation.hasRecordedValue(fact) ? fact.value : ""
+            return ProjectFactDraft(id: fact.id, key: FactPresentation.presentationKey(for: fact), label: fact.label,
+                                    value: value, original: fact)
+        }
+        factsDraft += FactPresentation.standardFields.filter { !existingKeys.contains($0.key) }.map { field in
+            ProjectFactDraft(id: "project-fact:\(field.key)", key: field.key, label: field.label,
+                             value: field.key == "address" ? folder.address : "")
         }
         isEditing = true
     }
@@ -1413,20 +1508,24 @@ private struct ProjectFactsView: View {
         for draft in factsDraft {
             let label = draft.label.trimmingCharacters(in: .whitespacesAndNewlines)
             let value = draft.value.trimmingCharacters(in: .whitespacesAndNewlines)
+            if value == draft.initialValue.trimmingCharacters(in: .whitespacesAndNewlines) {
+                if let fact = draft.original {
+                    facts.append(fact)
+                    continue
+                }
+                if draft.isStandard { continue }
+            }
+            if draft.isStandard && value.isEmpty && draft.key != "address" { continue }
             if draft.original == nil && label.isEmpty && value.isEmpty { continue }
             guard !label.isEmpty else {
                 saveError = "Give each fact a name."
                 return
             }
-            if let fact = draft.original, label == fact.label, value == fact.value {
-                facts.append(fact)
-            } else {
-                facts.append(ProjectStructuredFact(id: draft.id, key: draft.original?.key ?? "manual-\(draft.id)",
-                    label: label, value: value, status: value.isEmpty ? "unknown" : "stated", source: "manual",
-                    sourceText: draft.original == nil ? "Entered on iPhone." : "Edited on iPhone.", updatedAt: Date()))
-            }
+            facts.append(ProjectStructuredFact(id: draft.id, key: draft.original?.key ?? draft.key ?? "manual-\(draft.id)",
+                label: label, value: value, status: value.isEmpty ? "unknown" : "stated", source: "manual",
+                sourceText: draft.original == nil ? "Entered on iPhone." : "Edited on iPhone.", updatedAt: Date()))
         }
-        if library.updateProjectFacts(folderID: folderID, facts: facts,
+        if facts == original.structuredFacts || library.updateProjectFacts(folderID: folderID, facts: facts,
             expectedClientID: original.clientID, expectedFacts: original.structuredFacts, sessionID: session) {
             cancel()
         } else {
