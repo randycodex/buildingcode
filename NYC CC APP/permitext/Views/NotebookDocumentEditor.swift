@@ -93,7 +93,10 @@ final class NotebookDocumentEditorController: ObservableObject {
 struct NotebookDocumentFormatting: Decodable, Equatable {
     var bold = false
     var italic = false
+    var underline = false
     var strike = false
+    var highlight = false
+    var textColor = "default"
     var blockType = "paragraph"
     var selectedText = ""
     var linkURL = ""

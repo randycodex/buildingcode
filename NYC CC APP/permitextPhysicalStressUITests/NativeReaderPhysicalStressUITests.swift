@@ -2303,6 +2303,17 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.webViews.textViews.matching(NSPredicate(format: "label == %@", "Note body")).firstMatch
     }
 
+    private func revealNativeNotebookTool(_ label: String, in app: XCUIApplication, towardStart: Bool = false) -> XCUIElement {
+        let toolbar = app.scrollViews["native-notebook-formatting-toolbar"]
+        let tool = toolbar.buttons[label]
+        for _ in 0..<3 where !tool.isHittable {
+            if towardStart { toolbar.swipeRight() }
+            else { toolbar.swipeLeft() }
+        }
+        XCTAssertTrue(tool.isHittable, "\(label) must be reachable in the Note toolbar.")
+        return tool
+    }
+
     private func nativeNotebookBodyValue(_ body: XCUIElement) -> String? {
         // WebKit exposes nonbreaking spaces for typed spaces beside inline
         // references. Preserve paragraph boundaries while normalizing that AX
@@ -2464,9 +2475,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let body = nativeNotebookBody(in: app)
         XCTAssertTrue(body.waitForExistence(timeout: 30))
         body.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.04)).tap()
-        let tableTools = app.buttons["Table"]
-        XCTAssertTrue(tableTools.isHittable)
-        tableTools.tap()
+        revealNativeNotebookTool("Table", in: app).tap()
         app.buttons["Custom size…"].tap()
         XCTAssertTrue(app.navigationBars["Table Size"].waitForExistence(timeout: 5))
         app.buttons["Insert Table"].tap()
@@ -2505,7 +2514,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let body = nativeNotebookBody(in: app)
         XCTAssertTrue(body.waitForExistence(timeout: 30))
         body.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.04)).tap()
-        app.buttons["Table"].tap()
+        revealNativeNotebookTool("Table", in: app).tap()
         app.buttons["Insert 2 × 2 table"].tap()
 
         let column = app.webViews.buttons["Resize column"]
@@ -2551,19 +2560,29 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
         app.typeText("Tools check ")
         XCTAssertFalse(app.navigationBars["Note"].buttons["Done"].exists)
-        let toolCenters = ["Text formatting", "Lists", "Insert image", "Insert", "Table", "Undo", "Redo"].map {
-            app.buttons[$0].frame.midX
+        let toolbar = app.scrollViews["native-notebook-formatting-toolbar"]
+        XCTAssertTrue(toolbar.exists)
+        for label in ["Bold", "Italic", "Underline", "Strikethrough", "Highlight"] {
+            let control = toolbar.buttons[label]
+            XCTAssertTrue(control.isHittable)
+            control.tap()
+            XCTAssertTrue(control.isSelected)
+            control.tap()
+            XCTAssertFalse(control.isSelected)
         }
-        let toolSpacing = toolCenters[1] - toolCenters[0]
-        XCTAssertGreaterThan(toolSpacing, 32)
-        for (left, right) in zip(toolCenters, toolCenters.dropFirst()) {
-            XCTAssertEqual(right - left, toolSpacing, accuracy: 1)
-        }
-        keepScreenshot(named: "Evenly spaced Note tools in a single glass pill", from: app)
-        app.buttons["Lists"].tap()
+        let textColor = toolbar.buttons["Text color"]
+        textColor.tap()
+        app.buttons["Blue"].tap()
+        XCTAssertTrue(waitForValue("Blue", on: textColor))
+        textColor.tap()
+        app.buttons["Default"].tap()
+        XCTAssertTrue(waitForValue("Default", on: textColor))
+        keepScreenshot(named: "Direct Note formatting icons in the scrolling toolbar", from: app)
+        XCTAssertFalse(toolbar.buttons["Redo"].isHittable)
+        revealNativeNotebookTool("Lists", in: app).tap()
         app.buttons["Bulleted list"].tap()
-        XCTAssertTrue(waitForValue("bulletListItem", on: app.buttons["Text formatting"]))
-        app.buttons["Insert"].tap()
+        XCTAssertTrue(waitForValue("bulletListItem", on: revealNativeNotebookTool("Text formatting", in: app, towardStart: true)))
+        revealNativeNotebookTool("Insert", in: app).tap()
         app.buttons["Web link"].tap()
         let label = app.textFields["native-notebook-link-label"]
         XCTAssertTrue(label.waitForExistence(timeout: 5))
@@ -2579,17 +2598,18 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [inserted], timeout: 5), .completed, app.debugDescription)
         let withLink = nativeNotebookBodyValue(body)
         XCTAssertTrue(withLink?.contains("Tools check") == true)
-        app.buttons["Undo"].tap()
+        revealNativeNotebookTool("Undo", in: app).tap()
         let undone = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             let value = self.nativeNotebookBodyValue(body) ?? ""
             return !value.contains("Reference link") && value.contains("Tools check")
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [undone], timeout: 5), .completed, app.debugDescription)
-        app.buttons["Redo"].tap()
+        revealNativeNotebookTool("Redo", in: app).tap()
         let restored = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             self.nativeNotebookBodyValue(body) == withLink
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [restored], timeout: 5), .completed, app.debugDescription)
+        XCTAssertTrue(app.keyboards.firstMatch.exists)
         XCTAssertTrue(waitForValue("saved", on: element(in: app, identifier: "native-notebook-save-status"), timeout: 10))
         keepScreenshot(named: "Native continuous list and link with undo redo", from: app)
     }

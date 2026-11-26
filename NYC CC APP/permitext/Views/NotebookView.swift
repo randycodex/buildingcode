@@ -1347,14 +1347,26 @@ private struct NotebookCardEditorView: View {
     }
 
     private var formattingBar: some View {
-        HStack(spacing: 0) {
+        ScrollView(.horizontal) {
+            formattingTools
+                .padding(.horizontal, 6)
+                .frame(height: CodeScreenMetrics.bottomControlHeight)
+        }
+        .scrollIndicators(.hidden)
+        .scrollDismissesKeyboard(.never)
+        .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+        .clipShape(Capsule())
+        .codeLiquidGlassCapsule()
+        .codeTabAlignedHorizontalPadding()
+        .padding(.vertical, 4)
+        .disabled(!documentEditor.isReady || isLeaving || !isCurrentOwner)
+        .accessibilityIdentifier("native-notebook-formatting-toolbar")
+    }
+
+    private var formattingTools: some View {
+        let formatting = documentEditor.formatting
+        return HStack(spacing: 0) {
             Menu {
-                Button("Bold", systemImage: "bold") { Task { await performEditorCommand { try await documentEditor.toggleStyle("bold") } } }
-                Button("Italic", systemImage: "italic") { Task { await performEditorCommand { try await documentEditor.toggleStyle("italic") } } }
-                Button("Underline", systemImage: "underline") { Task { await performEditorCommand { try await documentEditor.toggleStyle("underline") } } }
-                Button("Strikethrough", systemImage: "strikethrough") { Task { await performEditorCommand { try await documentEditor.toggleStyle("strike") } } }
-                Button("Highlight", systemImage: "highlighter") { Task { await performEditorCommand { try await documentEditor.toggleStyle("highlight") } } }
-                Divider()
                 Button("Body") { Task { await performEditorCommand { try await documentEditor.setBlockType("paragraph") } } }
                 ForEach(1...3, id: \.self) { level in
                     Button("Heading \(level)") { Task { await performEditorCommand { try await documentEditor.setBlockType("heading", level: level) } } }
@@ -1363,12 +1375,6 @@ private struct NotebookCardEditorView: View {
                     formatButton("Default", command: .fontSize, value: "default")
                     ForEach([8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48], id: \.self) { size in
                         formatButton("\(size) pt", command: .fontSize, value: String(size))
-                    }
-                }
-                Menu("Text color") {
-                    formatButton("Default", command: .textColor, value: "default")
-                    ForEach(["Gray", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Pink"], id: \.self) { color in
-                        formatButton(color, command: .textColor, value: color.lowercased())
                     }
                 }
                 Menu("Line spacing") {
@@ -1380,7 +1386,23 @@ private struct NotebookCardEditorView: View {
                 }
             } label: { formattingItem(Text("Aa").font(.system(size: 19, weight: .medium))) }
             .accessibilityLabel("Text formatting")
-            .accessibilityValue(documentEditor.formatting.blockType)
+            .accessibilityValue(formatting.blockType)
+            styleButton("Bold", icon: "bold", style: "bold", isActive: formatting.bold)
+            styleButton("Italic", icon: "italic", style: "italic", isActive: formatting.italic)
+            styleButton("Underline", icon: "underline", style: "underline", isActive: formatting.underline)
+            styleButton("Strikethrough", icon: "strikethrough", style: "strike", isActive: formatting.strike)
+            styleButton("Highlight", icon: "highlighter", style: "highlight", isActive: formatting.highlight)
+            Menu {
+                formatButton("Default", command: .textColor, value: "default")
+                ForEach(["Gray", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Pink"], id: \.self) { color in
+                    formatButton(color, command: .textColor, value: color.lowercased())
+                }
+            } label: {
+                formattingItem(Image(systemName: "paintpalette"))
+                    .foregroundStyle(formatting.textColor == "default" ? Color.primary : accentColor)
+            }
+            .accessibilityLabel("Text color")
+            .accessibilityValue(formatting.textColor.capitalized)
             Menu {
                 Button("Bulleted list", systemImage: "list.bullet") { Task { await performEditorCommand { try await documentEditor.setBlockType("bulletListItem") } } }
                 Button("Numbered list", systemImage: "list.number") { Task { await performEditorCommand { try await documentEditor.setBlockType("numberedListItem") } } }
@@ -1412,7 +1434,7 @@ private struct NotebookCardEditorView: View {
                         showingTableSize = true
                     }
                 }
-                ForEach(documentEditor.formatting.tableActions) { action in
+                ForEach(formatting.tableActions) { action in
                     formatButton(action.label, command: .table, value: action.value,
                         role: action.value.hasPrefix("remove-") ? .destructive : nil)
                         .disabled(action.disabled)
@@ -1423,25 +1445,29 @@ private struct NotebookCardEditorView: View {
                 formattingItem(Image(systemName: "arrow.uturn.backward"))
             }
             .accessibilityLabel("Undo")
-            .disabled(!documentEditor.formatting.canUndo)
+            .disabled(!formatting.canUndo)
             Button { Task { await performEditorCommand { try await documentEditor.redo() } } } label: {
                 formattingItem(Image(systemName: "arrow.uturn.forward"))
             }
             .accessibilityLabel("Redo")
-            .disabled(!documentEditor.formatting.canRedo)
+            .disabled(!formatting.canRedo)
         }
         .font(.system(size: 18))
-        .padding(.horizontal, 4)
-        .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.bottomControlHeight)
-        .codeLiquidGlassCapsule()
-        .codeTabAlignedHorizontalPadding()
-        .padding(.vertical, 4)
-        .disabled(!documentEditor.isReady || isLeaving || !isCurrentOwner)
-        .accessibilityIdentifier("native-notebook-formatting-toolbar")
+    }
+
+    private func styleButton(_ title: String, icon: String, style: String, isActive: Bool) -> some View {
+        Button {
+            Task { await performEditorCommand { try await documentEditor.toggleStyle(style) } }
+        } label: {
+            formattingItem(Image(systemName: icon))
+                .foregroundStyle(isActive ? accentColor : Color.primary)
+        }
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(isActive ? .isSelected : [])
     }
 
     private func formattingItem(_ label: some View) -> some View {
-        label.frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.toolbarButtonSize)
+        label.frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
             .contentShape(Rectangle())
     }
 

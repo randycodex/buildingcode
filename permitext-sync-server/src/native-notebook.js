@@ -64,7 +64,8 @@ function formattingSnapshot() {
   const styles = editor?.getActiveStyles() || {};
   const history = editor?.getExtension("yUndo") || editor?.getExtension("history");
   return {
-    bold: !!styles.bold, italic: !!styles.italic, strike: !!styles.strike,
+    bold: !!styles.bold, italic: !!styles.italic, underline: !!styles.underline, strike: !!styles.strike,
+    highlight: styles.backgroundColor === "yellow", textColor: styles.textColor || "default",
     canUndo: Boolean(history && editor.canExec(history.undoCommand)),
     canRedo: Boolean(history && editor.canExec(history.redoCommand)),
     tableActions: notebookTableActions(editor).map(choice => ({ ...choice, disabled: Boolean(choice.disabled) })),
