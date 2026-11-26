@@ -39,9 +39,11 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
  var authoredCodeStore: BrowseStore? = BrowseStore()
  var codeSections: [CodeSectionCategory] = []
  var chapters: [Int] = []
- func persistContinuityContext() {}
+ var continuityWrites = 0
+ var warmedSections: [Int64?] = []
+ func persistContinuityContext() { continuityWrites += 1 }
  static func sortedCodeSections(_ values: [CodeSectionCategory]) -> [CodeSectionCategory] { values }
- func prewarmCodeSectionForBrowsing(id: Int64?) {}
+ func prewarmCodeSectionForBrowsing(id: Int64?) { warmedSections.append(id) }
  ${method("    func updateSelectedCodeSection(")}
  var activeCodeSources: ActiveCodeSources? = nil
  var activeCodeSourcesError: String? = nil
@@ -87,8 +89,10 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
   let unchangedRevision = queued.searchContentRevision
   queued.updateSelectedCodeSection(id: 2)
   precondition(queued.searchResults == ["completed-all-editions"] && queued.searchContentRevision == unchangedRevision)
+  precondition(queued.chapters.isEmpty && queued.continuityWrites == 0 && queued.warmedSections.isEmpty)
   queued.updateSelectedCodeSection(id: 3)
   precondition(queued.searchResults.isEmpty && queued.searchContentRevision != unchangedRevision)
+  precondition(queued.chapters == [1] && queued.continuityWrites == 1 && queued.warmedSections == [3])
   let oldGeneration = queued.allEditionSearchGeneration
   let oldContentRevision = queued.searchContentRevision
   queued.searchResults = ["partial-before-2014"]

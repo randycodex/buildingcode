@@ -135,6 +135,7 @@ import {
   sanitizedServerErrorReport
 } from "./operational-readiness.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
+import { mergeProjectSectionSelection } from "./project-section-selections.mjs";
 import { applyNotebookCardMutation, commitPostgresNotebookCardMutation, notebookCreationID, notebookMutationReplay } from "./notebook-persistence.mjs";
 import { normalizedResearchProjectStructuredFacts, researchProjectFactLine, projectFactProjection } from "./project-fact-projection.mjs";
 import {
@@ -27313,7 +27314,7 @@ async function canonicalizeSectionRecord(kind, record) {
   }
   if (kind === "projectSection") {
     record = {
-      ...record,
+      ...mergeProjectSectionSelection(null, record),
       folderClientID: syncProjectIdentity(record.folderClientID, record.userID) || null
     };
   }
@@ -27360,7 +27361,10 @@ async function canonicalizeMutationBatch(mutations) {
   const canonicalized = await Promise.all(source.map(canonicalizeMutation));
   const mutationsByID = new Map();
   const aliasesByCanonicalID = new Map();
-  canonicalized.forEach((mutation, index) => {
+  // Fold chronologically so a remove followed by a re-save starts a fresh
+  // set of excerpts even when a batch contains several versions of one link.
+  const ordered = [...canonicalized.entries()].sort((a, b) => mutationUpdatedAt(a[1]) - mutationUpdatedAt(b[1]));
+  ordered.forEach(([index, mutation]) => {
     const recordID = mutationRecordID(mutation);
     if (!recordID) return;
     const sourceRecordID = mutationRecordID(source[index]);
@@ -27370,6 +27374,11 @@ async function canonicalizeMutationBatch(mutations) {
       aliasesByCanonicalID.set(recordID, aliases);
     }
     const existing = mutationsByID.get(recordID);
+    if (existing?.projectSection && mutation.projectSection) {
+      if (existing.projectSection.deletedAt && !mutation.projectSection.deletedAt &&
+          mutationUpdatedAt(existing) === mutationUpdatedAt(mutation)) return;
+      mutation = { projectSection: mergeProjectSectionSelection(existing.projectSection, mutation.projectSection, { advanceTimestamp: false }) };
+    }
     if (!existing || mutationUpdatedAt(mutation) >= mutationUpdatedAt(existing)) {
       mutationsByID.set(recordID, mutation);
     }
@@ -27622,16 +27631,20 @@ function mergeMutations(existing, incoming) {
 
     const existingMutation = byID.get(id);
     const { kind } = mutationKindAndRecord(mutation);
+    let acceptedMutation = kind === "projectSection"
+      ? { projectSection: mergeProjectSectionSelection(existingMutation?.projectSection, mutation.projectSection) }
+      : mutation;
     if (
       kind !== "continuity" &&
       existingMutation &&
-      mutationUpdatedAt(mutation) < mutationUpdatedAt(existingMutation)
+      (mutationUpdatedAt(acceptedMutation) < mutationUpdatedAt(existingMutation) ||
+        (existingMutation.projectSection?.deletedAt && !acceptedMutation.projectSection?.deletedAt &&
+         mutationUpdatedAt(acceptedMutation) === mutationUpdatedAt(existingMutation)))
     ) {
       rejectedMutationIDs.push(id);
       continue;
     }
 
-    let acceptedMutation = mutation;
     if (kind === "project" && existingMutation) {
       const existingProject = mutationKindAndRecord(existingMutation).record;
       const incomingProject = mutationKindAndRecord(mutation).record;

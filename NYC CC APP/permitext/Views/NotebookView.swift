@@ -416,7 +416,7 @@ private struct ProjectNotebookSessionView: View {
                 } else if hasPresentedInitialCard {
                     NotebookCardEditorView(
                         projectID: projectID, projectName: projectName,
-                        routeID: initialCardID ?? directEditorID, cardID: initialCardID,
+                        routeID: directEditorID, cardID: initialCardID,
                         readOnly: access.readOnly && !permitsLocalDraftEditing, localDraftOnly: permitsLocalDraftEditing,
                         notebookRole: access.role, accentColor: accentColor,
                         referenceCandidates: editorReferenceCandidates, owner: owner,
@@ -436,6 +436,7 @@ private struct ProjectNotebookSessionView: View {
             await loadCards()
             guard !Task.isCancelled, isCurrentOwner else { return }
             if !hasPresentedInitialCard, initialCardID != nil || startNewNote {
+                if let initialCardID { directEditorID = noteRoute(for: initialCardID).id }
                 hasPresentedInitialCard = true
                 // Render the editor in this destination itself. Done returns
                 // directly to the project that opened it, without a second list.
@@ -450,6 +451,9 @@ private struct ProjectNotebookSessionView: View {
         }
         .onAppear { isVisible = true }
         .onDisappear { isVisible = false }
+        .onChange(of: editorRoute) { _, route in
+            if route == nil { refreshLocalDrafts() }
+        }
         .onChange(of: library.notebookReconnectRevision) {
             guard isVisible, editorRoute == nil, initialCardID == nil, !startNewNote else { return }
             Task { await loadCards(forceNetwork: true) }
@@ -483,6 +487,10 @@ private struct ProjectNotebookSessionView: View {
 
     private var notebookList: some View {
         let isEmpty = cards.isEmpty && localDrafts.isEmpty
+        let cardIDs = Set(cards.map(\.id))
+        let draftsByCardID = Dictionary(localDrafts.compactMap { entry in
+            entry.value.cardID.map { ($0, entry) }
+        }, uniquingKeysWith: { newest, _ in newest })
         return List {
             if !isEmpty, let errorMessage {
                 VStack(alignment: .leading, spacing: 8) {
@@ -490,31 +498,31 @@ private struct ProjectNotebookSessionView: View {
                     Button("Retry") { Task { await loadCards(forceNetwork: true) } }
                 }
             }
-            if !localDrafts.isEmpty {
-                Section("Drafts on this iPhone") {
-                    ForEach(localDrafts, id: \.scope) { entry in
-                        Button {
-                            editorRoute = NativeNotebookEditorRoute(cardID: entry.value.cardID, draftID: String(entry.scope.dropFirst("native-notebook-draft:".count)))
-                        } label: {
-                            noteListLabel(title: entry.value.title, date: entry.value.editedAt)
-                        }
-                        .disabled(isSelectingNotes)
-                    }
+            ForEach(localDrafts.filter { entry in
+                entry.value.cardID.map { !cardIDs.contains($0) } ?? true
+            }, id: \.scope) { entry in
+                Button {
+                    editorRoute = NativeNotebookEditorRoute(cardID: entry.value.cardID, draftID: draftRouteID(entry.scope))
+                } label: {
+                    noteListLabel(title: entry.value.title, date: entry.value.editedAt)
                 }
+                .disabled(isSelectingNotes)
             }
             ForEach(cards) { card in
+                let draft = draftsByCardID[card.id]
                 Button {
                     if isSelectingNotes {
                         if !selectedNoteIDs.insert(card.id).inserted { selectedNoteIDs.remove(card.id) }
                     } else {
-                        editorRoute = NativeNotebookEditorRoute(cardID: card.id)
+                        editorRoute = NativeNotebookEditorRoute(cardID: card.id, draftID: draft.map { draftRouteID($0.scope) })
                     }
                 } label: {
                     HStack(spacing: 12) {
                         if isSelectingNotes {
                             ListSelectionIndicator(isSelected: selectedNoteIDs.contains(card.id))
                         }
-                        noteListLabel(title: card.title, date: ListTimestamp.date(from: card.updatedAt))
+                        noteListLabel(title: draft?.value.title ?? card.title,
+                                      date: draft?.value.editedAt ?? ListTimestamp.date(from: card.updatedAt))
                     }
                     .contentShape(Rectangle())
                 }
@@ -678,23 +686,47 @@ private struct ProjectNotebookSessionView: View {
         var errorDescription: String? { "Open and sync the selected draft before moving its note to Trash." }
     }
 
-    private func loadCards(forceNetwork: Bool = false) async {
+    private func draftRouteID(_ scope: String) -> String {
+        String(scope.dropFirst("native-notebook-draft:".count))
+    }
+
+    private func noteRoute(for cardID: String) -> NativeNotebookEditorRoute {
+        let localDraft = localDrafts.first { $0.value.cardID == cardID }
+        return NativeNotebookEditorRoute(cardID: cardID, draftID: localDraft.map { draftRouteID($0.scope) })
+    }
+
+    private func refreshLocalDrafts(serverCards: [ProjectNotebookCardSummary]? = nil) {
         guard isCurrentOwner, let owner else {
-            cards = []
-            access = NotebookAccess(role: "viewer", readOnly: true)
-            errorMessage = "Sign in to load this Notebook."
-            isLoading = false
+            localDrafts = []
             return
         }
         let storedDrafts = (try? cache.entries(NativeNotebookDraft.self, accountID: owner.accountID, projectID: projectID, scopePrefix: "native-notebook-draft:"))?.filter {
             $0.value.hasUnsynchronizedChanges
         }.sorted { ($0.value.editedAt ?? .distantPast) > ($1.value.editedAt ?? .distantPast) } ?? []
+        let previouslyVisibleDrafts = Set(localDrafts.map(\.scope))
         localDrafts = storedDrafts.filter { entry in
             guard let cardID = entry.value.cardID else { return true }
+            if let serverCards {
+                guard let card = serverCards.first(where: { $0.id == cardID })
+                else { return previouslyVisibleDrafts.contains(entry.scope) }
+                return PermitextReleaseSurfaceVisibility.notebookCardIsVisible(card.cardType)
+            }
             guard let type = nativeNotebookCachedCardType(cache: cache, accountID: owner.accountID, projectID: projectID, cardID: cardID)
             else { return PermitextReleaseSurfaceVisibility.coordination }
             return PermitextReleaseSurfaceVisibility.notebookCardIsVisible(type)
         }
+    }
+
+    private func loadCards(forceNetwork: Bool = false) async {
+        guard isCurrentOwner, let owner else {
+            cards = []
+            localDrafts = []
+            access = NotebookAccess(role: "viewer", readOnly: true)
+            errorMessage = "Sign in to load this Notebook."
+            isLoading = false
+            return
+        }
+        refreshLocalDrafts()
         let cachedAccess = (try? cache.load(NotebookCardListResponse.self, accountID: owner.accountID,
             projectID: projectID, scope: "native-notebook-list"))?.value.access
         let requestID = UUID()
@@ -713,12 +745,7 @@ private struct ProjectNotebookSessionView: View {
             let response = try await library.notebookCards(projectID: projectID)
             guard isCurrentOwner, loadID == requestID, !Task.isCancelled else { return }
             cards = PermitextReleaseSurfaceVisibility.visibleNotebookCards(response.cards).sorted { $0.updatedAt > $1.updatedAt }
-            localDrafts = storedDrafts.filter { entry in
-                guard let cardID = entry.value.cardID else { return true }
-                guard let card = response.cards.first(where: { $0.id == cardID })
-                else { return localDrafts.contains { $0.scope == entry.scope } }
-                return PermitextReleaseSurfaceVisibility.notebookCardIsVisible(card.cardType)
-            }
+            refreshLocalDrafts(serverCards: response.cards)
             access = response.access ?? NotebookAccess(role: "editor", readOnly: false)
             permitsLocalDraftEditing = false
             errorMessage = nil
@@ -896,10 +923,11 @@ enum NativeNotebookRefreshDecision: Equatable {
                         serverContent: NativeNotebookEditableContent) -> Self {
         guard let draft, draft.hasUnsynchronizedChanges else { return .applyServer }
         if draft.pendingSave != nil { return .preservePending }
-        if draft.version != serverVersion { return .reviewConflict }
         let current = NativeNotebookEditableContent(title: draft.title, document: draft.document,
-                                                    evidenceLinks: draft.evidenceLinks, openQuestions: draft.openQuestions)
-        return current == serverContent ? .applyServer : .preserveDraft
+                                                    evidenceLinks: draft.evidenceLinks,
+                                                    openQuestions: draft.openQuestions?.isEmpty == false ? draft.openQuestions : nil)
+        if current == serverContent { return .applyServer }
+        return draft.version == serverVersion ? .preserveDraft : .reviewConflict
     }
 }
 
@@ -1666,8 +1694,9 @@ private struct NotebookCardEditorView: View {
                 return
             }
             if let deferredDraft { apply(deferredDraft) }
+            let draft = hasLoaded ? currentDraft : nil
             let decision = NativeNotebookRefreshDecision.resolve(
-                draft: hasLoaded ? currentDraft : nil, serverVersion: card.version,
+                draft: draft, serverVersion: card.version,
                 serverContent: editableContent(for: card))
             switch decision {
             case .preservePending:
@@ -1684,6 +1713,7 @@ private struct NotebookCardEditorView: View {
             case .applyServer:
                 apply(card)
                 errorMessage = nil
+                if draft?.hasUnsynchronizedChanges == true { _ = cacheDraft() }
             }
             refreshSucceeded = true
             try? cache.store(

@@ -623,33 +623,40 @@ private struct ProjectContextEditor: UIViewRepresentable {
 /// Shows shared provenance once, beneath the fact list.
 struct ProjectStructuredFactsSources: View {
     let facts: [ProjectStructuredFact]
+    @State private var isExpanded = false
 
     var body: some View {
         let notes = ProjectFactSourceNote.grouped(from: facts)
         if !notes.isEmpty {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Source information")
-                    .font(.caption.weight(.semibold))
-                ForEach(notes) { note in
-                    VStack(alignment: .leading, spacing: 4) {
-                        if notes.count > 1 {
-                            Text(note.factLabels.joined(separator: ", "))
-                                .fontWeight(.semibold)
-                        }
-                        Text(note.message)
-                            .textSelection(.enabled)
-                        let dates = note.updatedDates.reduce(into: [String]()) { result, date in
-                            let text = date.formatted(date: .abbreviated, time: .omitted)
-                            if !result.contains(text) { result.append(text) }
-                        }
-                        if !dates.isEmpty {
-                            Text("Updated \(dates.joined(separator: "; "))")
+            DisclosureGroup(isExpanded: $isExpanded) {
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(notes) { note in
+                        VStack(alignment: .leading, spacing: 4) {
+                            if notes.count > 1 {
+                                Text(note.factLabels.joined(separator: ", "))
+                                    .fontWeight(.semibold)
+                            }
+                            Text(note.message)
+                                .textSelection(.enabled)
+                            let dates = note.updatedDates.reduce(into: [String]()) { result, date in
+                                let text = date.formatted(date: .abbreviated, time: .omitted)
+                                if !result.contains(text) { result.append(text) }
+                            }
+                            if !dates.isEmpty {
+                                Text("Updated \(dates.joined(separator: "; "))")
+                            }
                         }
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 8)
+            } label: {
+                Text("Source information")
+                    .font(.caption.weight(.semibold))
             }
             .font(.caption)
             .foregroundStyle(.secondary)
+            .tint(.secondary)
             .fixedSize(horizontal: false, vertical: true)
             .padding(.top, 16)
             .accessibilityIdentifier("project-facts-sources")
@@ -660,9 +667,9 @@ struct ProjectStructuredFactsSources: View {
 struct ProjectStructuredFactRow: View {
     let fact: ProjectStructuredFact
 
-    private var statusLabel: String {
+    private var statusLabel: String? {
         switch fact.status.lowercased() {
-        case "sourced": return "Sourced"
+        case "sourced": return nil
         case "confirmed": return "Confirmed"
         case "stated": return "Stated"
         case "rejected": return "Rejected"
@@ -678,9 +685,11 @@ struct ProjectStructuredFactRow: View {
             Text(fact.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Not provided" : fact.value)
                 .font(.subheadline)
                 .fixedSize(horizontal: false, vertical: true)
-            Text(statusLabel)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            if let statusLabel {
+                Text(statusLabel)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 8)

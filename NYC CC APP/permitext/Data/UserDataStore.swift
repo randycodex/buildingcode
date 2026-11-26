@@ -1,6 +1,22 @@
 import Foundation
 import SQLite3
 
+/// Occurrences travel with the quote. Offsets refer to the older device-local text layout.
+struct ReaderEvidenceText: Equatable {
+    var excerpts: [String]
+    var offsets: [String: [Int]] = [:]
+    var occurrences: [String: [Int]] = [:]
+
+    /// Combine distinct occurrences from concurrent devices and ignore unrelated quote keys.
+    mutating func addOccurrences(_ added: [String: [Int]]) {
+        for quote in excerpts {
+            guard let incoming = added[quote] else { continue }
+            let positions = Set((occurrences[quote] ?? []) + incoming.filter { $0 >= 0 })
+            if !positions.isEmpty { occurrences[quote] = positions.sorted() }
+        }
+    }
+}
+
 protocol UserContentRepository {
     func bookmarkedSectionIDs(codeVersion: String) throws -> [Int64]
     func savedCodeVersions() throws -> [String]
@@ -10,7 +26,7 @@ protocol UserContentRepository {
     func isBookmarked(sectionID: Int64, codeVersion: String) throws -> Bool
     func toggleBookmark(sectionID: Int64, codeVersion: String) throws
     func saveSection(_ sectionID: Int64, toFolderIDs folderIDs: Set<Int64>, codeVersion: String) throws
-    func saveSelection(_ excerptsBySectionID: [Int64: [String]], toProject projectID: Int64, clientID: String, codeVersion: String) throws
+    func saveSelection(_ excerptsBySectionID: [Int64: [String]], toProject projectID: Int64, clientID: String, codeVersion: String, occurrences: [Int64: [String: [Int]]]) throws
     func noteBody(sectionID: Int64, codeVersion: String) throws -> String
     func noteBody(sectionID: Int64, blockID: String, codeVersion: String) throws -> String
     func noteBlockIDs(sectionID: Int64, codeVersion: String) throws -> [String]
@@ -37,6 +53,7 @@ protocol UserContentRepository {
     func folderCount(codeVersion: String) throws -> Int
     func totalFolderCount() throws -> Int
     func folderMembership(codeVersion: String) throws -> [Int64: [Int64]]
+    func readerEvidence(codeVersion: String) throws -> [Int64: [Int64: ReaderEvidenceText]]
     func sections(inFolder folderID: Int64, codeVersion: String) throws -> [Int64]
     func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String, selectedExcerpts: [String])]
     func createFolder(name: String, address: String, description: String, structuredFacts: [ProjectStructuredFact], colorHex: String, folderType: CodeFolderType, codeVersion: String) throws -> Int64
@@ -569,13 +586,14 @@ final class UserDataStore: UserContentRepository {
             }
 
             for target in destinations where existingByID[target.folderID] == nil {
-                try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion, selectedExcerpts: [])
+                try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion, saved: .init(excerpts: []), added: .init(excerpts: []))
             }
         }
     }
 
     func saveSelection(
-        _ excerptsBySectionID: [Int64: [String]], toProject projectID: Int64, clientID: String, codeVersion: String
+        _ excerptsBySectionID: [Int64: [String]], toProject projectID: Int64, clientID: String, codeVersion: String,
+        occurrences: [Int64: [String: [Int]]] = [:]
     ) throws {
         try performTransaction {
             guard try allFolders().contains(where: {
@@ -591,11 +609,14 @@ final class UserDataStore: UserContentRepository {
                 if try !isBookmarked(sectionID: sectionID, codeVersion: codeVersion) {
                     try insertBookmark(sectionID: sectionID, codeVersion: codeVersion)
                 }
-                let existing = try folderSectionExcerpts(sectionID: sectionID, folderID: target.folderID, codeVersion: codeVersion)
-                let combined = mergeFolderSectionExcerpts(existing, excerpts)
-                if existing != combined {
-                    try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion, selectedExcerpts: combined)
-                }
+                let existing = try folderSectionEvidence(sectionID: sectionID, folderID: target.folderID, codeVersion: codeVersion)
+                var saved = existing ?? ReaderEvidenceText(excerpts: [])
+                saved.excerpts = mergeFolderSectionExcerpts(existing?.excerpts, excerpts)
+                saved.addOccurrences(occurrences[sectionID] ?? [:])
+                guard existing != saved else { continue }
+                var added = ReaderEvidenceText(excerpts: excerpts)
+                added.addOccurrences(occurrences[sectionID] ?? [:])
+                try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion, saved: saved, added: added)
             }
         }
     }
@@ -1034,6 +1055,8 @@ final class UserDataStore: UserContentRepository {
         try addColumnIfMissing(table: "folder_sections", column: "deleted_at", definition: "TEXT")
         try migrateFolderSectionsCodeVersionConstraintIfNeeded()
         try addColumnIfMissing(table: "folder_sections", column: "selected_excerpts_json", definition: "TEXT")
+        try addColumnIfMissing(table: "folder_sections", column: "reader_excerpt_offsets", definition: "TEXT")
+        try addColumnIfMissing(table: "folder_sections", column: "selected_excerpt_occurrences", definition: "TEXT")
         try addColumnIfMissing(table: "sync_queue", column: "mutation_updated_at", definition: "TEXT NOT NULL DEFAULT ''")
         try backfillSyncColumns()
     }
@@ -2291,10 +2314,15 @@ final class UserDataStore: UserContentRepository {
     /// version. The view model uses this to render the Projects row in the
     /// Reader without a per-section round trip.
     func folderMembership(codeVersion: String) throws -> [Int64: [Int64]] {
+        try readerEvidence(codeVersion: codeVersion).mapValues { $0.keys.sorted() }
+    }
+
+    // A single read keeps membership and saved excerpts on the same version of the row.
+    func readerEvidence(codeVersion: String) throws -> [Int64: [Int64: ReaderEvidenceText]] {
         let intents = try latestFolderSectionIntents()
         let statement = try connection.prepare(
             """
-            SELECT section_id, folder_id, updated_at
+            SELECT section_id, folder_id, updated_at, selected_excerpts_json, reader_excerpt_offsets, selected_excerpt_occurrences
             FROM folder_sections
             WHERE code_version = ?;
             """
@@ -2302,7 +2330,7 @@ final class UserDataStore: UserContentRepository {
         defer { connection.finalize(statement) }
         try connection.bind(text: codeVersion, index: 1, to: statement)
 
-        var result: [Int64: [Int64]] = [:]
+        var result: [Int64: [Int64: ReaderEvidenceText]] = [:]
         while try connection.step(statement) == SQLITE_ROW {
             let sectionID = connection.int64(at: 0, in: statement)
             let folderID = connection.int64(at: 1, in: statement)
@@ -2314,7 +2342,9 @@ final class UserDataStore: UserContentRepository {
                 rowUpdatedAt: updatedAt,
                 intents: intents
             ) {
-                result[sectionID, default: []].append(folderID)
+                result[sectionID, default: [:]][folderID] = decodeReaderEvidence(
+                    excerpts: connection.stringOrNil(at: 3, in: statement),
+                    offsets: connection.stringOrNil(at: 4, in: statement), occurrences: connection.stringOrNil(at: 5, in: statement))
             }
         }
         return result
@@ -2717,22 +2747,31 @@ final class UserDataStore: UserContentRepository {
                 folderClientID: try folderClientID(id: folderID, codeVersion: codeVersion),
                 folderType: try folderType(id: folderID, codeVersion: codeVersion)
             )
-            let existing = try folderSectionExcerpts(sectionID: sectionID, folderID: folderID, codeVersion: codeVersion)
-            let combined = mergeFolderSectionExcerpts(existing, selectedExcerpts)
-            try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion, selectedExcerpts: combined)
+            let existing = try folderSectionEvidence(sectionID: sectionID, folderID: folderID, codeVersion: codeVersion)
+            let combined = mergeFolderSectionExcerpts(existing?.excerpts, selectedExcerpts)
+            try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion,
+                                    saved: .init(excerpts: combined, occurrences: existing?.occurrences ?? [:]),
+                                    added: .init(excerpts: selectedExcerpts))
         }
     }
 
-    private func folderSectionExcerpts(sectionID: Int64, folderID: Int64, codeVersion: String) throws -> [String]? {
+    private func decodeReaderEvidence(excerpts: String?, offsets: String?, occurrences: String?) -> ReaderEvidenceText {
+        ReaderEvidenceText(excerpts: ServerProjectSectionRecord.decodeExcerpts(excerpts) ?? [],
+            offsets: ServerProjectSectionRecord.decodeOccurrences(offsets) ?? [:],
+            occurrences: ServerProjectSectionRecord.decodeOccurrences(occurrences) ?? [:])
+    }
+
+    private func folderSectionEvidence(sectionID: Int64, folderID: Int64, codeVersion: String) throws -> ReaderEvidenceText? {
         let statement = try connection.prepare(
-            "SELECT selected_excerpts_json FROM folder_sections WHERE folder_id = ? AND code_version = ? AND section_id = ?;"
+            "SELECT selected_excerpts_json, reader_excerpt_offsets, selected_excerpt_occurrences FROM folder_sections WHERE folder_id = ? AND code_version = ? AND section_id = ?;"
         )
         defer { connection.finalize(statement) }
         sqlite3_bind_int64(statement, 1, folderID)
         try connection.bind(text: codeVersion, index: 2, to: statement)
         sqlite3_bind_int64(statement, 3, sectionID)
         guard try connection.step(statement) == SQLITE_ROW else { return nil }
-        return ServerProjectSectionRecord.decodeExcerpts(connection.stringOrNil(at: 0, in: statement)) ?? []
+        return decodeReaderEvidence(excerpts: connection.stringOrNil(at: 0, in: statement),
+                                    offsets: connection.stringOrNil(at: 1, in: statement), occurrences: connection.stringOrNil(at: 2, in: statement))
     }
 
     private func mergeFolderSectionExcerpts(_ existing: [String]?, _ added: [String]) -> [String] {
@@ -2741,15 +2780,15 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func upsertFolderSection(
-        _ sectionID: Int64, target: FolderSectionSyncTarget, codeVersion: String, selectedExcerpts: [String]
+        _ sectionID: Int64, target: FolderSectionSyncTarget, codeVersion: String, saved: ReaderEvidenceText, added: ReaderEvidenceText
     ) throws {
         let statement = try connection.prepare(
             """
             INSERT INTO folder_sections (
                 client_id, owner_id, visibility, sync_state, folder_id,
-                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json
+                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json, selected_excerpt_occurrences
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)
             ON CONFLICT(folder_id, code_version, section_id) DO UPDATE SET
                 client_id = excluded.client_id,
                 owner_id = excluded.owner_id,
@@ -2758,7 +2797,8 @@ final class UserDataStore: UserContentRepository {
                 added_at = excluded.added_at,
                 updated_at = excluded.updated_at,
                 deleted_at = NULL,
-                selected_excerpts_json = COALESCE(excluded.selected_excerpts_json, folder_sections.selected_excerpts_json);
+                selected_excerpts_json = COALESCE(excluded.selected_excerpts_json, folder_sections.selected_excerpts_json),
+                selected_excerpt_occurrences = COALESCE(excluded.selected_excerpt_occurrences, folder_sections.selected_excerpt_occurrences);
             """
         )
         defer { connection.finalize(statement) }
@@ -2772,11 +2812,20 @@ final class UserDataStore: UserContentRepository {
         sqlite3_bind_int64(statement, 7, sectionID)
         try connection.bind(text: now, index: 8, to: statement)
         try connection.bind(text: now, index: 9, to: statement)
+        if !saved.excerpts.isEmpty {
+            try connection.bind(text: String(decoding: try JSONEncoder().encode(saved.excerpts), as: UTF8.self), index: 10, to: statement)
+        }
+        if !saved.occurrences.isEmpty {
+            try connection.bind(text: String(decoding: try JSONEncoder().encode(saved.occurrences), as: UTF8.self), index: 11, to: statement)
+        }
+        // Send only this action: a concurrent remote delete/re-save may have
+        // invalidated earlier selections still present in our local snapshot.
         var values = ["folderClientID": target.folderClientID, "folderType": target.folderType.rawValue]
-        if !selectedExcerpts.isEmpty {
-            let json = String(decoding: try JSONEncoder().encode(selectedExcerpts), as: UTF8.self)
-            try connection.bind(text: json, index: 10, to: statement)
-            values["selectedExcerpts"] = json
+        if !added.excerpts.isEmpty {
+            values["selectedExcerpts"] = String(decoding: try JSONEncoder().encode(added.excerpts), as: UTF8.self)
+        }
+        if !added.occurrences.isEmpty {
+            values["selectedExcerptOccurrences"] = String(decoding: try JSONEncoder().encode(added.occurrences), as: UTF8.self)
         }
         _ = try connection.step(statement)
         try enqueueSyncOperation(
@@ -3162,6 +3211,7 @@ final class UserDataStore: UserContentRepository {
             ) else {
                 return nil
             }
+            if try isSeparateManualLink(record, folderID: folderID) { return nil }
             return try localMergeCandidate(
                 mutation: mutation,
                 sql: "SELECT sync_state, updated_at, deleted_at FROM folder_sections WHERE code_version = ? AND folder_id = ? AND section_id = ? LIMIT 1;",
@@ -3385,7 +3435,8 @@ final class UserDataStore: UserContentRepository {
                 updatedAt: record.updatedAt,
                 deletedAt: record.deletedAt,
                 serverEventID: record.serverEventID,
-                selectedExcerpts: record.selectedExcerpts
+                selectedExcerpts: record.selectedExcerpts,
+                selectedExcerptOccurrences: record.selectedExcerptOccurrences, selectionResetAt: record.selectionResetAt
             ))
         case .workboard:
             return mutation
@@ -3627,11 +3678,11 @@ final class UserDataStore: UserContentRepository {
             """
             INSERT OR IGNORE INTO folder_sections (
                 client_id, owner_id, visibility, sync_state, folder_id,
-                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json
+                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json, reader_excerpt_offsets, selected_excerpt_occurrences
             )
             SELECT
                 client_id, owner_id, visibility, sync_state, ?,
-                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json
+                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json, reader_excerpt_offsets, selected_excerpt_occurrences
             FROM folder_sections
             WHERE folder_id = ? AND code_version = ?;
             """
@@ -3736,6 +3787,22 @@ final class UserDataStore: UserContentRepository {
         }
     }
 
+    // Old desktop whole-section links have a separate ":manual" server ID. Both
+    // links share one local row, whose selected words take precedence in the Reader.
+    private func isSeparateManualLink(_ record: ServerProjectSectionRecord, folderID: Int64) throws -> Bool {
+        guard record.scope == "manual", record.selectedExcerpts?.isEmpty != false else { return false }
+        let statement = try connection.prepare("""
+            SELECT 1 FROM folder_sections WHERE folder_id = ? AND code_version = ? AND section_id = ?
+              AND client_id <> ? AND selected_excerpts_json IS NOT NULL AND selected_excerpts_json <> '[]';
+            """)
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, folderID)
+        try connection.bind(text: record.codeVersion, index: 2, to: statement)
+        sqlite3_bind_int64(statement, 3, record.sectionID)
+        try connection.bind(text: record.id, index: 4, to: statement)
+        return try connection.step(statement) == SQLITE_ROW
+    }
+
     private func upsertServerProjectSection(_ record: ServerProjectSectionRecord) throws {
         let legacyClientID = record.localFolderID.map {
             "\(record.userID):project:\(record.codeVersion):\($0)"
@@ -3746,16 +3813,40 @@ final class UserDataStore: UserContentRepository {
         ) else {
             return
         }
-        let existing = try folderSectionExcerpts(sectionID: record.sectionID, folderID: folderID, codeVersion: record.codeVersion)
-        let excerpts = mergeFolderSectionExcerpts(existing, record.selectedExcerpts ?? [])
+        if try isSeparateManualLink(record, folderID: folderID) { return }
+        var saved: ReaderEvidenceText
+        if let reset = record.selectionResetAt {
+            saved = ReaderEvidenceText(excerpts: record.selectedExcerpts ?? [])
+            // The server sends a complete post-deletion snapshot. Only newer,
+            // unacknowledged local actions belong to this lifetime.
+            for item in try localIntentQueueItems(entityType: .folderSection) where item.state != .synced
+                && item.mutationUpdatedAt > reset && item.payload.folderID == folderID && item.payload.sectionID == record.sectionID
+                && localCodeVersion(item.payload.codeVersion) == record.codeVersion && item.payload.values["scope"] == record.scope
+                && item.operationType == .upsert {
+                let values = item.payload.values
+                saved.excerpts = mergeFolderSectionExcerpts(saved.excerpts, ServerProjectSectionRecord.decodeExcerpts(values["selectedExcerpts"]) ?? [])
+                saved.addOccurrences(ServerProjectSectionRecord.decodeOccurrences(values["selectedExcerptOccurrences"]) ?? [:])
+            }
+        } else {
+            saved = try folderSectionEvidence(sectionID: record.sectionID, folderID: folderID, codeVersion: record.codeVersion)
+                ?? ReaderEvidenceText(excerpts: [])
+            saved.excerpts = mergeFolderSectionExcerpts(saved.excerpts, record.selectedExcerpts ?? [])
+        }
+        saved.addOccurrences(record.selectedExcerptOccurrences ?? [:])
         let timestamp = isoFormatter.string(from: record.updatedAt)
         let statement = try connection.prepare(
             """
-            INSERT OR REPLACE INTO folder_sections (
+            INSERT INTO folder_sections (
                 client_id, owner_id, visibility, sync_state, folder_id,
-                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json
+                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json, selected_excerpt_occurrences
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)
+            ON CONFLICT(folder_id, code_version, section_id) DO UPDATE SET
+                client_id = excluded.client_id, owner_id = excluded.owner_id, visibility = excluded.visibility,
+                sync_state = excluded.sync_state, updated_at = excluded.updated_at, deleted_at = NULL,
+                selected_excerpts_json = excluded.selected_excerpts_json,
+                selected_excerpt_occurrences = excluded.selected_excerpt_occurrences,
+                reader_excerpt_offsets = CASE WHEN ? THEN NULL ELSE folder_sections.reader_excerpt_offsets END;
             """
         )
         defer { connection.finalize(statement) }
@@ -3768,10 +3859,15 @@ final class UserDataStore: UserContentRepository {
         sqlite3_bind_int64(statement, 7, record.sectionID)
         try connection.bind(text: timestamp, index: 8, to: statement)
         try connection.bind(text: timestamp, index: 9, to: statement)
-        if !excerpts.isEmpty {
-            let json = String(decoding: try JSONEncoder().encode(excerpts), as: UTF8.self)
+        if !saved.excerpts.isEmpty {
+            let json = String(decoding: try JSONEncoder().encode(saved.excerpts), as: UTF8.self)
             try connection.bind(text: json, index: 10, to: statement)
         }
+        if !saved.occurrences.isEmpty {
+            let json = String(decoding: try JSONEncoder().encode(saved.occurrences), as: UTF8.self)
+            try connection.bind(text: json, index: 11, to: statement)
+        }
+        sqlite3_bind_int(statement, 12, record.selectionResetAt == nil ? 0 : 1)
         _ = try connection.step(statement)
     }
 
@@ -3782,9 +3878,12 @@ final class UserDataStore: UserContentRepository {
         if let folderID = try localFolderID(
             clientID: record.folderClientID ?? legacyClientID,
             codeVersion: record.codeVersion
-        ) ?? record.localFolderID {
+        ) ?? (record.folderClientID == nil ? record.localFolderID : nil) {
+            if try isSeparateManualLink(record, folderID: folderID) { return }
             try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND folder_id = ? AND section_id = ?;", codeVersion: record.codeVersion, firstID: folderID, secondID: record.sectionID)
-        } else {
+        } else if record.folderClientID == nil && record.localFolderID == nil {
+            // Legacy untargeted removals cover all memberships. An unknown explicit
+            // project must leave other projects and their selection locations intact.
             try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND section_id = ?;", codeVersion: record.codeVersion, sectionID: record.sectionID)
         }
     }

@@ -1,3 +1,4 @@
+import { createReaderEvidenceSection, readerExcerptFields, mergeReaderExcerptFields, coalesceQueuedReaderSelection } from "./reader-evidence-selection.js?v=1";
 import { normalizeNoteResearch } from "./note-research.js?v=1";
 import {buildProjectWorkspaceURL, createProjectURLCatalog, mergeProjectURLNames, parseProjectWorkspaceURL, projectURLSlug} from './project-urls.js?v=1';
 import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=22";
@@ -17,7 +18,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261124-quiet-note-save-v2635";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261125-evidence-selections-v2636";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -179,7 +180,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261124-quiet-note-save-v2635";
+} from "./offline-storage.js?v=20261125-evidence-selections-v2636";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -1636,9 +1637,10 @@ function projectSummaryWithPendingUpdates(summary) {
   return {...summary, projects: (summary.projects || []).map(project => {
     const pending = records[projectRecordID(project)];
     // Deletions, access changes, and account changes must never be hidden.
+    // Workflow lists use the latest pulled record when a view opens or reloads.
     return !project.deletedAt && !projectIsArchived(project) && pending?.domains?.project?.pending &&
       pending.project && !projectUpdateIsApplying(projectRecordID(project))
-        ? {...project, ...Object.fromEntries(["name", "title", "address", "description", "colorHex", "structuredFacts", "recordsChecklist", "openQuestions"]
+        ? {...project, ...Object.fromEntries(["name", "title", "address", "description", "colorHex", "structuredFacts"]
             .filter(key => Object.hasOwn(pending.project, key)).map(key => [key,pending.project[key]]))} : project;
   })};
 }
@@ -13562,7 +13564,7 @@ function currentContentSummary() {
     syncCodeVersion(item.codeVersion),
     item.folderClientID || item.projectID || item.localFolderID || "project",
     item.sectionID || item.savedSectionID || item.itemID || item.id || "section",
-    normalizeAnnotationBlockID(item.blockID)
+    normalizeAnnotationBlockID(item.blockID), item.scope || ""
   ].map(String).join(":");
   const projectSectionsByID = new Map(
     (summary.projectSections || [])
@@ -14733,13 +14735,18 @@ function enqueueSyncMutation(mutation, account, options = {}) {
   }
   const recordID = syncMutationRecordID(mutation);
   if (!recordID) throw new Error("Could not queue a sync record without an ID.");
+  const id = `${account.userID}:${recordID}`;
+  const previous = (state.syncOutbox || []).find(item => item.id === id);
+  if (previous?.mutation.projectSection && mutation.projectSection) {
+    mutation = {projectSection:coalesceQueuedReaderSelection(previous.mutation.projectSection, mutation.projectSection)};
+  }
   const entry = {
-    id: `${account.userID}:${recordID}`,
+    id,
     accountUserID: account.userID,
     recordID,
     mutation,
     operationGroupID: options.operationGroupID || null,
-    queuedAt: new Date().toISOString(),
+    queuedAt: new Date(Math.max(Date.now(), (Date.parse(previous?.queuedAt) || 0) + 1)).toISOString(),
     attemptCount: 0,
     lastError: null
   };
@@ -16237,8 +16244,9 @@ function projectSectionRecordForSection(project, sectionPayload) {
   const sectionID = String(sectionPayload.sectionID || "");
   const blockID = normalizeAnnotationBlockID(sectionPayload.blockID);
   const folderClientID = project.clientID || project.id || project.localFolderID || "";
+  const selection = Boolean(sectionPayload.selectedExcerpts?.length);
   return {
-    id: `web-project-section-${folderClientID}-${sectionID}${blockID ? `-${safeAnnotationIDPart(blockID)}` : ""}`,
+    id: `web-project-${selection ? "selection" : "section"}-${folderClientID}-${sectionID}${blockID ? `-${safeAnnotationIDPart(blockID)}` : ""}`,
     userID: account?.userID || "local-web",
     codeVersion: syncCodeVersion(
       sectionPayload.codeVersion || syncCodeVersionForPrefix(sectionPayload.codePrefix)
@@ -16254,7 +16262,8 @@ function projectSectionRecordForSection(project, sectionPayload) {
     blockLabel: sectionPayload.blockLabel || "",
     sectionNumber: sectionPayload.sectionNumber || "",
     title: sectionPayload.title || "Section",
-    scope: "manual",
+    scope: selection ? null : "manual",
+    ...(selection ? readerExcerptFields(sectionPayload) : {}),
     updatedAt: now
   };
 }
@@ -16272,6 +16281,7 @@ function projectSectionMutationForSection(project, sectionPayload) {
       sectionID: record.sectionID,
       blockID: record.blockID || null,
       scope: record.scope,
+      ...(record.selectedExcerpts ? readerExcerptFields(record) : {}),
       updatedAt: record.updatedAt
     }
   };
@@ -16290,7 +16300,7 @@ function deletedProjectSectionMutationForItem(project, item) {
       localFolderID: item.localFolderID || record.localFolderID,
       sectionID: Number(item.sectionID || item.savedSectionID || item.itemID),
       blockID: normalizeAnnotationBlockID(item.blockID) || null,
-      scope: item.scope || record.scope,
+      scope: item.id || item.selectedExcerpts ? item.scope || null : record.scope,
       updatedAt: now,
       deletedAt: now
     }
@@ -16832,7 +16842,18 @@ async function updateProjectFolder(project, details = {}) {
 
   if (account) {
     try {
-      await pushMutation(projectMutationForRecord(updated, account));
+      const outgoing = projectMutationForRecord(updated, account);
+      const recordID = syncMutationRecordID(outgoing);
+      const queuedProject = (state.syncOutbox || []).find(entry =>
+        entry.accountUserID === account.userID && entry.recordID === recordID)?.mutation?.project || {};
+      // The outbox coalesces writes for this Project. Carry intentional pending
+      // edits forward and leave other workflow lists to the server.
+      for (const key of ["recordsChecklist", "openQuestions"]) {
+        if (Object.hasOwn(details, key)) continue;
+        if (Object.hasOwn(queuedProject, key)) outgoing.project[key] = queuedProject[key];
+        else delete outgoing.project[key];
+      }
+      await pushMutation(outgoing);
       requireCurrentAccountRequest(requestIdentity);
       state.localProjects = (state.localProjects || []).filter((item) =>
         projectRecordID(item) !== id || JSON.stringify(item) !== localRevision);
@@ -16864,9 +16885,15 @@ async function updateProjectFolder(project, details = {}) {
 
 function workspaceSavedEvidenceKeys(summary = currentContentSummary()) {
   const project = workspaceProject(summary.projects || []);
-  return new Set(project ? (summary.projectSections || [])
-    .filter((item) => projectSectionBelongsToProject(item, project))
-    .map((item) => savedEvidenceKey(item)) : []);
+  const keys = new Set();
+  keys.excerpts = new Map();
+  if (project) for (const item of summary.projectSections || []) {
+    if (!projectSectionBelongsToProject(item, project)) continue;
+    const key = savedEvidenceKey(item);
+    keys.add(key);
+    if (item.selectedExcerpts?.length) keys.excerpts.set(key, mergeReaderExcerptFields(keys.excerpts.get(key) || {}, item));
+  }
+  return keys;
 }
 
 function isSectionSaved(section, codeVersion = "", savedKeys = null) {
@@ -16991,7 +17018,7 @@ async function chooseProjectForSaving() {
         return;
       }
       requireCurrentAccountRequest(identity);
-      finish(workspaceProject());
+      finish(projectRecordID(workspaceProject()) === projectRecordID(live) ? live : null);
     } catch (error) {
       if (!isCurrentAccountRequest(identity)) { finish(null); return; }
       status.textContent = error.message || "The Project could not be opened. Please try again.";
@@ -17069,11 +17096,14 @@ function showBookmarkUndo(payload, projects, requestIdentity, workspaceID, paneI
     notice.style.animation = "none";
     undo.disabled = true;
     try {
-      const restored = await persistSectionBookmark(payload, true);
+      const currentProject = workspaceProject();
+      const first = projects.find(entry => projectRecordID(entry.project) === projectRecordID(currentProject));
+      const restored = await persistSectionBookmark(first?.payload || payload, true);
       if (restored === false) { undo.disabled = false; return; }
-      for (const project of projects) {
+      for (const entry of projects) {
+        if (entry === first) continue;
         requireCurrentAccountRequest(requestIdentity);
-        await persistSectionInProject(project, payload);
+        await persistSectionInProject(entry.project, entry.payload);
       }
       await restoreBookmarkUndoNotes(notes, requestIdentity, workspaceID);
       syncReaderNoteBookmarkButtons(payload.sectionID, true, payload.codeVersion);
@@ -17099,10 +17129,12 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   const existingRecord = savedItemForSection(sectionPayload);
   const undoWorkspaceID = activeWorkspaceID;
   const undoPaneID = options.undoPaneID || document.activeElement?.closest(".workspace-panel")?.dataset.paneId || primarySavedPaneID();
-  const undoProjects = !saved ? (currentContentSummary().projects || []).filter((project) =>
-    (!targetProject || projectRecordID(project) === projectRecordID(targetProject)) &&
-    (currentContentSummary().projectSections || []).some((link) =>
-      savedEvidenceKey(link) === savedEvidenceKey(sectionPayload) && projectSectionBelongsToProject(link, project))) : [];
+  const undoSummary = saved ? null : currentContentSummary();
+  const undoProjects = (undoSummary?.projects || [])
+    .filter(project => !targetProject || projectRecordID(project) === projectRecordID(targetProject))
+    .flatMap(project => (undoSummary.projectSections || [])
+      .filter(link => savedEvidenceKey(link) === savedEvidenceKey(sectionPayload) && projectSectionBelongsToProject(link, project))
+      .map(link => ({project, payload:{...sectionPayload, ...readerExcerptFields(link)}})));
   const undoNotes = !saved ? (currentContentSummary().annotations || []).filter(record =>
     savedEvidenceKey(record) === savedEvidenceKey(sectionPayload) && String(record.noteBody || '').trim()).map(record => ({...record})) : [];
   const offerUndo = () => showBookmarkUndo({ ...sectionPayload }, undoProjects, requestIdentity, undoWorkspaceID, undoPaneID, undoNotes);
@@ -17192,8 +17224,16 @@ async function persistSectionInProject(project, sectionPayload) {
     void presentPlanLimitNotice("Project organization requires Pro", "Upgrade to Pro to add saved code to Projects.");
     return false;
   }
-  const record = projectSectionRecordForSection(project, sectionPayload);
+  // Only the explicit user selection is an outbound addition. A render can
+  // include previously acknowledged excerpts which another device has since removed.
   const mutation = projectSectionMutationForSection(project, sectionPayload);
+  if (sectionPayload.selectedExcerpts?.length) {
+    const key = savedEvidenceKey(sectionPayload);
+    const existing = currentContentSummary().projectSections.filter(link => !link.scope &&
+      savedEvidenceKey(link) === key && projectSectionBelongsToProject(link, project));
+    sectionPayload = {...sectionPayload, ...mergeReaderExcerptFields(...existing, sectionPayload)};
+  }
+  const record = projectSectionRecordForSection(project, sectionPayload);
   const current = (state.localProjectSections || []).filter((item) => item.id !== record.id);
   state.localProjectSections = [...current, record];
   if (account) enqueueSyncMutation(mutation, account);
@@ -17206,7 +17246,7 @@ async function persistSectionInProject(project, sectionPayload) {
   try {
     await pushMutation(mutation);
     requireCurrentAccountRequest(requestIdentity);
-    state.localProjectSections = (state.localProjectSections || []).filter((item) => item.id !== record.id);
+    state.localProjectSections = (state.localProjectSections || []).filter((item) => item !== record);
     saveWorkspaceState();
   } catch (error) {
     requireCurrentAccountRequest(requestIdentity);
@@ -17360,16 +17400,17 @@ async function removeSectionFromProject(project, item, options = {}) {
   const projectID = projectRecordID(project);
   if (!sectionID || !projectID) return;
 
+  const deletion = deletedProjectSectionMutationForItem(project, item);
   const matches = (candidate) =>
     String(candidate.id || "") === String(item.projectSectionID || item.id || "") ||
     (
       String(candidate.sectionID || candidate.savedSectionID || candidate.itemID || "") === sectionID &&
       syncCodeVersion(candidate.codeVersion) === syncCodeVersion(item.codeVersion) &&
       normalizeAnnotationBlockID(candidate.blockID) === blockID &&
+      (candidate.scope || null) === deletion.projectSection.scope &&
       projectSectionBelongsToProject(candidate, project)
     );
 
-  const deletion = deletedProjectSectionMutationForItem(project, item);
   state.localProjectSections = [
     ...(state.localProjectSections || []).filter((candidate) => !matches(candidate)),
     deletion.projectSection
@@ -18652,9 +18693,27 @@ function buildReaderChapterSection(panel, reader, section, groupLabelsByFirstSec
     codeVersion: reader.codeVersion,
     blockID: ""
   }, "", savedKeys);
+  const evidenceKey = savedEvidenceKey({sectionID:section.id, codeVersion:sectionWrapper.dataset.codeVersion});
+  sectionWrapper._readerEvidence = createReaderEvidenceSection(sectionWrapper, sectionHeading.textContent, blocks, block => {
+    if (block.kind === "image") return null;
+    if (!block.html) return document.createTextNode(block.plainText || "");
+    const template = document.createElement("template");
+    template.innerHTML = rewriteCodeHTML(block.html, block.assetRevision);
+    decorateCodeHTML(template.content);
+    return template.content;
+  });
+  const evidence = sectionWrapper._readerEvidence;
+  evidence.payload = readerPassagePayload(section, reader, annotationTargetForSection(section, reader));
+  sectionWrapper._refreshReaderEvidence = keys => evidence.update(keys?.excerpts?.get(evidenceKey),
+    [...(sectionWrapper._readerEvidenceAliases?.values() || [])].map(source => ({
+      ...source, record: keys?.excerpts?.get(savedEvidenceKey(source.payload))
+    })));
+  sectionWrapper._refreshReaderEvidence(savedKeys);
+  evidence.mount(sectionHeading, 0);
   const savedSection = Boolean(savedWholeSectionRecord);
   const sectionControls = renderInlineCommentBox(section, reader, annotationTargetForSection(section, reader), {
-    showBookmark: savedSection, bookmarkStateResolved: true, panel, accessGate: panel.__workspaceAccessGate, sectionMarker: true
+    showBookmark: savedSection, bookmarkStateResolved: true, panel, accessGate: panel.__workspaceAccessGate, sectionMarker: true,
+    updateExcerpts: sectionWrapper._refreshReaderEvidence
   });
   const noteMarker = sectionControls.querySelector(".inline-note-toggle");
   noteMarker.classList.add("reader-section-note-marker");
@@ -18683,6 +18742,7 @@ function buildReaderChapterSection(panel, reader, section, groupLabelsByFirstSec
     const marker = options.highlightedBlocks?.find(item => item.id === target.blockID);
     if (marker) marker.classes.forEach(name => node.classList.add(name));
     if (windowed) { linkInlineCodeReferences(node, panel, reader); decorateReaderDefinitions(node, reader); }
+    evidence.mount(node.firstElementChild, index + 1);
     return node;
   };
   const appendBlock = (block, index) => sectionWrapper.append(createBlock(block, index));
@@ -18714,6 +18774,7 @@ function buildReaderChapterSection(panel, reader, section, groupLabelsByFirstSec
 function collapseRepeatedReaderCatalogAliases(content) {
   let latestBodySection = null;
   let latestBodyText = "";
+  const aliasOwners = new Set();
   content.querySelectorAll(".chapter-section").forEach((section) => {
     if (section.previousElementSibling?.classList.contains("reader-section-placeholder")) {
       latestBodySection = null;
@@ -18744,12 +18805,24 @@ function collapseRepeatedReaderCatalogAliases(content) {
     const aliases = new Set(
       String(latestBodySection.dataset.sectionAliases || "").split(/\s+/).filter(Boolean)
     );
-    if (aliasID) aliases.add(aliasID);
+    if (aliasID) {
+      aliases.add(aliasID);
+      const payload = section._readerEvidence?.payload;
+      if (payload && latestBodySection._readerEvidence) {
+        latestBodySection._readerEvidenceAliases ||= new Map();
+        latestBodySection._readerEvidenceAliases.set(aliasID, {label:section.querySelector(".reader-section-title").textContent, payload});
+        aliasOwners.add(latestBodySection);
+      }
+    }
     if (aliases.size > 0) {
       latestBodySection.dataset.sectionAliases = Array.from(aliases).join(" ");
     }
     section.remove();
   });
+  if (aliasOwners.size) {
+    const keys = readerPrivateContentAllowed(content.closest(".reader-panel")) ? workspaceSavedEvidenceKeys() : null;
+    aliasOwners.forEach(section => section._refreshReaderEvidence(keys));
+  }
 }
 
 function stopReaderProgressiveHydration(content) {
@@ -19912,12 +19985,15 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     setResearchNoteActionLabel(noteButton, notebookAllowed && gate ? workingResearchNote() : null);
     bookmarkButton.hidden = !permitted;
     bookmarkButton.disabled = !permitted;
-    if (!permitted) return;
-    const saved = gate && !(options.bookmarkStateResolved && (initialRender === true || subscribingToAccess)) ? Boolean(isSectionSaved({
+    if (!permitted) { options.updateExcerpts?.(null); return; }
+    const refresh = gate && !(options.bookmarkStateResolved && (initialRender === true || subscribingToAccess));
+    const keys = refresh ? (initialRender?.savedEvidenceKeys?.() || workspaceSavedEvidenceKeys()) : null;
+    if (refresh) options.updateExcerpts?.(keys);
+    const saved = refresh ? Boolean(isSectionSaved({
       sectionID: target.sectionID || section.id,
       codeVersion: target.codeVersion,
       blockID: target.blockID || ""
-    }, "", initialRender?.savedEvidenceKeys?.())) : Boolean(options.showBookmark);
+    }, "", keys)) : Boolean(options.showBookmark);
     wrapper.classList.toggle("has-saved-section", saved);
     bookmarkButton.classList.toggle("is-saved", saved);
     bookmarkButton.innerHTML = bookmarkIconSVG(saved);
@@ -20449,8 +20525,14 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
     if (!button) return;
     syncImmediateBookmarkButton(button, showBookmark, bookmarkActionLabel(showBookmark, project));
   });
+  track.querySelectorAll(`.reader-panel .chapter-section[data-section-aliases~="${CSS.escape(sectionKey)}"]`).forEach(section => {
+    if (section.dataset.codeVersion === exactCodeVersion && readerPrivateContentAllowed(section.closest(".reader-panel"))) {
+      section._refreshReaderEvidence?.(snapshot());
+    }
+  });
   track.querySelectorAll(`.reader-panel .chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`).forEach((section) => {
     if (section.dataset.codeVersion !== exactCodeVersion || !readerPrivateContentAllowed(section.closest(".reader-panel"))) return;
+    section._refreshReaderEvidence?.(snapshot());
     const marker = section.querySelector(".reader-section-saved-marker");
     if (!marker) return;
     const showSectionMarker = Boolean(isSectionSaved({
@@ -31064,21 +31146,70 @@ function selectedReaderResearchPassages() {
     projectID: researchCreationProjectID() };
 }
 
+function captureReaderEvidenceIntent() {
+  const selection = window.getSelection();
+  if (!selection?.rangeCount || selection.isCollapsed) return null;
+  const range = selection.getRangeAt(0);
+  const start = range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement;
+  const panel = start?.closest(".reader-panel");
+  if (!panel || !panel.contains(range.endContainer) || !readerPrivateContentAllowed(panel)) return null;
+  const sections = [...panel.querySelectorAll(".chapter-section")].filter(section =>
+    section._readerEvidence && range.intersectsNode(section) &&
+    [...section.querySelectorAll("[data-evidence-part]")].some(part => range.intersectsNode(part)));
+  if (!sections.length) return null;
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  return {range:range.cloneRange(), sections, panel, isCurrent:() => workspaceID === activeWorkspaceID &&
+    isCurrentAccountRequest(identity) && panel.isConnected && readerPrivateContentAllowed(panel)};
+}
+
+async function saveReaderEvidenceIntent(intent) {
+  if (!intent.isCurrent()) return false;
+  const identity = captureAccountRequest();
+  const payloads = intent.sections.flatMap(section => {
+    const evidence = section._readerEvidence;
+    return section.isConnected && evidence ? evidence.capture(intent.range,evidence.payload) : [];
+  });
+  if (!payloads.length) throw new Error("Select passage text to save it to Evidence.");
+  if (!hasCapability("saved-work")) return persistSectionBookmark(payloads[0], true);
+  // Selecting a destination from the general Reader deliberately closes its panel.
+  // The captured payloads stay valid only in the project the user chose.
+  const originalProject = workspaceProject();
+  const project = originalProject || await chooseProjectForSaving();
+  if (!project) return false;
+  const destination = activeWorkspaceID;
+  const atDestination = () => isCurrentAccountRequest(identity) && activeWorkspaceID === destination &&
+    projectRecordID(workspaceProject()) === projectRecordID(project) && (!originalProject || intent.isCurrent());
+  for (const payload of payloads) {
+    if (!atDestination() || !await persistSectionBookmark(payload, true, {refreshSavedPanes:false})) return false;
+  }
+  if (!atDestination()) return false;
+  void refreshOpenSavedPanes().catch(() => {});
+  return true;
+}
+
 const readerSelectionResearchAction = document.createElement("button");
 readerSelectionResearchAction.type = "button";
-readerSelectionResearchAction.className = "reader-selection-research-action";
+const readerSelectionToolbar = document.createElement("div");
+readerSelectionToolbar.className = "reader-selection-research-action";
+readerSelectionToolbar.setAttribute("role", "group");
+readerSelectionToolbar.setAttribute("aria-label", "Selected passage");
+const readerSelectionEvidenceAction = document.createElement("button");
+readerSelectionEvidenceAction.type = "button";
+readerSelectionEvidenceAction.textContent = "Save to Evidence";
 readerSelectionResearchAction.textContent = "Add to Assistant";
 readerSelectionResearchAction.title = "Add selected text to a conversation";
-readerSelectionResearchAction.hidden = true;
-document.body.append(readerSelectionResearchAction);
+readerSelectionToolbar.hidden = true;
+readerSelectionToolbar.append(readerSelectionEvidenceAction, readerSelectionResearchAction);
+document.body.append(readerSelectionToolbar);
+let selectedReaderEvidenceIntent = null;
 let selectedReaderResearchIntent = null;
 let readerSelectionResearchPositionFrame = 0;
 let readerSelectionResearchPointerDown = false;
 function positionReaderSelectionResearchAction() {
   readerSelectionResearchPositionFrame = 0;
   const selection = window.getSelection();
-  if (!selectedReaderResearchIntent || readerSelectionResearchPointerDown || !selection?.rangeCount || selection.isCollapsed) {
-    readerSelectionResearchAction.hidden = true;
+  if ((!selectedReaderResearchIntent && !selectedReaderEvidenceIntent) || readerSelectionResearchPointerDown || !selection?.rangeCount || selection.isCollapsed) {
+    readerSelectionToolbar.hidden = true;
     return;
   }
   const range = selection.getRangeAt(0);
@@ -31086,7 +31217,7 @@ function positionReaderSelectionResearchAction() {
   const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
   const panel = element?.closest(".reader-panel");
   if (!panel?.isConnected) {
-    readerSelectionResearchAction.hidden = true;
+    readerSelectionToolbar.hidden = true;
     return;
   }
   const bounds = (panel.querySelector('.reader-content') || panel).getBoundingClientRect();
@@ -31104,42 +31235,59 @@ function positionReaderSelectionResearchAction() {
     anchorX = backwards ? anchor?.left : anchor?.right;
   }
   if (!anchor || right <= left || bottom <= top || anchor.bottom <= top || anchor.top >= bottom || anchorX < left || anchorX > right) {
-    readerSelectionResearchAction.hidden = true;
+    readerSelectionToolbar.hidden = true;
     return;
   }
-  readerSelectionResearchAction.hidden = false;
-  const width = readerSelectionResearchAction.offsetWidth, height = readerSelectionResearchAction.offsetHeight;
-  if (bottom - top < height) { readerSelectionResearchAction.hidden = true; return; }
+  readerSelectionToolbar.hidden = false;
+  const width = readerSelectionToolbar.offsetWidth, height = readerSelectionToolbar.offsetHeight;
+  if (bottom - top < height) { readerSelectionToolbar.hidden = true; return; }
   const x = Math.max(left + width / 2, Math.min(right - width / 2, anchorX));
   const above = anchor.top - height - 8;
   const positions = [above, anchor.bottom + 8, Math.min(...rects.map(rect => rect.top)) - height - 8];
   const y = positions.find(value => value >= top && value + height <= bottom &&
     !rects.some(rect => rect.bottom > value && rect.top < value + height && rect.right > x - width / 2 && rect.left < x + width / 2)) ?? above;
-  readerSelectionResearchAction.style.left = `${x}px`;
-  readerSelectionResearchAction.style.top = `${Math.max(top, Math.min(bottom - height, y))}px`;
+  readerSelectionToolbar.style.left = `${x}px`;
+  readerSelectionToolbar.style.top = `${Math.max(top, Math.min(bottom - height, y))}px`;
 }
 function scheduleReaderSelectionResearchAction() {
-  if (!selectedReaderResearchIntent || readerSelectionResearchPointerDown || readerSelectionResearchPositionFrame) return;
+  if ((!selectedReaderResearchIntent && !selectedReaderEvidenceIntent) || readerSelectionResearchPointerDown || readerSelectionResearchPositionFrame) return;
   readerSelectionResearchPositionFrame = requestAnimationFrame(positionReaderSelectionResearchAction);
 }
-readerSelectionResearchAction.addEventListener("pointerdown", (event) => event.preventDefault());
+readerSelectionToolbar.addEventListener("pointerdown", (event) => event.preventDefault());
 readerSelectionResearchAction.addEventListener("click", () => {
   const intent = selectedReaderResearchIntent;
   if (!intent || readerSelectionResearchAction.disabled) return;
   openResearchDestinationMenu(readerSelectionResearchAction, intent);
 });
+readerSelectionEvidenceAction.addEventListener("click", async () => {
+  const intent = selectedReaderEvidenceIntent;
+  if (!intent || readerSelectionEvidenceAction.disabled) return;
+  readerSelectionEvidenceAction.disabled = true;
+  try {
+    if (await saveReaderEvidenceIntent(intent)) {
+      window.getSelection()?.removeAllRanges();
+      selectedReaderResearchIntent = selectedReaderEvidenceIntent = null;
+      readerSelectionToolbar.hidden = true;
+    }
+  } catch (error) {
+    if (intent.isCurrent()) presentWorkspaceIssue(error.message || "Could not save the selected text.");
+  } finally { readerSelectionEvidenceAction.disabled = false; }
+});
 function refreshReaderSelectionResearchAction() {
-  if (document.activeElement === readerSelectionResearchAction) return;
-  if (readerSelectionResearchPointerDown) { readerSelectionResearchAction.hidden = true; return; }
-  selectedReaderResearchIntent = selectedReaderResearchPassages();
+  if (readerSelectionToolbar.contains(document.activeElement)) return;
+  if (readerSelectionResearchPointerDown) { readerSelectionToolbar.hidden = true; return; }
+  selectedReaderResearchIntent = researchWorkspaceProjectID() ? selectedReaderResearchPassages() : null;
+  selectedReaderEvidenceIntent = captureReaderEvidenceIntent();
   readerSelectionResearchAction.hidden = !selectedReaderResearchIntent;
+  readerSelectionEvidenceAction.hidden = !selectedReaderEvidenceIntent;
+  readerSelectionToolbar.hidden = !selectedReaderResearchIntent && !selectedReaderEvidenceIntent;
   scheduleReaderSelectionResearchAction();
 }
 document.addEventListener("selectionchange", refreshReaderSelectionResearchAction);
 document.addEventListener('pointerdown', event => {
   if (event.button !== 0 || !event.target.closest?.('.reader-panel')) return;
   readerSelectionResearchPointerDown = true;
-  readerSelectionResearchAction.hidden = true;
+  readerSelectionToolbar.hidden = true;
 }, {capture:true});
 window.addEventListener('pointerup', () => {
   if (!readerSelectionResearchPointerDown) return;
@@ -31155,8 +31303,8 @@ window.addEventListener('resize', scheduleReaderSelectionResearchAction);
 track.addEventListener('permitext:workspace-layout-change', scheduleReaderSelectionResearchAction);
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
-    readerSelectionResearchAction.hidden = true;
-    selectedReaderResearchIntent = null;
+    readerSelectionToolbar.hidden = true;
+    selectedReaderResearchIntent = selectedReaderEvidenceIntent = null;
   }
 });
 
@@ -42753,7 +42901,11 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null, options =
       content.querySelectorAll(".is-source-target").forEach((candidate) => {
         candidate.classList.remove("is-source-target");
       });
-      target.classList.add("is-source-target");
+      if (options.savedExcerpts) {
+        highlightReaderDestination(content, null);
+        const section = target.closest(".chapter-section");
+        target = section?._readerEvidence?.firstTarget(item.sectionID) || section || target;
+      } else target.classList.add("is-source-target");
       reader.sourceRevealToken = null;
       if (evidenceAnchor?.passages?.length) {
         revealNotebookEvidencePassages(target, evidenceAnchor);
@@ -42975,7 +43127,10 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     activateNotebookReference('reader');
     state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, 'notebook');
   }
+  const savedExcerpts = fromSaved && !detail.blockID &&
+    Boolean(workspaceSavedEvidenceKeys().excerpts?.has(savedEvidenceKey(detail)));
   const targetOptions = {
+    savedExcerpts,
     wholeSection: fromSaved && !detail.blockID && !options.evidenceAnchor?.passages?.length,
     preferPassage: ownedSource || fromResearch || options.sourceSurface === "search-detail",
     researchPassage: fromResearch, searchQuery: options.searchQuery, searchMatchMode: options.searchMatchMode,

@@ -20,6 +20,16 @@ enum ScrollPhase: CaseIterable {
     var isScrolling: Bool { self == .interacting || self == .decelerating || self == .animating }
 }
 struct NativeReaderRuntimeDocument { let id: String }
+@MainActor final class Library {
+    var requested: [Int64] = []
+    var holdsPreview = false
+    var resumePreview: CheckedContinuation<Void, Never>?
+    func loadSectionDetailAsync(sectionID: Int64) async -> String? {
+        requested.append(sectionID)
+        if holdsPreview { await withCheckedContinuation { resumePreview = $0 } }
+        return "Passage preview"
+    }
+}
 @MainActor final class ScrollState {
     var isScrollActive = false
     var isDecelerating = false
@@ -27,6 +37,7 @@ struct NativeReaderRuntimeDocument { let id: String }
 }
 @MainActor final class ReaderHarness {
     let scrollState = ScrollState()
+    let library = Library()
     var settledScrollTask: Task<Void, Never>?
     var isBrowserTabActive = true
     var pendingInitialBlockID: String?
@@ -37,7 +48,12 @@ struct NativeReaderRuntimeDocument { let id: String }
     var releasedLeases = 0
     var rememberedSectionUpdates: [Bool] = []
     struct Location { let sectionTargetIndex: Int? }
+    struct Target { let id: String; let sectionID: Int64 }
+    struct Summary { let id: Int64 }
+    var lastRecordedSectionTargetID: String?
+    let sectionTargets = [Target(id: "first", sectionID: 1), Target(id: "second", sectionID: 2)]
     let navigationIndex = ["late-layout-block": Location(sectionTargetIndex: 1)]
+    func sectionSummary(for target: Target) -> Summary? { Summary(id: target.sectionID) }
     func traceRestoration(_ event: String, phase: String) {}
     func releaseRestorationLease(reason: String) { releasedLeases += 1 }
     func persistLocation(blockID: String?) {
@@ -94,6 +110,22 @@ func check(_ value: @autoclosure () -> Bool, _ message: String) {
         await tracking.settledScrollTask!.value
         check(tracking.persisted == ["late-layout-block"] && tracking.media == ["chapter-a:late-layout-block"],
               "After touch ends, the final observed block persists once")
+        check(tracking.library.requested == [2], "A settled new section prepares its exact history preview")
+        tracking.lastRecordedSectionTargetID = "second"
+        tracking.scrollPhaseDidChange(.idle, document: document)
+        await tracking.settledScrollTask!.value
+        check(tracking.library.requested == [2], "The same section must not reload its preview")
+
+        let interrupted = ReaderHarness()
+        interrupted.library.holdsPreview = true
+        interrupted.visibleBlockDidChange("late-layout-block", document: document)
+        let preparing = interrupted.settledScrollTask!
+        while interrupted.library.resumePreview == nil { try? await Task.sleep(for: .milliseconds(10)) }
+        interrupted.scrollPhaseDidChange(.tracking, document: document)
+        interrupted.library.resumePreview?.resume()
+        await preparing.value
+        check(interrupted.persisted.isEmpty && interrupted.media.isEmpty,
+              "A gesture that starts during preview loading must invalidate that visit")
         let idle = ReaderHarness()
         idle.scrollPhaseDidChange(.idle, document: document)
         check(idle.persisted.isEmpty && idle.media.isEmpty, "Settled work remains deferred")

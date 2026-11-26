@@ -554,6 +554,8 @@ private struct ResearchSessionView: View {
     @State private var historyLegacySummaries: [ResearchConversationSummary]?
     @State private var isLoadingMoreHistory = false
     @State private var historyLoadedFilterKey: String?
+    @State private var historyLastNetworkLoad: (filterKey: String, completedAt: Date)?
+    @State private var preparedAllowanceSession: UUID?
     @State private var conversation: ResearchConversation?
     private struct FactReply: Identifiable {
         let id = UUID()
@@ -563,6 +565,13 @@ private struct ResearchSessionView: View {
     @State private var factReply: FactReply?
     @State private var factResponse = ""
     @State private var question = ""
+    @FocusState private var isComposerFocused: Bool
+    private enum ConversationScrollTarget: Equatable {
+        case question(String)
+        case answer(String)
+    }
+    @State private var conversationScrollTarget: ConversationScrollTarget?
+    @State private var conversationViewportHeight: CGFloat = 0
     @State private var isLoadingHistory = true
     @State private var isLoadingConversation = false
     @State private var historyLoadID: UUID?
@@ -582,7 +591,7 @@ private struct ResearchSessionView: View {
     @State private var pendingVisualReview: PendingResearchVisualReview?
     @State private var showingRename = false
     @State private var draftTitle = ""
-    @State private var isUpdatingPin = false
+    @State private var pendingHistoryPins: [String: Bool] = [:]
     @State private var renameConversationID: String?
     @State private var isUpdatingProjectContext = false
     @State private var pendingAssignmentProjectID: String?
@@ -788,10 +797,7 @@ private struct ResearchSessionView: View {
                 guard isCurrentOwner else { return }
                 // Restore the selected conversation immediately; billing metadata
                 // and history are independent reads, not prerequisites for reading.
-                async let allowance: Void = library.refreshResearchTurnAllowance(
-                    recoverUnfinishedPurchases: true,
-                    showsErrors: false
-                )
+                async let allowance: Void = prepareResearchAllowanceIfNeeded()
                 await openActiveConversationIfNeeded()
                 await allowance
                 guard isCurrentOwner, !Task.isCancelled else { return }
@@ -799,6 +805,8 @@ private struct ResearchSessionView: View {
             }
             .task(id: "\(library.hasResearchAccess):\(historyFilterKey)") {
                 guard isCurrentOwner, library.hasResearchAccess, !Task.isCancelled else { return }
+                if let last = historyLastNetworkLoad, last.filterKey == historyFilterKey,
+                   historyLoadedFilterKey == historyFilterKey, Date().timeIntervalSince(last.completedAt) < 60 { return }
                 await loadHistory()
             }
             .onChange(of: library.activeResearchConversationID) { previousID, id in
@@ -825,6 +833,8 @@ private struct ResearchSessionView: View {
                 renameConversationID = nil
                 isUpdatingProjectContext = false
                 showingAssignmentConfirmation = false
+                isComposerFocused = false
+                conversationScrollTarget = nil
                 question = ""
                 draftTitle = ""
                 errorMessage = nil
@@ -846,7 +856,10 @@ private struct ResearchSessionView: View {
                 Task { await refreshFromWeb() }
             }
             .onAppear { isVisible = true }
-            .onDisappear { isVisible = false }
+            .onDisappear {
+                isVisible = false
+                isComposerFocused = false
+            }
             .onChange(of: library.selectedTab) { _, tab in
                 if tab != .research { clearCitationPreview() }
             }
@@ -1076,17 +1089,13 @@ private struct ResearchSessionView: View {
                         Task { await setProjectContextIncluded(include, conversationID: conversation.id) }
                     }
                 ))
-                .disabled(isLoadingConversation || isSending || isUpdatingPin || isRefreshingSources || isConfirmingProjectContext)
+                .disabled(isLoadingConversation || isSending || isRefreshingSources || isConfirmingProjectContext)
             }
             Button("Rename", systemImage: "pencil") {
                 renameConversationID = conversation.id
                 draftTitle = conversation.title
                 showingRename = true
             }
-            Button(conversation.isPinned == true ? "Unpin" : "Pin", systemImage: conversation.isPinned == true ? "pin.slash" : "pin") {
-                Task { await pinConversation(id: conversation.id, isPinned: conversation.isPinned != true) }
-            }
-            .disabled(isSending || isUpdatingPin)
             Button("Delete", systemImage: "trash", role: .destructive) {
                 requestDeletion(id: conversation.id)
             }
@@ -1154,7 +1163,12 @@ private struct ResearchSessionView: View {
     }
 
     private var historyView: some View {
-        let orderedSummaries = ResearchHistoryPresentation.ordered(visibleHistory)
+        let orderedSummaries = ResearchHistoryPresentation.ordered(visibleHistory.map { summary in
+            guard let pinned = pendingHistoryPins[summary.id] else { return summary }
+            var displayed = summary
+            displayed.isPinned = pinned
+            return displayed
+        })
         let groups = ResearchHistoryPresentation.GroupLabels()
         let rowInset = CodeScreenMetrics.bottomControlHorizontalPadding - tabNavigationHorizontalInset
         return List {
@@ -1235,6 +1249,7 @@ private struct ResearchSessionView: View {
                             Button(item.isPinned == true ? "Unpin" : "Pin", systemImage: item.isPinned == true ? "pin.slash" : "pin") {
                                 Task { await pinConversation(id: item.id, isPinned: item.isPinned != true) }
                             }
+                            .disabled(pendingHistoryPins[item.id] != nil || isSending)
                         } label: {
                             Image(systemName: "ellipsis")
                                 .font(.body)
@@ -1246,7 +1261,7 @@ private struct ResearchSessionView: View {
                         .accessibilityIdentifier("research-history-options-\(item.id)")
                     }
                 }
-                .disabled(deletingConversationID == item.id || isDeletingHistoryBatch || isSending || isUpdatingPin)
+                .disabled(deletingConversationID == item.id || isDeletingHistoryBatch || isSending)
                 .listRowInsets(EdgeInsets(top: 0, leading: rowInset, bottom: 0, trailing: rowInset))
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.visible, edges: .bottom)
@@ -1313,7 +1328,8 @@ private struct ResearchSessionView: View {
     }
 
     private func conversationView(_ conversation: ResearchConversation) -> some View {
-        ScrollViewReader { proxy in
+        let visibleMessages = conversation.messages.filter { pendingQuestionAttempt == nil || $0.requestID != pendingQuestionAttempt?.id }
+        return ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 16) {
                     if let errorMessage { statusMessage(errorMessage) }
@@ -1326,18 +1342,18 @@ private struct ResearchSessionView: View {
                     if conversation.sources.contains(where: { $0.kind == "selection" }) {
                         evidenceSummary(conversation.sources)
                     }
-                    ForEach(conversation.messages.filter { pendingQuestionAttempt == nil || $0.requestID != pendingQuestionAttempt?.id }) { message in
+                    ForEach(visibleMessages) { message in
                         messageView(
                             message,
                             sources: conversation.sources,
                             onDetailsExpanded: {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) {
-                                    withAnimation(.easeInOut(duration: 0.24)) {
-                                        proxy.scrollTo("answer-details:\(message.id)", anchor: .center)
-                                    }
+                                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.25)) {
+                                    proxy.scrollTo("answer-details:\(message.id)", anchor: .top)
                                 }
                             }
                         )
+                            .frame(minHeight: conversationScrollTarget == .answer(message.id) && message.id == visibleMessages.last?.id
+                                ? conversationViewportHeight : nil, alignment: .topLeading)
                             .id(message.id)
                     }
                     if let pendingQuestionAttempt {
@@ -1370,14 +1386,33 @@ private struct ResearchSessionView: View {
                 .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
             }
             .scrollIndicators(.hidden, axes: .vertical)
+            .scrollDismissesKeyboard(.interactively)
+            .contentShape(Rectangle())
+            .simultaneousGesture(TapGesture().onEnded { isComposerFocused = false })
+            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
+                conversationViewportHeight = height
+            }
             .codePinnedTopBar { researchConversationHeader(conversation) }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 researchComposer
                     .padding(.bottom, floatingNavigationClearance)
             }
-            .onChange(of: conversation.messages.count) { _, _ in
-                if let id = conversation.messages.last?.id {
-                    withAnimation { proxy.scrollTo(id, anchor: .bottom) }
+            .onChange(of: pendingQuestionAttempt?.id) { _, id in
+                if let id { conversationScrollTarget = .question("pending:\(id)") }
+            }
+            .onChange(of: visibleMessages.last?.id) { _, id in
+                guard let id, let message = visibleMessages.last else { return }
+                conversationScrollTarget = message.answer == nil ? .question(id) : .answer(id)
+            }
+            .task(id: conversationScrollTarget) {
+                guard let target = conversationScrollTarget else { return }
+                await Task.yield()
+                guard !Task.isCancelled else { return }
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.28)) {
+                    switch target {
+                    case .question(let id): proxy.scrollTo(id, anchor: .bottom)
+                    case .answer(let id): proxy.scrollTo(id, anchor: .top)
+                    }
                 }
             }
         }
@@ -1403,7 +1438,7 @@ private struct ResearchSessionView: View {
                     .lineLimit(1...6)
                     .padding(.vertical, 4)
                     .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.toolbarButtonSize, alignment: .leading)
-                    .disabled(isSending || researchSendIsBlocked)
+                    .focused($isComposerFocused)
                     .accessibilityIdentifier("research-composer")
                 Button {
                     if isSending {
@@ -1457,7 +1492,7 @@ private struct ResearchSessionView: View {
         guard let identity = requestIdentity(), identity.conversationID == conversationID,
               conversation?.id == conversationID, conversation?.primaryProjectID != nil,
               !isUpdatingProjectContext, !isLoadingConversation, !isSending,
-              !isUpdatingPin, !isRefreshingSources, !isConfirmingProjectContext else { return }
+              !isRefreshingSources, !isConfirmingProjectContext else { return }
         isUpdatingProjectContext = true
         defer { if isCurrent(identity) { isUpdatingProjectContext = false } }
         do {
@@ -1722,13 +1757,10 @@ private struct ResearchSessionView: View {
                 .padding(.vertical, 10)
                 .foregroundStyle(.primary)
                 .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: 16))
-            HStack(spacing: 7) {
-                ProgressView()
-                    .controlSize(.small)
-                Text("per codes is researching…")
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
+            ProgressView()
+                .controlSize(.small)
+                .accessibilityLabel("Researching")
+                .accessibilityIdentifier("research-question-progress")
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
@@ -1954,6 +1986,7 @@ private struct ResearchSessionView: View {
                 cacheHistory(loaded, accountID: owner.accountID, replacingAll: page.hasMore == false)
             }
             historyLoadedFilterKey = filterKey
+            historyLastNetworkLoad = (filterKey, Date())
             historyErrorMessage = nil
         } catch {
             guard isCurrentOwner, historyLoadID == loadID, historyFilterKey == filterKey, !Task.isCancelled else { return }
@@ -2010,6 +2043,15 @@ private struct ResearchSessionView: View {
         }
         await allowance
         await history
+    }
+
+    private func prepareResearchAllowanceIfNeeded() async {
+        let session = library.privateSessionID
+        guard preparedAllowanceSession != session else { return }
+        await library.refreshResearchTurnAllowance(recoverUnfinishedPurchases: true, showsErrors: false)
+        guard isCurrentOwner, !Task.isCancelled, library.privateSessionID == session,
+              library.researchTurnAllowance != nil else { return }
+        preparedAllowanceSession = session
     }
 
     private func openActiveConversationIfNeeded() async {
@@ -2331,8 +2373,8 @@ private struct ResearchSessionView: View {
         errorMessage = nil
         questionErrorMessage = nil
         defer {
-            if isCurrent(identity), pendingQuestionAttempt?.id == attempt.id {
-                pendingQuestionAttempt = nil
+            if isCurrent(identity) {
+                if pendingQuestionAttempt?.id == attempt.id { pendingQuestionAttempt = nil }
                 isSending = false
                 activeResearchRequestTask = nil
             }
@@ -2347,6 +2389,7 @@ private struct ResearchSessionView: View {
             )
             try Task.checkCancellation()
             guard isCurrent(identity) else { return }
+            pendingQuestionAttempt = nil
             conversation = updated
             cacheConversation(updated)
             clearCachedQuestionAttempt(conversationID: id)
@@ -2456,17 +2499,38 @@ private struct ResearchSessionView: View {
     }
 
     private func pinConversation(id: String, isPinned: Bool) async {
-        guard isCurrentOwner, !isUpdatingPin, !isSending else { return }
-        isUpdatingPin = true
-        defer { if isCurrentOwner { isUpdatingPin = false } }
+        guard isCurrentOwner, let owner, pendingHistoryPins[id] == nil, !isSending else { return }
+        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) {
+            pendingHistoryPins[id] = isPinned
+        }
         do {
             let updated = try await library.pinResearchConversation(id: id, isPinned: isPinned)
             guard isCurrentOwner else { return }
-            if conversation?.id == id { conversation = updated }
-            cacheConversation(updated)
-            await loadHistory(forceNetwork: true)
+            if var current = conversation, current.id == id {
+                current.isPinned = updated.isPinned
+                current.updatedAt = max(current.updatedAt, updated.updatedAt)
+                conversation = current
+                cacheConversation(current)
+            } else if acceptsConversation(updated) {
+                try? ResearchConversationCacheLifecycle.store(updated, cache: cache,
+                    accountID: owner.accountID, conversationID: id)
+            }
+            if let index = summaries.firstIndex(where: { $0.id == id }) {
+                var summary = updated.summary
+                summary.historyContentFacts = summaries[index].historyContentFacts
+                summary.historyHiddenAt = summaries[index].historyHiddenAt
+                summaries[index] = summary
+                if let legacyIndex = historyLegacySummaries?.firstIndex(where: { $0.id == id }) {
+                    historyLegacySummaries?[legacyIndex] = summary
+                }
+                cacheHistory(summaries, accountID: owner.accountID)
+            }
+            pendingHistoryPins[id] = nil
         } catch {
             guard isCurrentOwner else { return }
+            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) {
+                pendingHistoryPins[id] = nil
+            }
             errorMessage = error.localizedDescription
         }
     }
@@ -2777,7 +2841,8 @@ private struct ResearchFeedbackSheet: View {
     init(existingFeedback: ResearchFeedback?, onCancel: @escaping () -> Void, onSubmit: @escaping (String, String?, String, String, String) -> Void) {
         self.onCancel = onCancel
         self.onSubmit = onSubmit
-        _category = State(initialValue: existingFeedback?.category ?? "incorrect_misleading")
+        let existingCategory = existingFeedback?.category
+        _category = State(initialValue: existingCategory == "helpful" ? "incorrect_misleading" : existingCategory ?? "incorrect_misleading")
         _comment = State(initialValue: existingFeedback?.userComment ?? "")
         _usefulness = State(initialValue: existingFeedback?.usefulness ?? "")
         _outsideChecking = State(initialValue: existingFeedback?.outsideChecking ?? "")
@@ -2971,7 +3036,7 @@ private struct ResearchVisualReviewSheet: View {
     }
 }
 
-private struct ResearchFormattedNarrative: View {
+private struct ResearchFormattedNarrative: View, Equatable {
     private struct Block: Identifiable {
         enum Kind {
             case paragraph(String)
@@ -3185,6 +3250,8 @@ private struct ResearchAnswerView: View {
     let onOpenCitation: (ResearchCitation) -> Void
     @State private var didCopy = false
     @State private var showsSourcesAndDetails = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private var reportedProblem: Bool { feedback.map { $0.category != "helpful" } ?? false }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -3201,6 +3268,7 @@ private struct ResearchAnswerView: View {
                     .accessibilityIdentifier("research-answer-authority-status")
             }
             ResearchFormattedNarrative(text: primaryNarrative)
+                .equatable()
                 .font(.body)
                 .textSelection(.enabled)
             if !answer.missingFacts.isEmpty {
@@ -3229,14 +3297,13 @@ private struct ResearchAnswerView: View {
                     .foregroundStyle(.secondary)
                     .accessibilityIdentifier("research-review-status")
             }
-            HStack(spacing: 6) {
+            HStack(spacing: 0) {
                 answerAction("Sources & details", systemImage: "doc.text") {
                     let willExpand = !showsSourcesAndDetails
-                    withAnimation(.easeInOut(duration: 0.2)) {
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2), completionCriteria: .removed) {
                         showsSourcesAndDetails.toggle()
-                    }
-                    if willExpand {
-                        onDetailsExpanded()
+                    } completion: {
+                        if willExpand && showsSourcesAndDetails { onDetailsExpanded() }
                     }
                 }
                 .accessibilityValue(showsSourcesAndDetails ? "Expanded" : "Collapsed")
@@ -3248,7 +3315,10 @@ private struct ResearchAnswerView: View {
                 answerAction("Helpful", systemImage: feedback?.category == "helpful" ? "hand.thumbsup.fill" : "hand.thumbsup", action: onHelpful)
                     .accessibilityAddTraits(feedback?.category == "helpful" ? .isSelected : [])
                     .disabled(isSavingFeedback)
-                answerAction(ResearchTrustCopy.reportProblemAction, systemImage: "exclamationmark.bubble", action: onReportProblem)
+                answerAction(ResearchTrustCopy.reportProblemAction,
+                             systemImage: reportedProblem ? "hand.thumbsdown.fill" : "hand.thumbsdown",
+                             action: onReportProblem)
+                    .accessibilityAddTraits(reportedProblem ? .isSelected : [])
                     .disabled(isSavingFeedback)
                 answerAction("Add to Notebook", systemImage: "note.text.badge.plus", action: onAddToNotebook)
                     .accessibilityIdentifier(notebookActionID)
@@ -3278,6 +3348,8 @@ private struct ResearchAnswerView: View {
     private func answerAction(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             ToolbarActionIcon(systemImage: systemImage)
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
         }
         .accessibilityLabel(title)
     }

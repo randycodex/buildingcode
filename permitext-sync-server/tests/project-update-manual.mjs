@@ -11,6 +11,25 @@ const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
 const event=n=>({projectID:'p',domain:'artifacts',version:n,updatedAt:`2026-10-24T04:00:0${n}Z`,details:['notebook'],manual:true});
 
+// Reloaded workflow views render data from the completed pull even if another
+// Project change is still awaiting explicit review.
+{
+ const earlier = {id:'p',name:'Previous name',openQuestions:[],recordsChecklist:[]};
+ const pulled = {id:'p',name:'New name',openQuestions:[{id:'phone-question'}],recordsChecklist:[{id:'phone-record'}]};
+ const c = vm.createContext({
+  activeAccount:()=>({userID:'u'}),
+  projectUpdateRecords:()=>({p:{domains:{project:{pending:true}},project:earlier}}),
+  projectRecordID:project=>project.id,
+  projectIsArchived:()=>false,
+  projectUpdateIsApplying:()=>false
+ });
+ vm.runInContext(actual('projectSummaryWithPendingUpdates'),c);
+ const [visible] = c.projectSummaryWithPendingUpdates({projects:[pulled]}).projects;
+ assert.equal(visible.name, earlier.name);
+ assert.equal(visible.openQuestions, pulled.openQuestions);
+ assert.equal(visible.recordsChecklist, pulled.recordsChecklist);
+}
+
 // Busy feedback follows the actual in-flight operation and clears afterward.
 for(const [syncing,online] of [[false,true],[true,true],[false,false]]) {
  const attributes={},classes=new Set();

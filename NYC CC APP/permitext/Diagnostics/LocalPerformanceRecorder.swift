@@ -218,3 +218,80 @@ enum LocalPerformanceRecorder {
     }
     #endif
 }
+
+#if DEBUG && canImport(UIKit)
+import UIKit
+
+/// A UI-test-only sample of main run loop frame delivery during real scroll gestures.
+/// CADisplayLink measures callbacks in this process, not GPU presentation.
+@MainActor
+final class NativeReaderFrameProbe: NSObject {
+    static let shared = NativeReaderFrameProbe()
+    private let trial = ProcessInfo.processInfo.environment["PERMITEXT_READER_FRAME_TRIAL"]
+    private weak var scrollView: UIScrollView?
+    private var displayLink: CADisplayLink?
+    private var previousTimestamp: CFTimeInterval?
+    private var firstOffset: CGFloat?
+    private var lastOffset: CGFloat = 0
+    private var intervalsMs: [Double] = []
+    private var sequence = 0
+
+    func attach(_ scrollView: UIScrollView) {
+        guard trial != nil else { return }
+        self.scrollView = scrollView
+        guard displayLink == nil else { return }
+        let link = CADisplayLink(target: self, selector: #selector(sample(_:)))
+        link.add(to: .main, forMode: .common)
+        displayLink = link
+    }
+
+    @objc private func sample(_ link: CADisplayLink) {
+        guard let scrollView, scrollView.window != nil else { return }
+        let moving = scrollView.isDragging || scrollView.isDecelerating
+        let offset = scrollView.contentOffset.y
+        if moving || firstOffset != nil, let previousTimestamp {
+            if firstOffset == nil { firstOffset = lastOffset }
+            if intervalsMs.count < 4096 {
+                intervalsMs.append((link.timestamp - previousTimestamp) * 1000)
+            }
+            if !moving { finish(at: offset) }
+        }
+        previousTimestamp = link.timestamp
+        lastOffset = offset
+    }
+
+    private func finish(at offset: CGFloat) {
+        guard let trial, let start = firstOffset, let scrollView else { return }
+        defer {
+            firstOffset = nil
+            intervalsMs.removeAll(keepingCapacity: true)
+        }
+        guard abs(offset - start) >= 20 else { return }
+        sequence += 1
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("reader-frame-times-\(trial)-\(sequence).json")
+        struct Sample: Encodable {
+            let startY, endY: CGFloat
+            let intervalsMs: [Double]
+            let visibleTextViews, visibleTextKit2Views: Int
+        }
+        var visible: [UITextView] = []
+        func visit(_ view: UIView) {
+            if let text = view as? UITextView {
+                if text.convert(text.bounds, to: scrollView).intersects(scrollView.bounds) {
+                    visible.append(text)
+                }
+                return
+            }
+            view.subviews.forEach(visit)
+        }
+        visit(scrollView)
+        let sample = Sample(startY: start, endY: offset, intervalsMs: intervalsMs,
+                            visibleTextViews: visible.count,
+                            visibleTextKit2Views: visible.filter { $0.textLayoutManager != nil }.count)
+        // All encoding and file I/O happen after deceleration ends.
+        do { try JSONEncoder().encode(sample).write(to: url, options: .atomic) }
+        catch { NSLog("Reader frame probe failed to save sample: %@", error.localizedDescription) }
+    }
+}
+#endif

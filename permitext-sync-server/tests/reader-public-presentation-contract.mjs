@@ -1,3 +1,4 @@
+import { createReaderEvidenceSection } from "../public/reader-evidence-selection.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
@@ -11,6 +12,7 @@ function actual(name) {
 }
 class Node {
   constructor(tag) { this.tagName=tag; this.className=""; this.dataset={}; this.children=[]; this.attrs={}; this.events={}; this.hidden=false; this.disabled=false; this.parentNode=null; this.style={setProperty(){}}; }
+  get firstElementChild() { return this.children[0] ?? null; }
   get classList() {
     return { contains:name=>this.className.split(/\s+/).includes(name),
       add:(...names)=>{this.className=[...new Set([...this.className.split(/\s+/).filter(Boolean),...names])].join(" ");},
@@ -35,9 +37,10 @@ const reader={id:"reader",codePrefix:"BC",codeVersion:"2022",chapterID:"chapter"
 const section={id:"section",sectionNumber:"1",title:"Public heading",readerAliasSectionIDs:[],blocks:[{id:"paragraph",plainText:"Complete public enacted text"}]};
 const target={sectionID:"section",codeVersion:"2022",blockID:"paragraph"};
 const context=vm.createContext({
+  createReaderEvidenceSection, workspaceSavedEvidenceKeys: () => new Set(),
   hasCapability:()=>true,
   document:{createElement:tag=>new Node(tag)}, window:{setTimeout:fn=>fn()},
-  syncCodeVersion:value=>value, syncCodeVersionForPrefix:()=>"2022", markResearchSelectable(){},
+  syncCodeVersion:value=>value, syncCodeVersionForPrefix:()=>"2022", markResearchSelectable(){}, savedEvidenceKey: item => item.sectionID,
   sectionDisplayTitle:(_number,title)=>title, readerAnnotatedBlocksForSection:value=>value.blocks,
   annotationTargetForSection:()=>({...target,blockID:""}), annotationTargetForBlock:()=>target,
   renderCodeBlock(block){const node=new Node("p");node.textContent=block.plainText;return node;},

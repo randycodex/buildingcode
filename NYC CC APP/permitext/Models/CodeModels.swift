@@ -873,7 +873,7 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
         userID = try container.decode(String.self, forKey: .userID)
         codeVersion = try container.decode(String.self, forKey: .codeVersion)
         clientID = try container.decodeIfPresent(String.self, forKey: .clientID)
-        localFolderID = try container.decode(Int64.self, forKey: .localFolderID)
+        localFolderID = try container.decodeIfPresent(Int64.self, forKey: .localFolderID) ?? 0
         name = try container.decodeIfPresent(String.self, forKey: .name)
         address = try container.decodeIfPresent(String.self, forKey: .address)
         description = try container.decodeIfPresent(String.self, forKey: .description)
@@ -905,9 +905,16 @@ struct ServerProjectSectionRecord: Codable, Hashable, Sendable {
     let deletedAt: Date?
     var serverEventID: Int64? = nil
     var selectedExcerpts: [String]? = nil
+    var selectedExcerptOccurrences: [String: [Int]]? = nil
+    var selectionResetAt: Date? = nil
 
     var resolvedFolderType: CodeFolderType {
         folderType ?? .project
+    }
+
+    static func decodeOccurrences(_ json: String?) -> [String: [Int]]? {
+        guard let json else { return nil }
+        return try? JSONDecoder().decode([String: [Int]].self, from: Data(json.utf8))
     }
 
     static func decodeExcerpts(_ json: String?) -> [String]? {
@@ -1142,7 +1149,8 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     scope: payload.values["scope"],
                     updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt,
-                    selectedExcerpts: ServerProjectSectionRecord.decodeExcerpts(payload.values["selectedExcerpts"])
+                    selectedExcerpts: ServerProjectSectionRecord.decodeExcerpts(payload.values["selectedExcerpts"]),
+                    selectedExcerptOccurrences: ServerProjectSectionRecord.decodeOccurrences(payload.values["selectedExcerptOccurrences"])
                 )
             )
         case .continuity:
@@ -4049,6 +4057,22 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         throw URLError(.unsupportedURL)
     }
 
+    func researchConversationPin(_ request: ResearchConversationPinRequest) async throws -> ResearchConversationResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            if ProcessInfo.processInfo.arguments.contains("--research-delayed-pin-fixture") {
+                try await Task.sleep(for: .seconds(3))
+            }
+            var conversation = try phase3ResearchConversation(id: request.conversationID)
+            conversation.isPinned = request.isPinned
+            conversation.updatedAt = phase3ResearchTimestamp(adding: 240)
+            phase3ResearchConversations[conversation.id] = conversation
+            return ResearchConversationResponse(conversation: conversation)
+        }
+        #endif
+        throw URLError(.unsupportedURL)
+    }
+
     func researchConversationRename(_ request: ResearchConversationRenameRequest) async throws -> ResearchConversationResponse {
         #if DEBUG
         if phase3ResearchFixtureEnabled {
@@ -4387,6 +4411,11 @@ enum UserContentMergeResolver {
     ) -> UserContentMergePlan {
         let candidates = incomingServerMutations.map { mutation in
             if let local = localCandidates[mutation.recordID] {
+                if case let .projectSection(section) = mutation, let reset = section.selectionResetAt,
+                   let localTime = local.localUpdatedAt, localTime <= reset {
+                    // The current membership was created after this local copy was deleted.
+                    return UserContentMergeCandidate(serverMutation: mutation)
+                }
                 return UserContentMergeCandidate(
                     recordID: mutation.recordID,
                     entityKind: mutation.entityKind,
@@ -4438,6 +4467,12 @@ enum UserContentMergeResolver {
                     action: .uploadLocal,
                     reason: "The queued local deletion must reach the server."
                 )
+            }
+            if candidate.localSyncState == .pendingUpload, candidate.entityKind == .projectSection, candidate.serverDeletedAt == nil {
+                // Independent selections are additive. The server merges both devices'
+                // occurrences, including older queued edits to a still-live membership.
+                return UserContentMergeDecision(recordID: candidate.recordID, entityKind: candidate.entityKind,
+                                                action: .uploadLocal, reason: "Merge the queued project evidence with the server copy.")
             }
             if let localUpdatedAt = candidate.localUpdatedAt,
                let serverUpdatedAt = candidate.serverUpdatedAt,

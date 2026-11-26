@@ -2,61 +2,6 @@ import SwiftUI
 import UIKit
 import os.signpost
 
-enum ReaderPassageSwipeEvent {
-    case began
-    case changed(translation: CGFloat)
-    case ended(translation: CGFloat, velocity: CGFloat)
-    case cancelled
-}
-
-struct ReaderPassageSwipeState {
-    let revealWidth: CGFloat
-    private(set) var offset: CGFloat = 0
-    private(set) var isDragging = false
-    private var startingOffset: CGFloat = 0
-    private(set) var isSaveArmed = false
-
-    var revealProgress: CGFloat { -offset / revealWidth }
-    var isOpen: Bool { !isDragging && offset == -revealWidth }
-
-    init(revealWidth: CGFloat) { self.revealWidth = max(revealWidth, 1) }
-
-    static func canBegin(horizontalVelocity: CGFloat, verticalVelocity: CGFloat, hasSelection: Bool) -> Bool {
-        !hasSelection && abs(horizontalVelocity) > abs(verticalVelocity) * 1.25
-    }
-
-    // A full swipe is deliberate travel from a closed tray, never a fast flick.
-    func shouldSave(on event: ReaderPassageSwipeEvent) -> Bool {
-        guard case .ended(let translation, _) = event else { return false }
-        return isDragging && startingOffset == 0 && translation <= -max(revealWidth * 2, 200)
-    }
-
-    mutating func apply(_ event: ReaderPassageSwipeEvent) {
-        switch event {
-        case .began:
-            startingOffset = offset
-            isDragging = true
-            isSaveArmed = false
-        case .changed(let translation):
-            isSaveArmed = startingOffset == 0 && translation <= -max(revealWidth * 2, 200)
-            offset = min(0, max(-revealWidth, startingOffset + translation))
-        case .ended(let translation, let velocity):
-            offset = min(0, max(-revealWidth, startingOffset + translation))
-            let projectedOffset = offset + velocity * 0.12
-            offset = projectedOffset < -revealWidth * 0.5 ? -revealWidth : 0
-            isDragging = false
-            isSaveArmed = false
-        case .cancelled:
-            offset = startingOffset
-            isDragging = false
-            isSaveArmed = false
-        }
-    }
-
-    mutating func open() { isSaveArmed = false; offset = -revealWidth; startingOffset = offset; isDragging = false }
-    mutating func close() { isSaveArmed = false; offset = 0; startingOffset = 0; isDragging = false }
-}
-
 extension Notification.Name {
     static let nycccClearRichTextSelection = Notification.Name("nycccClearRichTextSelection")
 }
@@ -96,14 +41,15 @@ struct AttributedTextView: View {
     var onSelectionChange: ((Bool) -> Void)? = nil
     var onOpenLink: ((URL) -> Void)? = nil
     var onResearchSelection: ((String) -> Void)? = nil
-    var onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil
     var chapterSelectionTarget: NativeChapterSelectionTarget?
+    let supportsInlineImages: Bool
+    var definitionsAlreadyApplied = false
     @Environment(\.readerDefinitionContext) private var definitionContext
     @Environment(\.openURL) private var openExternalURL
     @State private var definitionPresentation: ReaderDefinitionPresentation?
     @State private var textPreparation = ReaderAttributedTextPreparationCache()
     private var textBlocks: [AttributedTextBlock] {
-        textPreparation.blocks(for: attributedText, context: definitionContext) { source, context in
+        textPreparation.blocks(for: attributedText, context: definitionsAlreadyApplied ? nil : definitionContext) { source, context in
             ReaderDefinitionStore.shared.matcher(for: context).decorating(source)
         }
     }
@@ -126,8 +72,8 @@ struct AttributedTextView: View {
         onSelectionChange: ((Bool) -> Void)? = nil,
         onOpenLink: ((URL) -> Void)? = nil,
         onResearchSelection: ((String) -> Void)? = nil,
-        onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil,
-        chapterSelectionTarget: NativeChapterSelectionTarget? = nil
+        chapterSelectionTarget: NativeChapterSelectionTarget? = nil,
+        supportsInlineImages: Bool = true, definitionsAlreadyApplied: Bool = false
     ) {
         self.attributedText = attributedText
         self.onOpenImage = onOpenImage
@@ -135,28 +81,30 @@ struct AttributedTextView: View {
         self.onSelectionChange = onSelectionChange
         self.onOpenLink = onOpenLink
         self.onResearchSelection = onResearchSelection
-        self.onPassageSwipe = onPassageSwipe
         self.chapterSelectionTarget = chapterSelectionTarget
+        self.supportsInlineImages = supportsInlineImages
+        self.definitionsAlreadyApplied = definitionsAlreadyApplied
     }
 
     var body: some View {
+        Group {
+            if supportsInlineImages {
+                importedContent
+            } else if let block = textBlocks.first {
+                flowContent(block.attributedText, contentWidth: 0)
+            }
+        }
+        .popover(item: $definitionPresentation) { presentation in
+            ReaderDefinitionPopover(entries: presentation.entries) { definitionPresentation = nil }
+        }
+    }
+
+    private var importedContent: some View {
         VStack(alignment: .leading, spacing: 8) {
             ForEach(textBlocks) { block in
                 switch block.kind {
                 case .flow:
-                    AttributedTextContainer(
-                        attributedText: block.attributedText,
-                        contentWidth: max(availableWidth, 1),
-                        fillImagesToWidth: true,
-                        onOpenImage: onOpenImage,
-                        onContentTap: onContentTap,
-                        onSelectionChange: onSelectionChange,
-                        onOpenLink: definitionContext == nil ? onOpenLink : openReaderLink,
-                        onResearchSelection: onResearchSelection,
-                        onPassageSwipe: onPassageSwipe,
-                        chapterSelectionTarget: chapterSelectionTarget
-                    )
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    flowContent(block.attributedText, contentWidth: max(availableWidth, 1))
 
                 case .table:
                     ScrollView(.horizontal, showsIndicators: true) {
@@ -186,13 +134,26 @@ struct AttributedTextView: View {
                     .preference(key: AttributedTextWidthPreferenceKey.self, value: proxy.size.width)
             }
         }
-        .popover(item: $definitionPresentation) { presentation in
-            ReaderDefinitionPopover(entries: presentation.entries) { definitionPresentation = nil }
-        }
         .onPreferenceChange(AttributedTextWidthPreferenceKey.self) { width in
             guard width > 0 else { return }
             availableWidth = width
         }
+    }
+
+    private func flowContent(_ text: NSAttributedString, contentWidth: CGFloat) -> some View {
+        AttributedTextContainer(
+            attributedText: text,
+            contentWidth: contentWidth,
+            fillImagesToWidth: true,
+            onOpenImage: onOpenImage,
+            onContentTap: onContentTap,
+            onSelectionChange: onSelectionChange,
+            onOpenLink: definitionContext == nil ? onOpenLink : openReaderLink,
+            onResearchSelection: onResearchSelection,
+            chapterSelectionTarget: chapterSelectionTarget,
+            supportsInlineImages: supportsInlineImages
+        )
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func preferredTableWidth(for text: NSAttributedString, availableWidth: CGFloat) -> CGFloat {
@@ -282,9 +243,14 @@ private struct AttributedTextWidthPreferenceKey: PreferenceKey {
     }
 }
 
+extension NSAttributedString.Key {
+    static let nativeReaderSavedForeground = NSAttributedString.Key("permitext.nativeReaderSavedForeground")
+}
+
 enum ReaderEnactedTextLinkStyle {
+    // UIKit's uniform link color would override the saved portion of a link.
+    // Apply the foreground to the text runs while preserving the actionable URL.
     static let textViewAttributes: [NSAttributedString.Key: Any] = [
-        .foregroundColor: UIColor.secondaryLabel,
         .underlineStyle: 0
     ]
 
@@ -301,7 +267,9 @@ enum ReaderEnactedTextLinkStyle {
         let result = NSMutableAttributedString(attributedString: original)
         for range in linkedRanges {
             result.removeAttribute(.underlineStyle, range: range)
-            result.addAttribute(.foregroundColor, value: UIColor.secondaryLabel, range: range)
+            original.enumerateAttribute(.nativeReaderSavedForeground, in: range) { savedColor, subrange, _ in
+                result.addAttribute(.foregroundColor, value: savedColor as? UIColor ?? UIColor.secondaryLabel, range: subrange)
+            }
         }
         return result
     }
@@ -316,8 +284,8 @@ private struct AttributedTextContainer: UIViewRepresentable {
     var onSelectionChange: ((Bool) -> Void)?
     var onOpenLink: ((URL) -> Void)?
     var onResearchSelection: ((String) -> Void)?
-    var onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil
     var chapterSelectionTarget: NativeChapterSelectionTarget? = nil
+    var supportsInlineImages = true
 
     func makeCoordinator() -> Coordinator {
         Coordinator(
@@ -339,46 +307,39 @@ private struct AttributedTextContainer: UIViewRepresentable {
         textView.textContainer.lineFragmentPadding = 0
         textView.adjustsFontForContentSizeCategory = true
         textView.linkTextAttributes = ReaderEnactedTextLinkStyle.textViewAttributes
-        updateAccessibility(for: textView)
-        textView.delegate = context.coordinator
-        textView.attachmentTapHandler = { image in
-            context.coordinator.onOpenImage?(image)
+        let coordinator = context.coordinator
+        textView.delegate = coordinator
+        textView.attachmentTapHandler = { [weak coordinator] image in
+            coordinator?.onOpenImage?(image)
         }
-        textView.contentTapHandler = {
-            context.coordinator.onContentTap?()
+        textView.contentTapHandler = { [weak coordinator] in
+            coordinator?.onContentTap?()
         }
-        textView.selectionChangeHandler = { hasSelection in
-            context.coordinator.onSelectionChange?(hasSelection)
+        textView.selectionChangeHandler = { [weak coordinator] hasSelection in
+            coordinator?.onSelectionChange?(hasSelection)
         }
         textView.isAuxiliaryTapHandlingEnabled = onOpenImage != nil || onContentTap != nil
-        textView.passageSwipeHandler = onPassageSwipe
         textView.chapterSelectionTarget = chapterSelectionTarget
         return textView
     }
 
     func updateUIView(_ uiView: RichTextView, context: Context) {
-        context.coordinator.onOpenImage = onOpenImage
-        context.coordinator.onContentTap = onContentTap
-        context.coordinator.onSelectionChange = onSelectionChange
-        context.coordinator.onOpenLink = onOpenLink
-        context.coordinator.onResearchSelection = onResearchSelection
-        uiView.attachmentTapHandler = { image in
-            context.coordinator.onOpenImage?(image)
-        }
-        uiView.contentTapHandler = {
-            context.coordinator.onContentTap?()
-        }
-        uiView.selectionChangeHandler = { hasSelection in
-            context.coordinator.onSelectionChange?(hasSelection)
-        }
+        let coordinator = context.coordinator
+        let researchAvailabilityChanged = (coordinator.onResearchSelection != nil) != (onResearchSelection != nil)
+        coordinator.onOpenImage = onOpenImage
+        coordinator.onContentTap = onContentTap
+        coordinator.onSelectionChange = onSelectionChange
+        coordinator.onOpenLink = onOpenLink
+        coordinator.onResearchSelection = onResearchSelection
         uiView.isAuxiliaryTapHandlingEnabled = onOpenImage != nil || onContentTap != nil
-        uiView.passageSwipeHandler = onPassageSwipe
-        uiView.linkTextAttributes = ReaderEnactedTextLinkStyle.textViewAttributes
-        updateAccessibility(for: uiView)
 
+        let sourceChanged = !coordinator.hasRendered(source: attributedText)
+        if sourceChanged || researchAvailabilityChanged {
+            updateAccessibility(for: uiView)
+        }
         let contentSizeCategory = uiView.traitCollection.preferredContentSizeCategory
-        if context.coordinator.requiresTextUpdate(
-            source: attributedText,
+        if coordinator.requiresTextUpdate(
+            sourceChanged: sourceChanged,
             contentWidth: contentWidth,
             fillImagesToWidth: fillImagesToWidth,
             contentSizeCategory: contentSizeCategory
@@ -405,15 +366,23 @@ private struct AttributedTextContainer: UIViewRepresentable {
         guard onResearchSelection != nil else {
             textView.accessibilityIdentifier = nil
             textView.accessibilityLabel = nil
+            textView.accessibilityValue = nil
             return
         }
 
         textView.accessibilityIdentifier = ReaderSelectionMenuBuilder.selectableTextAccessibilityIdentifier
         textView.accessibilityLabel = attributedText.string.trimmingCharacters(in: .whitespacesAndNewlines)
+        var savedValue: String?
+        attributedText.enumerateAttribute(.nativeReaderSavedForeground, in: NSRange(location: 0, length: attributedText.length)) { color, _, stop in
+            guard color is UIColor else { return }
+            savedValue = "Saved text"
+            stop.pointee = true
+        }
+        textView.accessibilityValue = savedValue
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: RichTextView, context: Context) -> CGSize? {
-        let width = max(max(contentWidth, proposal.width ?? contentWidth), 1)
+        let width = max(proposal.width ?? contentWidth, 1)
         let contentSizeCategory = uiView.traitCollection.preferredContentSizeCategory
         if let cachedSize = context.coordinator.cachedMeasuredSize(
             source: attributedText,
@@ -435,6 +404,9 @@ private struct AttributedTextContainer: UIViewRepresentable {
     }
 
     private func renderedAttributedText() -> NSAttributedString {
+        // Native Reader images are separate blocks, so resizing text never
+        // requires rebuilding its attributed string to fit inline images.
+        guard supportsInlineImages else { return ReaderEnactedTextLinkStyle.applying(to: attributedText) }
         guard attributedText.length > 0 else { return attributedText }
 
         let fullRange = NSRange(location: 0, length: attributedText.length)
@@ -550,14 +522,17 @@ private struct AttributedTextContainer: UIViewRepresentable {
             self.onResearchSelection = onResearchSelection
         }
 
+        func hasRendered(source: NSAttributedString) -> Bool {
+            lastRenderedSource === source || lastRenderedSource?.isEqual(to: source) == true
+        }
+
         func requiresTextUpdate(
-            source: NSAttributedString,
+            sourceChanged: Bool,
             contentWidth: CGFloat,
             fillImagesToWidth: Bool,
             contentSizeCategory: UIContentSizeCategory
         ) -> Bool {
-            (lastRenderedSource !== source && lastRenderedSource?.isEqual(to: source) != true)
-                || lastRenderedContentWidth != contentWidth
+            sourceChanged || lastRenderedContentWidth != contentWidth
                 || lastRenderedFillImagesToWidth != fillImagesToWidth
                 || lastRenderedContentSizeCategory != contentSizeCategory
         }
@@ -631,23 +606,32 @@ private struct AttributedTextContainer: UIViewRepresentable {
             }
 
             let selectedText = String(textView.text[selectedRange])
-            var actions = suggestedActions
-            if let target = (textView as? RichTextView)?.chapterSelectionTarget,
-               let save = target.controller.evidenceAction(in: range, at: target.address) {
-                actions.append(save)
+            if let view = textView as? RichTextView, let target = view.chapterSelectionTarget {
+                return target.controller.nativeSelectionMenu(for: target.documentRange(range), in: view,
+                                                             selectedText: selectedText, suggestedActions: suggestedActions,
+                                                             fallbackResearch: onResearchSelection)
             }
             return ReaderSelectionMenuBuilder.menu(
                 selectedText: selectedText,
-                suggestedActions: actions,
+                suggestedActions: suggestedActions,
                 onResearchSelection: onResearchSelection
             )
         }
 
         func textView(_ textView: UITextView, willPresentEditMenuWith animator: any UIEditMenuInteractionAnimating) {
-            guard let view = textView as? RichTextView, view.chapterSelectionTarget != nil else { return }
+            guard let view = textView as? RichTextView, let target = view.chapterSelectionTarget else { return }
+            target.controller.nativeEditMenuWillAppear(in: view)
             animator.addCompletion { [weak view] in
                 guard let view else { return }
                 view.chapterSelectionTarget?.controller.nativeEditMenuDidAppear(in: view)
+            }
+        }
+
+        func textView(_ textView: UITextView, willDismissEditMenuWith animator: any UIEditMenuInteractionAnimating) {
+            guard let view = textView as? RichTextView, let controller = view.chapterSelectionTarget?.controller else { return }
+            animator.addCompletion { [weak controller, weak view] in
+                guard let view else { return }
+                controller?.nativeEditMenuDidDismiss(in: view)
             }
         }
 
@@ -711,6 +695,8 @@ final class RichTextView: UITextView {
         drawChapterSelection()
     }
 
+    var chapterHighlightBounds: CGRect? { chapterSelectionLayer?.path?.boundingBoxOfPath }
+
     func containsChapterSelection(at point: CGPoint) -> Bool {
         chapterSelectionLayer?.path?.contains(point) == true
     }
@@ -739,23 +725,14 @@ final class RichTextView: UITextView {
         highlight.path = path.cgPath
         CATransaction.commit()
     }
-    var passageSwipeHandler: ((ReaderPassageSwipeEvent) -> Void)? {
+    var isAuxiliaryTapHandlingEnabled = false {
         didSet {
-            passagePanRecognizer.isEnabled = passageSwipeHandler != nil
+            guard isAuxiliaryTapHandlingEnabled != oldValue else { return }
+            if isAuxiliaryTapHandlingEnabled && auxiliaryTapRecognizer.view == nil {
+                addGestureRecognizer(auxiliaryTapRecognizer)
+            }
+            auxiliaryTapRecognizer.isEnabled = isAuxiliaryTapHandlingEnabled
         }
-    }
-    private lazy var passageSwipeDelegate = ReaderPassageSwipeDelegate(textView: self)
-    private lazy var passagePanRecognizer: UIPanGestureRecognizer = {
-        let recognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePassagePan(_:)))
-        recognizer.maximumNumberOfTouches = 1
-        recognizer.cancelsTouchesInView = false
-        recognizer.delegate = passageSwipeDelegate
-        recognizer.isEnabled = false
-        return recognizer
-    }()
-    var isAuxiliaryTapHandlingEnabled: Bool {
-        get { auxiliaryTapRecognizer.isEnabled }
-        set { auxiliaryTapRecognizer.isEnabled = newValue }
     }
     private var selectionObserver: NSObjectProtocol?
     private lazy var auxiliaryTapRecognizer = UITapGestureRecognizer(
@@ -765,8 +742,6 @@ final class RichTextView: UITextView {
 
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
-        addGestureRecognizer(auxiliaryTapRecognizer)
-        addGestureRecognizer(passagePanRecognizer)
         selectionObserver = NotificationCenter.default.addObserver(
             forName: .nycccClearRichTextSelection,
             object: nil,
@@ -781,8 +756,6 @@ final class RichTextView: UITextView {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        addGestureRecognizer(auxiliaryTapRecognizer)
-        addGestureRecognizer(passagePanRecognizer)
         selectionObserver = NotificationCenter.default.addObserver(
             forName: .nycccClearRichTextSelection,
             object: nil,
@@ -798,24 +771,6 @@ final class RichTextView: UITextView {
     deinit {
         if let selectionObserver {
             NotificationCenter.default.removeObserver(selectionObserver)
-        }
-    }
-
-    @objc private func handlePassagePan(_ recognizer: UIPanGestureRecognizer) {
-        guard selectedRange.length == 0 else {
-            passageSwipeHandler?(.cancelled)
-            return
-        }
-        switch recognizer.state {
-        case .began: passageSwipeHandler?(.began)
-        case .changed: passageSwipeHandler?(.changed(translation: recognizer.translation(in: self).x))
-        case .ended:
-            passageSwipeHandler?(.ended(
-                translation: recognizer.translation(in: self).x,
-                velocity: recognizer.velocity(in: self).x
-            ))
-        case .cancelled, .failed: passageSwipeHandler?(.cancelled)
-        default: break
         }
     }
 
@@ -881,41 +836,6 @@ final class RichTextView: UITextView {
         }
 
         return nil
-    }
-}
-
-private final class ReaderPassageSwipeDelegate: NSObject, UIGestureRecognizerDelegate {
-    weak var textView: RichTextView?
-
-    init(textView: RichTextView) { self.textView = textView }
-
-    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard let textView, textView.passageSwipeHandler != nil,
-              let pan = gestureRecognizer as? UIPanGestureRecognizer else { return false }
-        let velocity = pan.velocity(in: textView)
-        return ReaderPassageSwipeState.canBegin(
-            horizontalVelocity: velocity.x,
-            verticalVelocity: velocity.y,
-            hasSelection: textView.selectedRange.length > 0
-        )
-    }
-
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        guard let textView else { return false }
-        // Leave text selection and the navigation controller's leading-edge swipe alone.
-        return textView.passageSwipeHandler != nil
-            && textView.selectedRange.length == 0
-            && touch.location(in: textView.window).x >= CodeScreenMetrics.readerPassageLeadingEdgeExclusion
-    }
-
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard let textView, let otherView = otherGestureRecognizer.view,
-              otherGestureRecognizer is UIPanGestureRecognizer,
-              otherView !== textView else { return false }
-        // The enclosing ScrollView must not cancel the horizontal passage drag.
-        // The velocity check above lets vertical gestures use only its scroll pan.
-        return textView.isDescendant(of: otherView)
     }
 }
 
@@ -1444,7 +1364,7 @@ extension AttributedTextView {
                                   contentSizeCategory: .large)
         coordinator.storeMeasuredSize(CGSize(width: 320, height: 100), source: seed, width: 320,
                                       contentSizeCategory: .large)
-        return (coordinator.requiresTextUpdate(source: candidate, contentWidth: width,
+        return (coordinator.requiresTextUpdate(sourceChanged: !coordinator.hasRendered(source: candidate), contentWidth: width,
                                               fillImagesToWidth: fillImages, contentSizeCategory: category),
                 coordinator.cachedMeasuredSize(source: candidate, width: width,
                                                contentSizeCategory: category) != nil)

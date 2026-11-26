@@ -8,6 +8,44 @@ import WebKit
 @testable import permitext
 
 extension EntitlementAndSyncContractTests {
+    @MainActor
+    func testSettledReaderHistoryKeepsColdPassagePreviews() async throws {
+        func makeLibrary() -> CodeLibraryViewModel {
+            let defaults = isolatedEntitlementDefaults()
+            return CodeLibraryViewModel(continuityStore: ContinuityStore(defaults: defaults),
+                preferencesDefaults: defaults, loadsPersistedAccount: false,
+                ownsAccountSync: false)
+        }
+        let cold = makeLibrary()
+        let prepared = makeLibrary()
+        for library in [cold, prepared] {
+            for _ in 0..<600 where !library.isInitialContentLoaded {
+                try await Task.sleep(for: .milliseconds(100))
+            }
+            let loaded = await library.prepareCodeVersionForEvidence(UserContentSyncCodeVersion.canonicalNYC2022)
+            XCTAssertTrue(loaded)
+        }
+        let building = try XCTUnwrap(prepared.codeSections.first { $0.name == "BUILDING CODE" })
+        let clock = ContinuousClock()
+        var coldCommit = Duration.zero
+        var preparedCommit = Duration.zero
+        for number in ["101.1", "101.2", "1001.1", "D106.1"] {
+            let section = try XCTUnwrap(prepared.sectionSummary(sectionNumber: number, codeSectionID: building.id))
+            let target = try XCTUnwrap(prepared.searchReaderTarget(sectionID: section.id))
+            let anchor = PublishedHTMLAnchor(sectionNumber: number, title: section.title, anchorID: number, level: 3)
+            coldCommit += clock.measure { cold.noteSectionOpened(anchor: anchor, chapter: target.chapter) }
+            let loaded = await prepared.loadSectionDetailAsync(sectionID: section.id)
+            let detail = try XCTUnwrap(loaded)
+            preparedCommit += clock.measure { prepared.noteSectionOpened(anchor: anchor, chapter: target.chapter) }
+            let visit = try XCTUnwrap(prepared.recentlyViewedSections.first)
+            XCTAssertEqual(visit.sectionID, section.id)
+            XCTAssertFalse(visit.previewText.isEmpty)
+            XCTAssertEqual(visit.previewText, prepared.sectionPreviewSnippet(from: detail.officialText))
+            XCTAssertEqual(visit.previewText, cold.recentlyViewedSections.first?.previewText)
+        }
+        print("Reader history across four sections, cold main-thread commit \(coldCommit), prepared main-thread commit \(preparedCommit)")
+    }
+
     func testSearchBreadcrumbsFollowSectionRootsAndRestartedLists() throws {
         let version = try XCTUnwrap(BundleDatabaseLocator().availableCodeVersions().first {
             UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2022
@@ -854,8 +892,10 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(Set(card.folderMembership[savedID] ?? []), [folderID])
         XCTAssertTrue(card.folders.contains { $0.id == folderID })
         XCTAssertTrue(card.projectBookmarksByFolderID.isEmpty)
-        XCTAssertFalse(card.toggleBookmark(sectionID: otherID))
+        // Another reader removes this legacy bookmark before the card exports its deferred rows.
+        try store.toggleBookmark(sectionID: otherID, codeVersion: version)
         main.reconcileExternalSavedWorkChange(from: card, scheduleAccountSync: false)
+        XCTAssertFalse(card.isBookmarked(sectionID: otherID))
         XCTAssertTrue(card.bookmarks.contains { $0.id == savedID && $0.isBookmarked })
         XCTAssertTrue(card.bookmarks.contains { $0.id == noteID })
         XCTAssertTrue(main.bookmarks.contains { $0.id == savedID && $0.isBookmarked })
@@ -2517,13 +2557,13 @@ final class EntitlementAndSyncContractTests: XCTestCase {
               "id": "project-legacy",
               "userID": "apple:folder-test",
               "codeVersion": "nyc-construction-codes-2022",
-              "localFolderID": 1,
               "updatedAt": 0
             }
             """.utf8
         )
         let legacyRecord = try JSONDecoder().decode(ServerProjectRecord.self, from: legacyJSON)
         XCTAssertEqual(legacyRecord.folderType, .project)
+        XCTAssertEqual(legacyRecord.localFolderID, 0)
 
         let referenceRecord = ServerProjectRecord(
             id: "reference-1",
@@ -2861,6 +2901,48 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(ReaderCodeMenuSectionTitle.landUseAndZoning, "Land Use and Zoning")
     }
 
+    @MainActor
+    func testSelectionColorReachesOpenReadersWhenSavedListHydrationFails() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("reader.sqlite")
+        let store = try UserDataStore(databaseURL: url)
+        let defaults = isolatedEntitlementDefaults()
+        LocalEntitlementService.setDebugPlan(.pro, defaults: defaults)
+        let account = SignedInAccount(appUserID: "clerk:reader-selection", authProvider: .clerk,
+            authProviderUserID: "reader-selection", appleUserID: "", displayName: "Reader",
+            signedInAt: Date(), backendSessionToken: "test-token")
+        let owner = CodeLibraryViewModel(userContentRepository: store, preferencesDefaults: defaults,
+            entitlementService: LocalEntitlementService(defaults: defaults), loadsInitialContent: true,
+            loadsPersistedAccount: false, initialSignedInAccount: account, ownsAccountSync: false)
+        for _ in 0..<600 where !owner.isInitialContentLoaded { try await Task.sleep(for: .milliseconds(100)) }
+        let version = try XCTUnwrap(owner.selectedVersion?.codeVersion)
+        let project = try store.createFolder(name: "Project", address: "", description: "",
+            colorHex: CodeFolder.defaultColorHex, folderType: .project, codeVersion: version)
+        owner.refreshFolders()
+        let clientID = try XCTUnwrap(owner.folders.first { $0.id == project }).clientID
+        owner.selectReaderSaveDestination(.project(clientID))
+        XCTAssertEqual(owner.readerSaveDestinationProject?.id, project)
+        let source = owner.makeSearchReaderLibrary()
+        let other = owner.makeSearchReaderLibrary()
+        let sectionID: Int64 = 101
+        let quote = "the same words"
+        let selection = ResearchSelectionRequest(sectionID: String(sectionID), selectedText: quote)
+        XCTAssertTrue(source.saveReaderSelectionToEvidence([selection], occurrences: [sectionID: [quote: [0]]]))
+
+        let db = try SQLiteConnection(path: url.path, readOnly: false)
+        try db.execute("ALTER TABLE notes RENAME TO unavailable_notes;")
+        XCTAssertThrowsError(try store.noteEntries(codeVersion: version))
+        let revision = owner.bookmarkRevision
+        XCTAssertTrue(source.saveReaderSelectionToEvidence([selection], occurrences: [sectionID: [quote: [32]]]))
+        XCTAssertNotEqual(revision, owner.bookmarkRevision)
+        other.reconcileExternalSavedWorkChange(scheduleAccountSync: false)
+        for reader in [owner, source, other] {
+            XCTAssertEqual(reader.readerEvidence[sectionID]?[project], ReaderEvidenceText(excerpts: [quote], occurrences: [quote: [0, 32]]))
+        }
+    }
+
     func testSavingSelectionsPreservesExactExcerptsPerProjectAndSyncsThem() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -2875,11 +2957,22 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         let second = try project("Second")
         let clientID = try XCTUnwrap(store.allFolders().first(where: { $0.id == first })).clientID
         try store.saveSection(101, toFolderIDs: [second], codeVersion: version)
-        let excerpts: [Int64: [String]] = [101: ["end of the first paragraph."], 102: ["101.2 Scope.\nStart of the second"]]
+        let firstQuote = "end of the first paragraph."
+        let secondQuote = "101.2 Scope.\nStart of the second"
+        let excerpts: [Int64: [String]] = [101: [firstQuote], 102: [secondQuote]]
         XCTAssertThrowsError(try store.saveSelection(excerpts, toProject: first, clientID: "stale", codeVersion: version))
         XCTAssertFalse(try store.isBookmarked(sectionID: 102, codeVersion: version))
-        try store.saveSelection(excerpts, toProject: first, clientID: clientID, codeVersion: version)
-        try store.saveSelection(excerpts, toProject: first, clientID: clientID, codeVersion: version)
+        try store.saveSelection(excerpts, toProject: first, clientID: clientID, codeVersion: version,
+                                occurrences: [101: [firstQuote: [90, 2, 90, -1]], 102: [secondQuote: [0]]])
+        let anotherOccurrence: [Int64: [String: [Int]]] = [101: [firstQuote: [90, 150]]]
+        try store.saveSelection(excerpts, toProject: first, clientID: clientID, codeVersion: version, occurrences: anotherOccurrence)
+        try store.saveSelection(excerpts, toProject: first, clientID: clientID, codeVersion: version, occurrences: anotherOccurrence)
+        let reopened = try UserDataStore(databaseURL: directory.appendingPathComponent("local.sqlite"))
+        let evidence = try reopened.readerEvidence(codeVersion: version)
+        XCTAssertEqual(evidence[101]?[first], ReaderEvidenceText(excerpts: [firstQuote], occurrences: [firstQuote: [2, 90, 150]]))
+        XCTAssertEqual(evidence[102]?[first], ReaderEvidenceText(excerpts: [secondQuote], occurrences: [secondQuote: [0]]))
+        XCTAssertEqual(evidence[101]?[second], ReaderEvidenceText(excerpts: []))
+        XCTAssertTrue(try reopened.readerEvidence(codeVersion: UserContentSyncCodeVersion.localNYC2014).isEmpty)
         let saved = try store.evidenceReferences(inFolder: first)
         XCTAssertEqual(Dictionary(uniqueKeysWithValues: saved.map { ($0.sectionID, $0.selectedExcerpts) }), excerpts)
         XCTAssertEqual(try store.evidenceReferences(inFolder: second).first?.selectedExcerpts, [])
@@ -2893,18 +2986,74 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             let mutation = try ServerUserContentMutation(syncQueueItem: item, account: account)
             if case .projectSection(let section) = mutation, let selection = section.selectedExcerpts {
                 XCTAssertEqual(selection, excerpts[section.sectionID])
+                XCTAssertNotNil(section.selectedExcerptOccurrences)
                 selectionMutations += 1
+                try store.applyServerUserContentMutation(mutation)
             }
             try remote.applyServerUserContentMutation(mutation)
         }
-        XCTAssertEqual(selectionMutations, 2)
+        XCTAssertEqual(selectionMutations, 3)
         let remoteFolder = try XCTUnwrap(remote.allFolders().first(where: { $0.name == "First" }))
         let downloaded = try remote.evidenceReferences(inFolder: remoteFolder.id)
         XCTAssertEqual(Dictionary(uniqueKeysWithValues: downloaded.map { ($0.sectionID, $0.selectedExcerpts) }), excerpts)
+        XCTAssertEqual(try store.readerEvidence(codeVersion: version), evidence)
+        XCTAssertEqual(try remote.readerEvidence(codeVersion: version)[101]?[remoteFolder.id],
+                       ReaderEvidenceText(excerpts: [firstQuote], occurrences: [firstQuote: [2, 90, 150]]))
+        XCTAssertEqual(try remote.readerEvidence(codeVersion: version)[102]?[remoteFolder.id],
+                       ReaderEvidenceText(excerpts: [secondQuote], occurrences: [secondQuote: [0]]))
+
+        // A web selection of the same words adds another occurrence. A replay or
+        // a legacy client lacking locations must preserve all known occurrences.
+        var webRecord = try XCTUnwrap(try store.pendingSyncQueueItems(limit: 50).compactMap { item -> ServerProjectSectionRecord? in
+            guard case let .projectSection(section) = try ServerUserContentMutation(syncQueueItem: item, account: account),
+                  section.sectionID == 101, section.selectedExcerpts != nil else { return nil }
+            return section
+        }.first)
+        let olderQueuedSelection = UserContentMergeCandidate(recordID: webRecord.id, entityKind: .projectSection,
+            localUpdatedAt: webRecord.updatedAt.addingTimeInterval(-1), serverUpdatedAt: webRecord.updatedAt,
+            localSyncState: .pendingUpload)
+        XCTAssertEqual(UserContentMergeResolver.decision(for: olderQueuedSelection).action, .uploadLocal)
+        webRecord.selectedExcerptOccurrences = [firstQuote: [1, 2], "unrelated quote": [9]]
+        try remote.applyServerUserContentMutation(.projectSection(webRecord))
+        webRecord.selectedExcerptOccurrences = nil
+        try remote.applyServerUserContentMutation(.projectSection(webRecord))
+        XCTAssertEqual(try remote.readerEvidence(codeVersion: version)[101]?[remoteFolder.id]?.occurrences,
+                       [firstQuote: [1, 2, 90, 150]])
+
+        webRecord.selectedExcerpts = ["Fresh words"]
+        webRecord.selectedExcerptOccurrences = ["Fresh words": [0]]
+        webRecord.selectionResetAt = webRecord.updatedAt
+        XCTAssertEqual(UserContentMergeResolver.plan(incomingServerMutations: [.projectSection(webRecord)],
+            localCandidates: [webRecord.id: olderQueuedSelection]).decisions.first?.action, .applyServer)
+        try remote.applyServerUserContentMutation(.projectSection(webRecord))
+        XCTAssertEqual(try remote.readerEvidence(codeVersion: version)[101]?[remoteFolder.id],
+                       ReaderEvidenceText(excerpts: ["Fresh words"], occurrences: ["Fresh words": [0]]))
+
+        let manualTombstone = ServerProjectSectionRecord(id: webRecord.id + ":manual", userID: webRecord.userID,
+            codeVersion: webRecord.codeVersion, folderClientID: webRecord.folderClientID, folderType: webRecord.folderType,
+            localFolderID: webRecord.localFolderID, sectionID: webRecord.sectionID, scope: "manual",
+            updatedAt: webRecord.updatedAt, deletedAt: webRecord.updatedAt)
+        try remote.applyServerUserContentMutation(.projectSection(manualTombstone))
+        XCTAssertEqual(try remote.readerEvidence(codeVersion: version)[101]?[remoteFolder.id],
+                       ReaderEvidenceText(excerpts: ["Fresh words"], occurrences: ["Fresh words": [0]]))
+
+        // A device can add a new quote while offline after the remote membership
+        // was deleted. The next reset snapshot keeps only that pending action.
+        let addedQuote = "New local words"
+        try remote.saveSelection([101: [addedQuote]], toProject: remoteFolder.id, clientID: remoteFolder.clientID,
+                                 codeVersion: version, occurrences: [101: [addedQuote: [1]]])
+        webRecord.selectionResetAt = webRecord.updatedAt.addingTimeInterval(-10)
+        webRecord.selectedExcerpts = ["Server words"]
+        webRecord.selectedExcerptOccurrences = ["Server words": [0]]
+        try remote.applyServerUserContentMutation(.projectSection(webRecord))
+        let postReset = try XCTUnwrap(remote.readerEvidence(codeVersion: version)[101]?[remoteFolder.id])
+        XCTAssertEqual(Set(postReset.excerpts), Set(["Server words", addedQuote]))
+        XCTAssertEqual(postReset.occurrences, ["Server words": [0], addedQuote: [1]])
 
         try store.removeSection(101, fromFolder: first, codeVersion: version)
         try store.addSection(101, toFolder: first, codeVersion: version, selectedExcerpts: excerpts[101] ?? [])
         XCTAssertEqual(try store.evidenceReferences(inFolder: first).first(where: { $0.sectionID == 101 })?.selectedExcerpts, excerpts[101])
+        XCTAssertEqual(try store.readerEvidence(codeVersion: version)[101]?[first], ReaderEvidenceText(excerpts: [firstQuote]))
     }
 
     func testSavingEvidenceRequiresDestinationAndAtomicallyCreatesOneBookmarkWithManyMemberships() throws {
@@ -5165,7 +5314,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(chapterSource.contains(".overlay(alignment: .topTrailing)"))
         XCTAssertNotNil(chapterSource.range(of: #"\.lineLimit\(1\)\s*\.fixedSize\(\)"#, options: .regularExpression))
         XCTAssertTrue(chapterSource.contains(".accessibilityLabel(sectionID.map { library.readerSaveActionLabel(sectionID: $0) }"))
-        XCTAssertTrue(nativeSource.contains("ReaderCurrentSectionBookmarkButton"))
+        XCTAssertFalse(nativeSource.contains("ReaderCurrentSectionBookmarkButton"))
         XCTAssertTrue(htmlReaderSource.contains("ReaderCurrentSectionBookmarkButton"))
     }
 
@@ -8169,7 +8318,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertFalse(nativeReaderSource.contains(".scrollPosition($scrollPosition)"))
         XCTAssertTrue(nativeReaderSource.contains(".equatable()"))
         XCTAssertTrue(nativeReaderSource.contains("NativeReaderTextBlockView: View, Equatable"))
-        XCTAssertTrue(nativeReaderSource.contains("attributedText: savedText(baseAttributedText)"))
+        XCTAssertTrue(nativeReaderSource.contains("attributedText: saved.applying(to: attributedText ?? baseAttributedText"))
+        XCTAssertTrue(nativeReaderSource.contains("supportsInlineImages: false"))
         XCTAssertTrue(nativeReaderSource.contains("cache.countLimit = 256"))
         XCTAssertTrue(nativeReaderSource.contains("cache.totalCostLimit = 24 * 1024 * 1024"))
         XCTAssertFalse(nativeReaderSource.contains(".onScrollTargetVisibilityChange"))
@@ -8214,6 +8364,82 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             ResearchSelectionRequest(sectionID: "1011", selectedText: "first excerpt."),
             ResearchSelectionRequest(sectionID: "1012", selectedText: "101.2 Scope.\nSecond excerpt.")
         ])
+    }
+
+    func testBuildingCodeHeadingsGroupWithTheirOwnProvisionText() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let source = corpusRootURL.appendingPathComponent("2022-construction-codes/code-sections/building-code/chapters/1.html")
+        let resolved = await store.debugRoute(for: source)
+        let route = try XCTUnwrap(resolved)
+        let prepared = try await store.loadPreparedDocument(for: route)
+        let groups = NativeReaderTextGroup.plan(prepared)
+        for number in ["101.1", "101.2", "101.3"] {
+            let targetIndex = try XCTUnwrap(prepared.sectionTargets.firstIndex { $0.sectionNumber == number })
+            let headingID = prepared.sectionTargets[targetIndex].blockID
+            let group = try XCTUnwrap(groups.first { $0.id == headingID })
+            XCTAssertEqual(group.rows.first?.block.kind, .heading)
+            let paragraph = try XCTUnwrap(group.rows.dropFirst().first)
+            XCTAssertEqual(paragraph.block.kind, .paragraph)
+            XCTAssertTrue(group.rows.allSatisfy { prepared.navigationIndex[$0.id]?.sectionTargetIndex == targetIndex },
+                          "Section \(number) must keep its own passage and citation target.")
+        }
+    }
+
+    @MainActor
+    func testGroupedReaderMapsSelectionAndTintsOnlySavedCharacters() throws {
+        let lines = ["101.2 Scope.", "  Room 🪟 windows.  ", "Room again."]
+        let blocks = NativeReaderDisplayBlock.blocks(from: lines.enumerated().map { index, text in
+            NativeReaderRuntimeBlock(id: String(index), kind: index == 0 ? .heading : .paragraph,
+                sourceOrder: index, sectionID: "scope", anchorIDs: [], plainText: text, runs: [],
+                headingLevel: index == 0 ? 3 : nil, listItems: [])
+        })
+        let passage = NativeReaderPassageText(rows: blocks[...])
+        let last = NativeChapterSelectionAddress(block: 2)
+        let word = NativeChapterSelectionRange(.init(address: last, offset: 0), .init(address: last, offset: 4))
+        let offset = try XCTUnwrap(passage.offset(for: word, quote: "Room"))
+        XCTAssertEqual(offset, "101.2 Scope.\nRoom 🪟 windows.\n".utf16.count)
+        XCTAssertEqual(passage.highlight(.init(excerpts: ["Room"], offsets: ["Room": [offset]])), .ranges([:]))
+        let saved = passage.highlight(.init(excerpts: ["Room"], occurrences: ["Room": [1]]))
+        XCTAssertEqual(saved, .ranges([last: [NSRange(location: 0, length: 4)]]))
+        XCTAssertEqual(passage.highlight(.init(excerpts: ["Room"])), .ranges([:]))
+        XCTAssertEqual(passage.occurrences(for: word, quote: "Room"), [1])
+        XCTAssertEqual(passage.highlight(.init(excerpts: ["again."], occurrences: ["again.": [1]])), .ranges([:]))
+        XCTAssertEqual(passage.highlight(.init(excerpts: ["again."], offsets: ["again.": [9999]])),
+                       .ranges([last: [NSRange(location: 5, length: 6)]]))
+        XCTAssertEqual(passage.highlight(.init(excerpts: ["Room"], occurrences: ["Room": [-1, 2]])), .ranges([:]))
+        XCTAssertEqual(passage.highlight(.init(excerpts: ["windows.\nRoom"])),
+                       passage.highlight(.init(excerpts: ["windows.  \u{00A0}Room"], occurrences: ["windows.  \u{00A0}Room": [0]])))
+        let repeated = NativeReaderDisplayBlock.blocks(from: [NativeReaderRuntimeBlock(
+            id: "repeat", kind: .paragraph, sourceOrder: 0, sectionID: "scope", anchorIDs: [],
+            plainText: "🪟 ababa", runs: [], headingLevel: nil, listItems: [])])
+        let overlapping = NativeReaderPassageText(rows: repeated[...])
+        let secondABA = NativeChapterSelectionRange(.init(address: .init(block: 0), offset: 5),
+                                                    .init(address: .init(block: 0), offset: 8))
+        XCTAssertEqual(overlapping.occurrences(for: secondABA, quote: "aba"), [1])
+        XCTAssertEqual(overlapping.highlight(.init(excerpts: ["aba"])), .ranges([:]))
+        XCTAssertEqual(overlapping.highlight(.init(excerpts: ["aba"], occurrences: ["aba": [1]])),
+                       .ranges([.init(block: 0): [NSRange(location: 5, length: 3)]]))
+        let paragraphs = passage.highlight(.init(excerpts: ["windows.\nRoom"]))
+        XCTAssertEqual(paragraphs, .ranges([
+            .init(block: 1): [NSRange(location: "  Room 🪟 ".utf16.count, length: 8)],
+            last: [NSRange(location: 0, length: 4)]
+        ]))
+        let original = NSAttributedString(string: "Room again.", attributes: [.foregroundColor: UIColor.label])
+        let highlighted = saved.applying(to: original, address: last, accent: .systemOrange)
+        XCTAssertEqual(highlighted.attribute(.foregroundColor, at: 3, effectiveRange: nil) as? UIColor, .systemOrange)
+        XCTAssertEqual(highlighted.attribute(.foregroundColor, at: 4, effectiveRange: nil) as? UIColor, .label)
+        XCTAssertEqual(original.attribute(.foregroundColor, at: 3, effectiveRange: nil) as? UIColor, .label)
+        XCTAssertEqual(passage.range?.start.address.block, 0)
+        XCTAssertEqual(passage.range?.end, .init(address: last, offset: lines.last!.utf16.count))
+
+        let host = NativeChapterSelectionTarget(controller: NativeChapterSelectionController(),
+            address: .init(block: 1), components: [NSRange(location: 0, length: lines[1].utf16.count),
+                NSRange(location: lines[1].utf16.count + 1, length: lines[2].utf16.count)])
+        let selection = NSRange(location: 2, length: lines[1].utf16.count + 3)
+        let mapped = host.documentRange(selection)
+        XCTAssertEqual(mapped.start, .init(address: .init(block: 1), offset: 2))
+        XCTAssertEqual(mapped.end, .init(address: last, offset: 4))
+        XCTAssertEqual(host.localRange(mapped, length: lines[1].utf16.count + 1 + lines[2].utf16.count), selection)
     }
 
     func testNativeReaderVisibleBlockResolutionObservesWithoutReassertingScrollPosition() {
@@ -11354,6 +11580,30 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertEqual(styled.attribute(.foregroundColor, at: 11, effectiveRange: nil) as? UIColor, accent)
     }
 
+    func testSavedCharactersInDefinitionAndAuthoredLinksKeepTheirColorAndDestination() throws {
+        let entry = ReaderDefinitionEntry(id: "fixture", term: "FIRE WALL", aliases: [], text: "Fixture", resolution: "direct", applicability: "definition-chapter", source: .init(file: "fixture", anchor: "fixture", sectionNumber: "202", chapter: "2", code: "BC", bundle: "2022"))
+        let source = NSMutableAttributedString(string: "fire wall and § 203")
+        let reference = try XCTUnwrap(URL(string: "https://example.com/code-reference"))
+        source.addAttribute(.link, value: reference, range: NSRange(location: 14, length: 5))
+        let address = NativeChapterSelectionAddress(block: 0)
+        let saved = NativeReaderSavedText.ranges([address: [NSRange(location: 5, length: 4), NSRange(location: 16, length: 3)]])
+        let accent = UIColor.systemOrange
+        let matcher = ReaderDefinitionMatcher(entries: [entry])
+        // The ungrouped Reader decorates definitions after applying the saved color.
+        let decorated = matcher.decorating(saved.applying(to: source, address: address, accent: accent))
+        let styled = ReaderEnactedTextLinkStyle.applying(to: decorated)
+        let definition = try XCTUnwrap(styled.attribute(.link, at: 5, effectiveRange: nil) as? URL)
+        XCTAssertEqual(matcher.definitions(for: definition).map(\.id), ["fixture"])
+        XCTAssertEqual(styled.attribute(.link, at: 16, effectiveRange: nil) as? URL, reference)
+        for offset in [0, 4, 14, 15] {
+            XCTAssertEqual(styled.attribute(.foregroundColor, at: offset, effectiveRange: nil) as? UIColor, .secondaryLabel)
+        }
+        for offset in [5, 8, 16, 18] {
+            XCTAssertEqual(styled.attribute(.foregroundColor, at: offset, effectiveRange: nil) as? UIColor, accent)
+        }
+        XCTAssertNil(ReaderEnactedTextLinkStyle.textViewAttributes[.foregroundColor])
+    }
+
     func testDefinitionRegistryDoesNotDefaultUnknownEdition() throws {
         let registry = try registry()
         let context = ReaderDefinitionContext(versionFileName: "unknown", codeSectionID: 1, chapterNumber: "1")
@@ -12051,6 +12301,8 @@ final class NativeNotebookRefreshDecisionTests: XCTestCase {
         XCTAssertTrue(acknowledged.hasUnsynchronizedChanges)
         XCTAssertEqual(acknowledged.document, saved.document)
         XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: acknowledged, serverVersion: 7, serverContent: saved), .applyServer)
+        acknowledged.openQuestions = []
+        XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: acknowledged, serverVersion: 9, serverContent: saved), .applyServer)
     }
 }
 

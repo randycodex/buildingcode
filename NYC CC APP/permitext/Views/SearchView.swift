@@ -311,7 +311,6 @@ struct SearchView: View {
     private var sessionAccountID: String { library.signedInAccount?.appUserID ?? "permitext-signed-out-search" }
     private var sessionScope: String { "\(sessionAccountID)|all-installed-editions" }
 
-    private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let tabBarClearance: CGFloat = CodeScreenMetrics.searchTabBarClearance
 
     private var accentColor: Color {
@@ -439,7 +438,6 @@ struct SearchView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar { searchToolbar }
         .onAppear {
-            rebuildSearchCaches()
             rebuildJumpBackInCache()
             scheduleSearch()
             if library.pendingDeepLinkedSectionID != nil {
@@ -564,7 +562,6 @@ struct SearchView: View {
                                 .accessibilityAddTraits(.isHeader)
                                 .accessibilityIdentifier("search-family-\(family.id)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, 16)
                                 .padding(.top, 16)
                                 .background(Color(uiColor: .secondarySystemGroupedBackground),
                                     in: UnevenRoundedRectangle(topLeadingRadius: 22, topTrailingRadius: 22, style: .continuous))
@@ -574,12 +571,10 @@ struct SearchView: View {
                                     sectionGroupHeader(group)
                                     Divider()
                                 }
-                                .padding(.horizontal, 16)
                                 .background(Color(uiColor: .secondarySystemGroupedBackground))
                                 if expandedSearchGroups.contains(group.id) {
                                     ForEach(group.results, id: \.searchIdentity) { result in
                                         searchResultLink(result, groupID: group.id)
-                                            .padding(.horizontal, 16)
                                             .background(Color(uiColor: .secondarySystemGroupedBackground))
                                     }
                                 }
@@ -594,7 +589,7 @@ struct SearchView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
-            .padding(.horizontal, contentHorizontalInset)
+            .codeTabAlignedHorizontalPadding()
             .padding(.top, 8)
             .padding(.bottom, 16)
         }
@@ -670,7 +665,7 @@ struct SearchView: View {
                     case .viewed: recentlyViewedSection(limit: nil)
                     }
                 }
-                .padding(contentHorizontalInset)
+                .padding(CodeScreenMetrics.screenHorizontalPadding)
             }
             .scrollIndicators(.hidden)
             .navigationTitle(collection.rawValue)

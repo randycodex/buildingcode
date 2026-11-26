@@ -8,7 +8,7 @@ const context=vm.createContext({state,queue,Date,Set,document:{activeElement:nul
   requirePrivateWorkspaceWritable(){},captureAccountRequest:()=>({userID:'u'}),requireCurrentAccountRequest(){},
   activeAccount:()=>({userID:'u'}),workspaceProject:()=>project,savedItemForSection:()=>null,
   primarySavedPaneID:()=>'',currentContentSummary:()=>({projects:[]}),hasCapability:()=>true,
-  projectRecordID:p=>p.id,syncCodeVersion:x=>x,defaultSyncCodeVersion:'edition',setLocalSectionSaved(){},
+  projectRecordID:p=>p.id,syncCodeVersion:x=>x,defaultSyncCodeVersion:'edition',setLocalSectionSaved(){},syncReaderNoteBookmarkButtons(){},syncSearchResultBookmarkButtons(){},
   savedEvidenceKey:x=>x.sectionID,savedRecordForSection:x=>({...x,id:x.sectionID}),
   savedMutationForSection:x=>({savedItem:{...x,id:x.sectionID}}),saveWorkspaceState(){},
   projectSectionRecordForSection:(p,x)=>({...x,id:`project-${x.sectionID}`}),

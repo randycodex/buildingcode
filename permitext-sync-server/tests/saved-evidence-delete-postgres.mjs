@@ -69,5 +69,51 @@ sql.transaction=async queries=>{
 const concurrent=await repo.deleteSavedEvidence(user,{projectID:'p',items});
 assert.equal(concurrent.deletedCount,101);assert(guards>=2,'Competing sync must retry with a fresh snapshot');
 assert.equal((await db.query('SELECT count(*)::int AS n FROM permitext_saved_items WHERE deleted_at IS NULL')).rows[0].n,2,'New competing destination keeps its bookmark');
+// The project item, full pull, and incremental event must agree after two
+// devices save distinct occurrences of identical text into the same project.
+const membershipID = 'repeated-quote-project-link';
+const quote = 'lot line';
+const membership = (second, fields) => ({projectSection: {
+  id: membershipID, userID: user, sectionID: 1101, codeVersion, folderClientID: 'p',
+  updatedAt: new Date(1700000000000 + 1000 * second).toISOString(), ...fields
+}});
+const selection = index => ({selectedExcerpts: [quote], selectedExcerptOccurrences: {[quote]: [index]}});
+const pushLink = mutation => repo.push(user, [mutation]);
+const firstSelection = await pushLink(membership(2, selection(1)));
+const competing = membership(1, selection(0)); // authored earlier while offline
+const newer = membership(3, {selectedExcerpts: '["other"]', selectedExcerptOccurrences: '{"other":[2]}'});
+let injectCompetingSelection = true;
+sql.transaction = async queries => {
+  if (injectCompetingSelection && queries.some(q => q.query.includes('AS selection_snapshot_guard'))) {
+    injectCompetingSelection = false;
+    assert.deepEqual((await pushLink(competing)).acceptedMutationIDs, [membershipID]);
+  }
+  return originalTransaction(queries);
+};
+assert.deepEqual((await pushLink(newer)).acceptedMutationIDs, [membershipID]);
+sql.transaction = originalTransaction;
+const legacyWrite = await pushLink(membership(4, {}));
+const retry = await pushLink(competing);
+assert.deepEqual(retry.acceptedMutationIDs, [membershipID]);
+assert.equal(retry.latestEventID, legacyWrite.latestEventID);
+const expected = {[quote]: [0, 1], other: [2]};
+const delta = await repo.pull(user, {sinceEventID: firstSelection.latestEventID});
+assert.deepEqual(delta.mutations.find(m => m.projectSection?.id === membershipID).projectSection.selectedExcerptOccurrences, expected);
+for (const table of ['sync_events', 'project_items', 'user_content_records']) {
+  const {rows} = await db.query(
+    `SELECT mutation FROM permitext_${table} WHERE record_id=$1${table === 'sync_events' ? ' ORDER BY event_id DESC LIMIT 1' : ''}`,
+    [membershipID]);
+  assert.deepEqual(rows[0].mutation.projectSection.selectedExcerptOccurrences, expected, table);
+  assert.deepEqual(rows[0].mutation.projectSection.selectedExcerpts, [quote, 'other'], table);
+}
+const removed = membership(5, {});
+removed.projectSection.deletedAt = removed.projectSection.updatedAt;
+assert.deepEqual((await pushLink(removed)).acceptedMutationIDs, [membershipID]);
+assert.deepEqual((await pushLink(competing)).rejectedMutationIDs, [membershipID]);
+assert.deepEqual((await pushLink(membership(6, selection(2)))).acceptedMutationIDs, [membershipID]);
+assert.deepEqual((await pushLink(competing)).rejectedMutationIDs, [membershipID]);
+const fresh = (await repo.pull(user, {})).mutations.find(m => m.projectSection?.id === membershipID).projectSection;
+assert.deepEqual(fresh.selectedExcerptOccurrences, {[quote]: [2]});
+assert.deepEqual(fresh.selectedExcerpts, [quote]);
 await db.close();
-console.log('Batch delete PostgreSQL passed: actual SQL 101 items, atomic recovery failure rollback, shared destination preservation, notes, idempotency, typed tables and Trash restore.');
+console.log('Batch delete PostgreSQL passed: actual SQL 101 items, atomic recovery failure rollback, shared destination preservation, notes, idempotency, typed tables, Trash restore, and cross-device selection merges with concurrent and delayed writes.');

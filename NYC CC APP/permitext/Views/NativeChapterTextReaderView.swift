@@ -3,6 +3,7 @@ import SwiftUI
 import UIKit
 
 private let nativeReaderLegacyScrollCoordinateSpace = "nativeReaderScroll"
+private let nativeReaderContentCoordinateSpace = "nativeReaderContent"
 
 struct NativeChapterTextReaderView: View {
     let chapter: CodeChapter
@@ -26,12 +27,18 @@ struct NativeChapterTextReaderView: View {
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @State private var document: NativeReaderRuntimeDocument?
     @State private var displayBlocks: [NativeReaderDisplayBlock] = []
+    @StateObject private var textLayout = NativeReaderTextGroupStore()
     @State private var sectionTargets: [NativeReaderSectionTarget] = []
     @State private var sectionMetadata: NativeReaderSectionMetadata = .empty
     @State private var navigationIndex = NativeReaderNavigationIndex.empty
     @StateObject private var scrollState = NativeReaderScrollState()
     @State private var currentSectionTargetIndex: Int?
-    @State private var pendingInitialBlockID: String?
+    private var pendingInitialBlockID: String? {
+        get { scrollState.pendingInitialBlockID }
+        nonmutating set {
+            if scrollState.pendingInitialBlockID != newValue { scrollState.pendingInitialBlockID = newValue }
+        }
+    }
     @State private var explicitNavigation = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var initialTargetIsVisible = false
@@ -84,26 +91,31 @@ struct NativeChapterTextReaderView: View {
             ?? NativeReaderDocumentStore.shared.preparedDocumentIfCached(for: route) {
             _document = State(initialValue: prepared.document)
             _displayBlocks = State(initialValue: prepared.displayBlocks)
+            _textLayout = StateObject(wrappedValue: NativeReaderTextGroupStore(prepared: prepared))
             _sectionTargets = State(initialValue: prepared.sectionTargets)
             _sectionMetadata = State(initialValue: prepared.sectionMetadata)
             _navigationIndex = State(initialValue: prepared.navigationIndex)
-            let target = NativeReaderLocationResolver.initialBlockID(
-                in: prepared.document,
-                prepared: prepared,
-                opensAtChapterTop: opensAtChapterTop,
-                rememberedBlockID: rememberedBlockID.wrappedValue,
-                rememberedAnchorID: rememberedAnchorID.wrappedValue,
-                initialAnchorID: initialAnchorID,
-                initialSectionNumber: initialSectionNumber,
-                initialSectionTitle: initialSectionTitle
-            )
-            let requiresInitialRestore = NativeReaderInitialRestorationPolicy.requiresRestoration(
-                opensAtChapterTop: opensAtChapterTop,
-                targetBlockID: target,
-                firstBlockID: prepared.document.blocks.first?.id,
-                rememberedViewportBlockID: rememberedViewport.wrappedValue?.blockID
-            )
-            _pendingInitialBlockID = State(initialValue: requiresInitialRestore ? target : nil)
+            // StateObject evaluates this initializer once for the mounted chapter.
+            // Parent updates while scrolling must not repeat the opening passage search.
+            _scrollState = StateObject(wrappedValue: {
+                let target = NativeReaderLocationResolver.initialBlockID(
+                    in: prepared.document,
+                    prepared: prepared,
+                    opensAtChapterTop: opensAtChapterTop,
+                    rememberedBlockID: rememberedBlockID.wrappedValue,
+                    rememberedAnchorID: rememberedAnchorID.wrappedValue,
+                    initialAnchorID: initialAnchorID,
+                    initialSectionNumber: initialSectionNumber,
+                    initialSectionTitle: initialSectionTitle
+                )
+                let requiresRestore = NativeReaderInitialRestorationPolicy.requiresRestoration(
+                    opensAtChapterTop: opensAtChapterTop,
+                    targetBlockID: target,
+                    firstBlockID: prepared.document.blocks.first?.id,
+                    rememberedViewportBlockID: rememberedViewport.wrappedValue?.blockID
+                )
+                return NativeReaderScrollState(pendingInitialBlockID: requiresRestore ? target : nil)
+            }())
         }
     }
 
@@ -293,21 +305,14 @@ struct NativeChapterTextReaderView: View {
         document: NativeReaderRuntimeDocument,
         proxy: ScrollViewProxy
     ) -> some View {
+        let scroll = readerScrollView(document: document, proxy: proxy)
+            .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
+            .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { positions in
+                scrollState.blockPositions = positions
+                readerGeometryDidChange(document: document, proxy: proxy)
+            }
         if #available(iOS 18.0, *) {
-            readerScrollView(document: document, proxy: proxy)
-                .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
-                .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
-                    scrollState.blockOffsets = offsets
-                    traceRestoration("offset-preference")
-                    guard !correctLateLayout(proxy: proxy) else { return }
-                    visibleBlockDidChange(
-                        NativeReaderVisibleBlockResolver.topBlockID(
-                            from: offsets,
-                            threshold: CodeScreenMetrics.topTitlePadding + 1
-                        ),
-                        document: document
-                    )
-                }
+            scroll
                 .onScrollPhaseChange { _, newPhase in
                     scrollPhaseDidChange(newPhase, document: document)
                 }
@@ -316,32 +321,36 @@ struct NativeChapterTextReaderView: View {
                 } action: { _, _ in
                     traceRestoration("content-size")
                     guard scrollState.restorationLease != nil else { return }
-                    // Preference offsets and content size arrive independently.
-                    // Coalesce onto the next turn before consuming row geometry.
-                    scrollState.restorationGeometryTask?.cancel()
-                    scrollState.restorationGeometryTask = Task { @MainActor in
-                        await Task.yield()
-                        guard !Task.isCancelled else { return }
-                        traceRestoration("content-size-coalesced")
-                        _ = correctLateLayout(proxy: proxy)
-                    }
+                    readerGeometryDidChange(document: document, proxy: proxy)
                 }
         } else {
-            readerScrollView(document: document, proxy: proxy)
-                .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
-                .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
-                    scrollState.blockOffsets = offsets
-                    traceRestoration("offset-preference")
-                    guard !correctLateLayout(proxy: proxy) else { return }
-                    visibleBlockDidChange(
-                        NativeReaderVisibleBlockResolver.topBlockID(
-                            from: offsets,
-                            threshold: CodeScreenMetrics.topTitlePadding + 1
-                        ),
-                        document: document
-                    )
-                }
+            scroll
         }
+    }
+
+    private func readerGeometryDidChange(document: NativeReaderRuntimeDocument, proxy: ScrollViewProxy) {
+        if scrollState.restorationLease == nil {
+            reportVisibleBlock(document: document)
+            return
+        }
+        // Content size, row positions and viewport position can arrive in
+        // separate callbacks for one layout. Correct only after they settle.
+        scrollState.restorationGeometryTask?.cancel()
+        scrollState.restorationGeometryTask = Task { @MainActor in
+            await Task.yield()
+            guard !Task.isCancelled, !correctLateLayout(proxy: proxy) else { return }
+            reportVisibleBlock(document: document)
+        }
+    }
+
+    private func reportVisibleBlock(document: NativeReaderRuntimeDocument) {
+        visibleBlockDidChange(
+            NativeReaderVisibleBlockResolver.topBlockID(
+                from: scrollState.blockPositions,
+                threshold: CodeScreenMetrics.topTitlePadding + 1 - scrollState.contentTopInViewport
+            ),
+            document: document
+        )
     }
 
     private func readerScrollView(
@@ -357,12 +366,12 @@ struct NativeChapterTextReaderView: View {
             Group {
                 if NativeReaderStackPolicy.usesEagerStack(displayBlocks) {
                     VStack(alignment: .leading, spacing: 0) {
-                        readerBlocks(displayBlocks, document: document, proxy: proxy, tracksOffsets: true)
+                        chapterRows(document: document, proxy: proxy)
                     }
                     .scrollTargetLayout()
                 } else {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        readerBlocks(displayBlocks, document: document, proxy: proxy, tracksOffsets: true)
+                        chapterRows(document: document, proxy: proxy)
                     }
                     .scrollTargetLayout()
                 }
@@ -370,7 +379,22 @@ struct NativeChapterTextReaderView: View {
             .codeTabAlignedHorizontalPadding()
             .padding(.top, CodeScreenMetrics.topTitlePadding)
             .padding(.bottom, 28 + readerControlsClearance)
-            .background(NativeReaderScrollViewProbe { scrollView in
+            // Scrolling moves this one origin. Rows report their position
+            // within the content only when the lazy stack lays them out.
+            .coordinateSpace(name: nativeReaderContentCoordinateSpace)
+            .background(alignment: .top) {
+                Color.clear.frame(height: 1)
+                    .onGeometryChange(for: CGFloat.self) { geometry in
+                        geometry.frame(in: .named(nativeReaderLegacyScrollCoordinateSpace)).minY
+                    } action: { top in
+                        scrollState.contentTopInViewport = top
+                        readerGeometryDidChange(document: document, proxy: proxy)
+                    }
+            }
+            .background(NativeReaderScrollViewProbe { [weak library, weak textLayout, scrollState] scrollView in
+#if DEBUG
+                NativeReaderFrameProbe.shared.attach(scrollView)
+#endif
                 scrollState.scrollView = scrollView
                 let selection = scrollState.chapterSelection
                 selection.attach(to: scrollView)
@@ -381,9 +405,29 @@ struct NativeChapterTextReaderView: View {
                         return library?.sectionSummary(sectionNumber: number, codeSectionID: codeSectionID)?.id
                     }
                 }
+                selection.passageRange = { [weak textLayout] range in
+                    guard let layout = textLayout, blocks.indices.contains(range.start.address.block),
+                          blocks.indices.contains(range.end.address.block),
+                          let target = index[blocks[range.start.address.block].id]?.sectionTargetIndex,
+                          index[blocks[range.end.address.block].id]?.sectionTargetIndex == target,
+                          targets[target].sectionNumber != nil else { return nil }
+                    return layout.passageRange(target)
+                }
                 selection.askAssistant = { [weak library] in library?.sendToResearch($0) }
-                selection.saveToEvidence = { [weak library] passages in
-                    library?.saveReaderSelectionToEvidence(passages) ?? false
+                selection.saveToEvidence = { [weak library, weak textLayout] passages, range in
+                    guard let library, let textLayout else { return false }
+                    var occurrences: [Int64: [String: [Int]]] = [:]
+                    var visited = Set<Int>()
+                    for block in range.start.address.block...range.end.address.block where blocks.indices.contains(block) {
+                        guard let target = index[blocks[block].id]?.sectionTargetIndex, visited.insert(target).inserted,
+                              let number = targets[target].sectionNumber,
+                              let id = library.sectionSummary(sectionNumber: number, codeSectionID: codeSectionID)?.id,
+                              let passage = passages.first(where: { $0.sectionID == String(id) }),
+                              let location = textLayout.passage(target) else { continue }
+                        let quote = passage.selectedText
+                        occurrences[id, default: [:]][quote] = location.occurrences(for: range, quote: quote)
+                    }
+                    return library.saveReaderSelectionToEvidence(passages, occurrences: occurrences)
                 }
             })
         }
@@ -391,21 +435,62 @@ struct NativeChapterTextReaderView: View {
         .accessibilityIdentifier("native-reader-ready")
     }
 
+    @ViewBuilder
+    private func chapterRows(document: NativeReaderRuntimeDocument, proxy: ScrollViewProxy) -> some View {
+        let projectID = library.readerSaveDestinationProject?.id
+        let evidence = library.readerEvidence
+        if !textLayout.groups.isEmpty && searchQuery.isEmpty {
+            ForEach(textLayout.groups) { group in
+                if group.rows.count == 1 || group.rows.dropFirst().contains(where: { scrollState.exactLayoutBlockIDs.contains($0.id) }) {
+                    readerBlocks(Array(group.rows), document: document, proxy: proxy, tracksOffsets: true, projectID: projectID, evidence: evidence)
+                } else {
+                    let index = navigationIndex[group.id]?.sectionTargetIndex
+                    let target = index.map { sectionTargets[$0] }
+                    // Only paragraphs receive definition links. The heading may carry its own source ID.
+                    let sectionID = group.rows.first(where: { $0.block.kind == .paragraph })?.block.sectionID ?? ""
+                    NativeReaderGroupedTextView(
+                        group: group, routeID: route.id, theme: library.readerTheme,
+                        accent: library.accentColor(for: chapter.codeSectionID),
+                        saved: savedText(for: index, projectID: projectID, evidence: evidence), selection: scrollState.chapterSelection,
+                        onOpenLink: { handleLink($0, document: document, proxy: proxy) },
+                        onResearch: { sendSelectionToResearch($0, target: target) }
+                    )
+                    .equatable()
+                    .environment(\.readerDefinitionContext, sectionMetadata.definitionSectionIDs.contains(sectionID) ? nil : chapter.codeSectionID.map {
+                        ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0,
+                                                chapterNumber: chapter.chapterNumber, chapterID: chapter.id,
+                                                sectionNumber: sectionMetadata.sectionNumbersBySectionID[sectionID])
+                    })
+                    .id(group.id)
+                    .modifier(NativeReaderBlockOffsetModifier(blockID: group.id, tracksOffset: true))
+                }
+            }
+        } else {
+            readerBlocks(displayBlocks, document: document, proxy: proxy, tracksOffsets: true, projectID: projectID, evidence: evidence)
+        }
+    }
+
+    private func savedText(for targetIndex: Int?, projectID: Int64?, evidence: [Int64: [Int64: ReaderEvidenceText]]) -> NativeReaderSavedText {
+        guard let projectID, !evidence.isEmpty, let targetIndex,
+              let sectionID = sectionSummary(for: sectionTargets[targetIndex])?.id,
+              let excerpts = evidence[sectionID]?[projectID] else { return .none }
+        return textLayout.savedText(excerpts, target: targetIndex)
+    }
+
     private func readerBlocks(
         _ blocks: [NativeReaderDisplayBlock],
         document: NativeReaderRuntimeDocument,
         proxy: ScrollViewProxy,
-        tracksOffsets: Bool
+        tracksOffsets: Bool,
+        projectID: Int64?,
+        evidence: [Int64: [Int64: ReaderEvidenceText]]
     ) -> some View {
         let needsSectionScope = chapter.codeSectionID.map {
             ReaderDefinitionStore.shared.hasSectionScopes(for: ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber, chapterID: chapter.id))
         } ?? false
-        let destinationID = library.readerSaveDestinationProject?.id
         return ForEach(blocks) { displayBlock in
             let location = navigationIndex[displayBlock.id]
             let target = location?.sectionTargetIndex.map { sectionTargets[$0] }
-            let bookmarkSectionID = target.flatMap(sectionSummary(for:))?.id
-            let memberships = bookmarkSectionID.flatMap { library.folderMembership[$0] } ?? []
             NativeReaderTextBlockView(
                 block: displayBlock.block,
                 hierarchyIndentation: displayBlock.hierarchyIndentation,
@@ -429,8 +514,8 @@ struct NativeChapterTextReaderView: View {
                 searchQuery: searchQuery,
                 searchMatches: searchMatchesByBlock[displayBlock.id] ?? [],
                 activeSearchMatchID: activeSearchMatchID,
-                bookmarkSectionID: bookmarkSectionID,
-                isBookmarked: destinationID.map(memberships.contains) ?? false,
+                saved: savedText(for: location?.sectionTargetIndex, projectID: projectID, evidence: evidence),
+                blockIndex: location?.displayIndex ?? 0,
                 chapterSelectionTarget: tracksOffsets ? location.map {
                     NativeChapterSelectionTarget(controller: scrollState.chapterSelection, address: .init(block: $0.displayIndex))
                 } : nil,
@@ -464,7 +549,8 @@ struct NativeChapterTextReaderView: View {
                     && abs((saved?.width ?? 0) - Double(geometry.size.width)) < 1
                 VStack(alignment: .leading, spacing: 0) {
                     readerBlocks(Array(displayBlocks[index..<min(displayBlocks.count, index + 12)]),
-                                 document: document, proxy: proxy, tracksOffsets: false)
+                                 document: document, proxy: proxy, tracksOffsets: false,
+                                 projectID: library.readerSaveDestinationProject?.id, evidence: library.readerEvidence)
                 }
                 .codeTabAlignedHorizontalPadding()
                 .frame(width: geometry.size.width, alignment: .topLeading)
@@ -531,6 +617,8 @@ struct NativeChapterTextReaderView: View {
         sectionMetadata = .empty
         navigationIndex = .empty
         pendingInitialBlockID = nil
+        scrollState.blockPositions = [:]
+        scrollState.contentTopInViewport = 0
         scrollState.visibleBlockID = nil
         scrollState.isScrollActive = false
         scrollState.isDecelerating = false
@@ -588,6 +676,7 @@ struct NativeChapterTextReaderView: View {
                 scrollState.lastTextPrefetchCenterIndex = initialIndex
             }
             displayBlocks = prepared.displayBlocks
+            textLayout.prepare(prepared)
             sectionTargets = prepared.sectionTargets
             sectionMetadata = prepared.sectionMetadata
             navigationIndex = prepared.navigationIndex
@@ -631,9 +720,20 @@ struct NativeChapterTextReaderView: View {
             } catch {
                 return
             }
-            guard !Task.isCancelled, isBrowserTabActive,
-                  pendingInitialBlockID == nil, !scrollState.isScrollActive,
-                  scrollState.visibleBlockID == displayBlockID else { return }
+            @MainActor func isStillSettled() -> Bool {
+                !Task.isCancelled && isBrowserTabActive && pendingInitialBlockID == nil
+                    && !scrollState.isScrollActive && scrollState.visibleBlockID == displayBlockID
+            }
+            guard isStillSettled() else { return }
+            if let index = navigationIndex[displayBlockID]?.sectionTargetIndex {
+                let target = sectionTargets[index]
+                if target.id != lastRecordedSectionTargetID, let sectionID = sectionSummary(for: target)?.id {
+                    // Recently Viewed reads the official passage for its preview. A cold
+                    // lookup can parse chapter HTML; warm it off the scrolling thread.
+                    _ = await library.loadSectionDetailAsync(sectionID: sectionID)
+                    guard isStillSettled() else { return }
+                }
+            }
             persistLocation(blockID: displayBlockID)
             scheduleNearbyMediaPrefetch(around: displayBlockID, document: document)
             settledScrollTask = nil
@@ -719,7 +819,7 @@ struct NativeChapterTextReaderView: View {
               let started = scrollState.debugRestorationStartedAt, now - started <= 45 else { return }
         let view = scrollState.scrollView
         let lease = scrollState.restorationLease
-        let y = scrollState.blockOffsets[observed]
+        let y = scrollState.viewportY(for: observed)
         let offset = view?.contentOffset.y
         let origin = y.flatMap { y in offset.map { y + $0 } }
         let measuredDelta = lease.flatMap { lease in
@@ -773,7 +873,7 @@ struct NativeChapterTextReaderView: View {
             }
             try? await Task.sleep(for: .milliseconds(16))
             if initialTargetIsVisible,
-               let offset = scrollState.blockOffsets[targetBlockID],
+               let offset = scrollState.viewportY(for: targetBlockID),
                let scrollView = scrollState.scrollView {
                 let height = scrollView.contentSize.height
                 if let previousGeometry,
@@ -825,7 +925,7 @@ struct NativeChapterTextReaderView: View {
         for _ in 0..<50 {
             guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return false }
             if let view = scrollState.scrollView,
-               let currentY = scrollState.blockOffsets[targetBlockID], currentY.isFinite {
+               let currentY = scrollState.viewportY(for: targetBlockID), currentY.isFinite {
                 let desired = boundedOffset(view.contentOffset.y + currentY - minY, in: view)
                 let height = view.contentSize.height
                 if abs(desired - view.contentOffset.y) >= 1 {
@@ -872,7 +972,7 @@ struct NativeChapterTextReaderView: View {
         let lease = NativeReaderRestorationLease(blockID: blockID, minY: minY,
             width: view.bounds.width, previousOffset: view.contentOffset.y,
             previousHeight: view.contentSize.height,
-            previousOrigin: scrollState.blockOffsets[blockID].map { $0 + view.contentOffset.y })
+            previousOrigin: scrollState.viewportY(for: blockID).map { $0 + view.contentOffset.y })
         scrollState.restorationLease = lease
         traceRestoration("lease-begin")
         // Safety expiry limits corrective ownership; it never delays revealing
@@ -891,7 +991,7 @@ struct NativeChapterTextReaderView: View {
 
     private func restorationHasArrived(_ lease: NativeReaderRestorationLease) -> Bool {
         guard let view = scrollState.scrollView,
-              let y = scrollState.blockOffsets[lease.blockID], y.isFinite,
+              let y = scrollState.viewportY(for: lease.blockID), y.isFinite,
               y >= lease.minY - 1, y < view.bounds.height else { return false }
         return abs(boundedOffset(view.contentOffset.y + y - lease.minY, in: view) - view.contentOffset.y) < 1
     }
@@ -909,7 +1009,7 @@ struct NativeChapterTextReaderView: View {
         }
         let offset = view.contentOffset.y
         let height = view.contentSize.height
-        let y = scrollState.blockOffsets[lease.blockID]
+        let y = scrollState.viewportY(for: lease.blockID)
         let origin = y.map { $0 + offset }
         let heightChanged = abs(height - lease.previousHeight) >= 1
         let originChanged = origin.flatMap { current in lease.previousOrigin.map { abs(current - $0) >= 1 } } ?? false
@@ -987,7 +1087,7 @@ struct NativeChapterTextReaderView: View {
     private func persistLocation(blockID: String?) {
         guard let blockID, let location = navigationIndex[blockID] else { return }
         if pendingInitialBlockID == nil,
-           let minY = scrollState.blockOffsets[blockID],
+           let minY = scrollState.viewportY(for: blockID),
            let width = scrollState.scrollView?.bounds.width, width > 0 {
             rememberedViewport.wrappedValue = NativeReaderViewportPosition(routeID: route.id, theme: library.readerTheme, blockID: blockID, minY: Double(minY), width: Double(width))
         }
@@ -1173,6 +1273,16 @@ private struct NativeReaderRestorationLease {
 
 @MainActor
 private final class NativeReaderScrollState: ObservableObject {
+    var exactLayoutBlockIDs: Set<String> = []
+    @Published var pendingInitialBlockID: String? {
+        didSet { if let pendingInitialBlockID { exactLayoutBlockIDs.insert(pendingInitialBlockID) } }
+    }
+
+    init(pendingInitialBlockID: String? = nil) {
+        self.pendingInitialBlockID = pendingInitialBlockID
+        if let pendingInitialBlockID { exactLayoutBlockIDs.insert(pendingInitialBlockID) }
+    }
+
 #if DEBUG
     var debugObservedRestorationTarget: String?
     var debugRestorationStartedAt: TimeInterval?
@@ -1184,12 +1294,17 @@ private final class NativeReaderScrollState: ObservableObject {
     var restorationGeometryTask: Task<Void, Never>?
     weak var scrollView: UIScrollView?
     let chapterSelection = NativeChapterSelectionController()
-    var blockOffsets: [String: CGFloat] = [:]
+    var blockPositions: [String: CGFloat] = [:]
+    var contentTopInViewport: CGFloat = 0
     var visibleBlockID: String?
     var isScrollActive = false
     var isDecelerating = false
     var lastTextPrefetchCenterIndex: Int?
     var textPrefetchTask: Task<Void, Never>?
+
+    func viewportY(for blockID: String) -> CGFloat? {
+        blockPositions[blockID].map { $0 + contentTopInViewport }
+    }
 
     func waitForNavigationTransition() async {
         var responder: UIResponder? = scrollView
@@ -1244,7 +1359,7 @@ private struct NativeReaderBlockOffsetModifier: ViewModifier {
                         key: NativeReaderBlockOffsetPreferenceKey.self,
                         value: [
                             blockID: geometry.frame(
-                                in: .named(nativeReaderLegacyScrollCoordinateSpace)
+                                in: .named(nativeReaderContentCoordinateSpace)
                             ).minY
                         ]
                     )
@@ -2113,15 +2228,12 @@ private struct NativeReaderTextBlockView: View, Equatable {
     let searchQuery: String
     let searchMatches: [NativeReaderSearchMatch]
     let activeSearchMatchID: String?
-    let bookmarkSectionID: Int64?
-    let isBookmarked: Bool
+    var saved: NativeReaderSavedText = .none
+    var blockIndex = 0
     var chapterSelectionTarget: NativeChapterSelectionTarget? = nil
     let onResearchSelection: (String) -> Void
 
-    @EnvironmentObject private var library: CodeLibraryViewModel
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.tabNavigationHorizontalInset) private var tabNavigationHorizontalInset
-    @State private var passageSwipe = ReaderPassageSwipeState(revealWidth: CodeScreenMetrics.readerPassageRevealWidth)
 
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.block == rhs.block
@@ -2133,8 +2245,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
             && lhs.searchQuery == rhs.searchQuery
             && lhs.searchMatches == rhs.searchMatches
             && lhs.activeSearchMatchID == rhs.activeSearchMatchID
-            && lhs.bookmarkSectionID == rhs.bookmarkSectionID
-            && lhs.isBookmarked == rhs.isBookmarked
+            && lhs.saved == rhs.saved && lhs.blockIndex == rhs.blockIndex
             && lhs.chapterSelectionTarget == rhs.chapterSelectionTarget
     }
 
@@ -2144,7 +2255,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
             case .heading:
                 heading
             case .paragraph:
-                bookmarkableParagraph
+                selectableText(role: .body)
             case .orderedList, .unorderedList:
                 NativeReaderListBlockView(
                     cachePrefix: route.id,
@@ -2156,7 +2267,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
                     onOpenLink: onOpenLink,
                     searchQuery: searchQuery,
                     onResearchSelection: onResearchSelection,
-                    isBookmarked: isBookmarked,
+                    saved: saved, blockIndex: blockIndex,
                     chapterSelectionTarget: chapterSelectionTarget
                 )
             case .caption:
@@ -2216,102 +2327,9 @@ private struct NativeReaderTextBlockView: View, Equatable {
             }
         }
         .accessibilityValue([
-            isBookmarked ? "Saved section" : "",
+            saved.contains(block: blockIndex) ? "Saved text" : "",
             searchMatches.isEmpty ? "" : "\(searchMatches.count) search matches"
         ].filter { !$0.isEmpty }.joined(separator: ", "))
-        .onDisappear { passageSwipe.close() }
-    }
-
-    @ViewBuilder
-    private var bookmarkableParagraph: some View {
-        if let bookmarkSectionID {
-            selectableText(
-                role: .body,
-                onPassageSwipe: handlePassageSwipe,
-                onSelectionChange: { hasSelection in
-                    if hasSelection { passageSwipe.close() }
-                }
-            )
-            .padding(.trailing, isBookmarked ? 24 : 0)
-            .offset(x: passageSwipe.offset)
-            .clipped()
-            .overlay(alignment: .trailing) {
-                if isBookmarked && passageSwipe.offset == 0 {
-                    Image(systemName: "bookmark.fill")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(Color(uiColor: accentColor))
-                        .frame(width: 24)
-                        .allowsHitTesting(false)
-                        .accessibilityHidden(true)
-                } else if passageSwipe.isOpen {
-                    // Keep the save confirmation and its Project action outside the tray bounds.
-                    passageActions(sectionID: bookmarkSectionID)
-                } else {
-                    passageActions(sectionID: bookmarkSectionID)
-                        .mask(alignment: .trailing) {
-                            Rectangle().frame(width: max(-passageSwipe.offset - CodeScreenMetrics.readerPassageActionGap, 0))
-                        }
-                }
-            }
-            .accessibilityAction(named: "Show passage actions") {
-                withAnimation(reduceMotion ? nil : .smooth(duration: 0.24)) { passageSwipe.open() }
-            }
-            .accessibilityAction(named: "Ask Assistant about this passage") {
-                onResearchSelection(block.plainText)
-            }
-        } else {
-            selectableText(role: .body)
-        }
-    }
-
-    private func passageActions(sectionID: Int64) -> some View {
-        HStack(spacing: CodeScreenMetrics.readerPassageActionSpacing) {
-            ReaderCurrentSectionBookmarkButton(
-                sectionID: sectionID,
-                accentColor: Color(uiColor: accentColor),
-                accessibilityID: "reader-passage-bookmark-\(sectionID)"
-            )
-            .scaleEffect(passageSwipe.isSaveArmed && !isBookmarked ? 1.15 : 1)
-            .animation(reduceMotion ? nil : .smooth(duration: 0.15), value: passageSwipe.isSaveArmed)
-            .background(Color(uiColor: accentColor).opacity(0.18), in: RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius))
-
-            Button {
-                onResearchSelection(block.plainText)
-            } label: {
-                Image(systemName: ReaderSelectionMenuBuilder.researchSystemImageName)
-                    .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                    .foregroundStyle(Color(uiColor: accentColor))
-                    .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .background(Color(uiColor: accentColor).opacity(0.18), in: RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius))
-            .accessibilityLabel("Ask Assistant about this passage")
-            .accessibilityIdentifier("reader-passage-research-\(sectionID)")
-        }
-        .frame(width: CodeScreenMetrics.readerPassageActionTrayWidth)
-        .opacity(passageSwipe.revealProgress)
-        .allowsHitTesting(passageSwipe.isOpen)
-        .accessibilityHidden(!passageSwipe.isOpen)
-    }
-
-    private func handlePassageSwipe(_ event: ReaderPassageSwipeEvent) {
-        if passageSwipe.shouldSave(on: event), let sectionID = bookmarkSectionID,
-           !library.isSavedToReaderDestination(sectionID: sectionID),
-           library.toggleReaderDestinationSave(sectionID: sectionID) {
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
-            withAnimation(reduceMotion ? nil : .smooth(duration: 0.24)) { passageSwipe.close() }
-            return
-        }
-        switch event {
-        case .began, .changed:
-            // Follow the finger directly; animate only the final settling motion.
-            var transaction = Transaction()
-            transaction.animation = nil
-            withTransaction(transaction) { passageSwipe.apply(event) }
-        case .ended, .cancelled:
-            withAnimation(reduceMotion ? nil : .smooth(duration: 0.24)) { passageSwipe.apply(event) }
-        }
     }
 
     @ViewBuilder
@@ -2338,11 +2356,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
         }
     }
 
-    private func selectableText(
-        role: NativeReaderTypographyRole,
-        onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil,
-        onSelectionChange: ((Bool) -> Void)? = nil
-    ) -> some View {
+    private func selectableText(role: NativeReaderTypographyRole) -> some View {
         let cacheID = NativeReaderAttributedTextCacheKey.block(
             routeID: route.id,
             blockID: block.id,
@@ -2359,9 +2373,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
             activeHighlightRange: searchMatches.first(where: { $0.id == activeSearchMatchID })?.range,
             onOpenLink: onOpenLink,
             onResearchSelection: onResearchSelection,
-            onPassageSwipe: onPassageSwipe,
-            onSelectionChange: onSelectionChange,
-            isBookmarked: isBookmarked,
+            saved: saved, address: .init(block: blockIndex),
             chapterSelectionTarget: chapterSelectionTarget
         )
     }
@@ -2521,8 +2533,6 @@ struct NativeReaderPhase9SnapshotHarness: View {
                         searchQuery: configuration.searchQuery,
                         searchMatches: NativeReaderSearchIndex.matches(query: configuration.searchQuery, in: [displayBlock]),
                         activeSearchMatchID: nil,
-                        bookmarkSectionID: nil,
-                        isBookmarked: false,
                         onResearchSelection: { _ in }
                     )
                 }
@@ -2703,7 +2713,8 @@ private struct NativeReaderListBlockView: View {
     let onOpenLink: (URL) -> Void
     let searchQuery: String
     let onResearchSelection: (String) -> Void
-    var isBookmarked = false
+    var saved: NativeReaderSavedText = .none
+    var blockIndex = 0
     var chapterSelectionTarget: NativeChapterSelectionTarget? = nil
 
     private var rows: [NativeReaderListRow] {
@@ -2723,6 +2734,7 @@ private struct NativeReaderListBlockView: View {
                             ),
                             runs: row.runs,
                             plainText: row.plainText,
+                            address: .init(block: blockIndex, row: rowIndex),
                             selectionTarget: chapterSelectionTarget?.listText(row: rowIndex)
                         )
                     } else {
@@ -2737,6 +2749,7 @@ private struct NativeReaderListBlockView: View {
                                     ),
                                     runs: segment.runs,
                                     plainText: segment.plainText,
+                                    address: .init(block: blockIndex, row: rowIndex, segment: index),
                                     selectionTarget: chapterSelectionTarget?.listText(row: rowIndex, segment: index)
                                 )
                             case .table:
@@ -2772,6 +2785,7 @@ private struct NativeReaderListBlockView: View {
         cacheID: String,
         runs: [NativeReaderRuntimeTextRun],
         plainText: String,
+        address: NativeChapterSelectionAddress,
         selectionTarget: NativeChapterSelectionTarget?
     ) -> some View {
         HStack(alignment: .top, spacing: 8) {
@@ -2792,7 +2806,7 @@ private struct NativeReaderListBlockView: View {
                 ),
                 onOpenLink: onOpenLink,
                 onResearchSelection: onResearchSelection,
-                isBookmarked: isBookmarked,
+                saved: saved, address: address,
                 chapterSelectionTarget: selectionTarget
             )
         }
@@ -2828,7 +2842,198 @@ private struct NativeReaderListRow: Identifiable {
     }
 }
 
+enum NativeReaderSavedText: Equatable {
+    case none
+    case whole
+    case ranges([NativeChapterSelectionAddress: [NSRange]])
+
+    func contains(block: Int) -> Bool {
+        switch self {
+        case .none: return false
+        case .whole: return true
+        case .ranges(let ranges): return ranges.keys.contains { $0.block == block }
+        }
+    }
+
+    func applying(to source: NSAttributedString, address: NativeChapterSelectionAddress, accent: UIColor) -> NSAttributedString {
+        let spans: [NSRange]
+        switch self {
+        case .none: return source
+        case .whole: spans = [NSRange(location: 0, length: source.length)]
+        case .ranges(let ranges): spans = ranges[address] ?? []
+        }
+        guard !spans.isEmpty else { return source }
+        let result = NSMutableAttributedString(attributedString: source)
+        for span in spans where NSMaxRange(span) <= source.length {
+            source.enumerateAttribute(.backgroundColor, in: span) { background, range, _ in
+                if background == nil {
+                    result.addAttributes([.foregroundColor: accent, .nativeReaderSavedForeground: accent], range: range)
+                }
+            }
+        }
+        return result
+    }
+}
+
+// Evidence stores verbatim excerpts per provision. Match against its continuous
+// text so a selection spanning paragraphs colors only the selected characters.
+struct NativeReaderPassageText {
+    struct Segment {
+        let address: NativeChapterSelectionAddress
+        let text: String
+    }
+
+    let segments: [Segment]
+    private let text: NSString
+    private let searchText: SearchText
+    private let locations: [(address: NativeChapterSelectionAddress, inPassage: NSRange, leadingSpace: Int)]
+
+    init(rows: ArraySlice<NativeReaderDisplayBlock>) {
+        segments = rows.indices.flatMap { NativeReaderChapterSelectionText.segments(in: rows[$0].block, index: $0) }
+            .filter { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        var parts: [String] = []
+        var locations: [(address: NativeChapterSelectionAddress, inPassage: NSRange, leadingSpace: Int)] = []
+        var offset = 0
+        for segment in segments {
+            let trimmed = segment.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            let local = (segment.text as NSString).range(of: trimmed, options: .literal)
+            if !parts.isEmpty { offset += 1 }
+            parts.append(trimmed)
+            locations.append((segment.address, NSRange(location: offset, length: local.length), local.location))
+            offset += local.length
+        }
+        let text = parts.joined(separator: "\n")
+        self.text = text as NSString
+        self.searchText = SearchText(text)
+        self.locations = locations
+    }
+
+    var range: NativeChapterSelectionRange? {
+        guard let first = segments.first, let last = segments.last else { return nil }
+        return .init(.init(address: first.address, offset: 0),
+                     .init(address: last.address, offset: last.text.utf16.count))
+    }
+
+    func offset(for selection: NativeChapterSelectionRange, quote: String) -> Int? {
+        for (part, segment) in zip(locations, segments) {
+            let original = segment.text as NSString
+            guard let selected = selection.range(in: part.address, length: original.length) else { continue }
+            let snippet = original.substring(with: selected).trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !snippet.isEmpty else { continue }
+            let local = original.range(of: snippet, options: .literal, range: selected)
+            let offset = part.inPassage.location + local.location - part.leadingSpace
+            guard valid(quote, at: offset) else { return nil }
+            return offset
+        }
+        return nil
+    }
+
+    private func valid(_ quote: String, at offset: Int) -> Bool {
+        let length = quote.utf16.count
+        guard offset >= 0, offset <= text.length - length else { return false }
+        return text.substring(with: NSRange(location: offset, length: length)) == quote
+    }
+
+    /// Match the web Reader's whitespace folding, preserving UTF-16 offsets into the
+    /// native text for painting. A match may cross a paragraph, a link, or an inline style.
+    private struct SearchText {
+        let string: NSString
+        let sourceOffsets: [Int]
+
+        init(_ source: String) {
+            var units: [UInt16] = []
+            var offsets: [Int] = []
+            var afterSpace = false
+            for (offset, unit) in source.utf16.enumerated() {
+                // ECMAScript WhiteSpace and LineTerminator (the web Reader uses /\s+/).
+                switch unit {
+                case 0x09...0x0D, 0x20, 0xA0, 0x1680, 0x2000...0x200A, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000, 0xFEFF:
+                    if afterSpace { continue }
+                    afterSpace = true
+                    units.append(0x20)
+                default:
+                    afterSpace = false
+                    units.append(unit)
+                }
+                offsets.append(offset)
+            }
+            offsets.append(source.utf16.count)
+            self.string = String(decoding: units, as: UTF16.self) as NSString
+            self.sourceOffsets = offsets
+        }
+
+        func matches(_ quote: String) -> [NSRange] {
+            let needle = (SearchText(quote).string as String).trimmingCharacters(in: CharacterSet(charactersIn: " "))
+            guard !needle.isEmpty else { return [] }
+            var matches: [NSRange] = []
+            var start = 0
+            while start < string.length {
+                let range = string.range(of: needle, options: .literal,
+                                         range: NSRange(location: start, length: string.length - start))
+                guard range.location != NSNotFound else { break }
+                let sourceStart = sourceOffsets[range.location]
+                matches.append(NSRange(location: sourceStart, length: sourceOffsets[NSMaxRange(range)] - sourceStart))
+                start = range.location + 1 // Include overlapping occurrences, just as String.indexOf does on web.
+            }
+            return matches
+        }
+    }
+
+    func occurrences(for selection: NativeChapterSelectionRange, quote: String) -> [Int] {
+        guard let selected = offset(for: selection, quote: quote),
+              let ordinal = searchText.matches(quote).firstIndex(where: { $0.location == selected }) else { return [] }
+        return [ordinal]
+    }
+
+    func highlight(_ evidence: ReaderEvidenceText) -> NativeReaderSavedText {
+        var ranges: [NativeChapterSelectionAddress: [NSRange]] = [:]
+        for excerpt in evidence.excerpts where !excerpt.isEmpty {
+            let candidates = searchText.matches(excerpt)
+            let selected = Set(evidence.occurrences[excerpt] ?? [])
+            for (ordinal, match) in candidates.enumerated() {
+                // Both readers resolve anchored quotes strictly. Older device-local
+                // offsets cannot identify a shared occurrence on the other device.
+                guard selected.isEmpty ? candidates.count == 1 : selected.contains(ordinal) else { continue }
+                for location in locations {
+                    let overlap = NSIntersectionRange(match, location.inPassage)
+                    guard overlap.length > 0 else { continue }
+                    ranges[location.address, default: []].append(.init(
+                        location: location.leadingSpace + overlap.location - location.inPassage.location, length: overlap.length))
+                }
+            }
+        }
+        return .ranges(ranges)
+    }
+}
+
 enum NativeReaderChapterSelectionText {
+    static func segments(in block: NativeReaderRuntimeBlock, index: Int) -> [NativeReaderPassageText.Segment] {
+        var result: [NativeReaderPassageText.Segment] = []
+        func append(_ runs: [NativeReaderRuntimeTextRun], fallback: String, row: Int = 0, segment: Int = 0) {
+            let text = runs.isEmpty ? fallback : runs.map(\.text).joined()
+            if !text.isEmpty {
+                result.append(.init(address: .init(block: index, row: row, segment: segment), text: text))
+            }
+        }
+        switch block.kind {
+        case .heading, .paragraph, .caption, .footnote, .sourceNote, .editorNote:
+            append(block.runs, fallback: block.plainText)
+        case .orderedList, .unorderedList:
+            for (rowIndex, row) in block.listItems.flatMap(NativeReaderListRow.flatten).enumerated() {
+                if row.segments.isEmpty {
+                    append(row.runs, fallback: row.plainText, row: rowIndex)
+                } else {
+                    for (index, segment) in row.segments.enumerated() where segment.kind == .text {
+                        append(segment.runs, fallback: segment.plainText, row: rowIndex, segment: index)
+                    }
+                }
+            }
+        case .table, .figure, .image, .divider, .unsupportedHTML:
+            break
+        }
+        return result
+    }
+
     static func resolve(_ selection: NativeChapterSelectionRange, in blocks: [NativeReaderDisplayBlock],
                         sectionID: (String) -> Int64?) -> NativeChapterSelectedText {
         guard blocks.indices.contains(selection.start.address.block),
@@ -2841,30 +3046,12 @@ enum NativeReaderChapterSelectionText {
             let display = blocks[blockIndex]
             let block = display.block
             var paragraphs: [String] = []
-            func append(_ runs: [NativeReaderRuntimeTextRun], fallback: String,
-                        row: Int = 0, segment: Int = 0) {
-                let text = (runs.isEmpty ? fallback : runs.map(\.text).joined()) as NSString
-                let address = NativeChapterSelectionAddress(block: blockIndex, row: row, segment: segment)
-                guard let range = selection.range(in: address, length: text.length) else { return }
+            for segment in segments(in: block, index: blockIndex) {
+                let text = segment.text as NSString
+                guard let range = selection.range(in: segment.address, length: text.length) else { continue }
                 let excerpt = text.substring(with: text.rangeOfComposedCharacterSequences(for: range))
                     .trimmingCharacters(in: .whitespacesAndNewlines)
                 if !excerpt.isEmpty { paragraphs.append(excerpt) }
-            }
-            switch block.kind {
-            case .heading, .paragraph, .caption, .footnote, .sourceNote, .editorNote:
-                append(block.runs, fallback: block.plainText)
-            case .orderedList, .unorderedList:
-                for (rowIndex, row) in block.listItems.flatMap(NativeReaderListRow.flatten).enumerated() {
-                    if row.segments.isEmpty {
-                        append(row.runs, fallback: row.plainText, row: rowIndex)
-                    } else {
-                        for (index, segment) in row.segments.enumerated() where segment.kind == .text {
-                            append(segment.runs, fallback: segment.plainText, row: rowIndex, segment: index)
-                        }
-                    }
-                }
-            case .table, .figure, .image, .divider, .unsupportedHTML:
-                break
             }
             guard !paragraphs.isEmpty else { continue }
             selectedBlocks.append(contentsOf: paragraphs)
@@ -3160,37 +3347,21 @@ private struct NativeReaderPreparedAttributedTextView: View {
     var activeHighlightRange: NSRange? = nil
     let onOpenLink: (URL) -> Void
     let onResearchSelection: (String) -> Void
-    var onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil
-    var onSelectionChange: ((Bool) -> Void)? = nil
-
-    var isBookmarked = false
+    var saved: NativeReaderSavedText = .none
+    var address = NativeChapterSelectionAddress(block: 0)
     var chapterSelectionTarget: NativeChapterSelectionTarget? = nil
 
     @Environment(\.readerDefinitionContext) private var definitionContext
     @State private var attributedText: NSAttributedString?
 
     var body: some View {
-        Group {
-            if let attributedText {
-                AttributedTextView(
-                    attributedText: savedText(attributedText),
-                    onSelectionChange: onSelectionChange,
-                    onOpenLink: onOpenLink,
-                    onResearchSelection: onResearchSelection,
-                    onPassageSwipe: onPassageSwipe,
-                    chapterSelectionTarget: chapterSelectionTarget
-                )
-            } else {
-                AttributedTextView(
-                    attributedText: savedText(baseAttributedText),
-                    onSelectionChange: onSelectionChange,
-                    onOpenLink: onOpenLink,
-                    onResearchSelection: onResearchSelection,
-                    onPassageSwipe: onPassageSwipe,
-                    chapterSelectionTarget: chapterSelectionTarget
-                )
-            }
-        }
+        AttributedTextView(
+            attributedText: saved.applying(to: attributedText ?? baseAttributedText, address: address, accent: accentColor),
+            onOpenLink: onOpenLink,
+            onResearchSelection: onResearchSelection,
+            chapterSelectionTarget: chapterSelectionTarget,
+            supportsInlineImages: false
+        )
         .environment(\.readerDefinitionContext, allowsDefinitionLinks ? definitionContext : nil)
         .frame(maxWidth: .infinity, alignment: .leading)
         .task(id: taskID) {
@@ -3216,19 +3387,6 @@ private struct NativeReaderPreparedAttributedTextView: View {
                 attributedText = nil
             }
         }
-    }
-
-    // Color a presentation copy, never the shared text/definition cache.
-    // Preserve search contrast, typography, links and definition metadata.
-    private func savedText(_ source: NSAttributedString) -> NSAttributedString {
-        guard isBookmarked else { return source }
-        let result = NSMutableAttributedString(attributedString: source)
-        source.enumerateAttributes(in: NSRange(location: 0, length: source.length)) { attributes, range, _ in
-            if attributes[.backgroundColor] == nil {
-                result.addAttribute(.foregroundColor, value: accentColor, range: range)
-            }
-        }
-        return result
     }
 
     private var allowsDefinitionLinks: Bool {
@@ -3516,5 +3674,207 @@ enum NativeReaderStackPolicy {
             guard textCount <= maximumEagerUTF16Count else { return false }
         }
         return true
+    }
+}
+
+private final class NativeReaderTextGroupStore: ObservableObject {
+    @Published private(set) var groups: [NativeReaderTextGroup] = []
+    private var prepared: NativeReaderPreparedDocument?
+    private var textByTarget: [Int: NativeReaderPassageText] = [:]
+    private var savedByTarget: [Int: (evidence: ReaderEvidenceText, saved: NativeReaderSavedText)] = [:]
+
+    init(prepared: NativeReaderPreparedDocument? = nil) {
+        if let prepared { prepare(prepared) }
+    }
+
+    func prepare(_ document: NativeReaderPreparedDocument) {
+        prepared = document
+        textByTarget.removeAll()
+        savedByTarget.removeAll()
+        groups = NativeReaderTextGroup.isEnabled ? NativeReaderTextGroup.plan(document) : []
+    }
+
+    func passage(_ target: Int) -> NativeReaderPassageText? {
+        if let cached = textByTarget[target] { return cached }
+        guard let prepared, prepared.sectionTargets.indices.contains(target),
+              let start = prepared.navigationIndex[prepared.sectionTargets[target].blockID]?.displayIndex else { return nil }
+        let end = prepared.displayBlocks[start...].firstIndex {
+            prepared.navigationIndex[$0.id]?.sectionTargetIndex != target
+        } ?? prepared.displayBlocks.endIndex
+        let value = NativeReaderPassageText(rows: prepared.displayBlocks[start..<end])
+        textByTarget[target] = value
+        return value
+    }
+
+    func passageRange(_ target: Int) -> NativeChapterSelectionRange? { passage(target)?.range }
+
+    func savedText(_ evidence: ReaderEvidenceText, target: Int) -> NativeReaderSavedText {
+        if evidence.excerpts.isEmpty { return .whole }
+        if let cached = savedByTarget[target], cached.evidence == evidence { return cached.saved }
+        let saved = passage(target)?.highlight(evidence) ?? .none
+        savedByTarget[target] = (evidence, saved)
+        return saved
+    }
+}
+
+struct NativeReaderTextGroup: Identifiable, Equatable {
+#if DEBUG
+    static let isEnabled = !ProcessInfo.processInfo.arguments.contains("--native-reader-ungrouped-text")
+#else
+    static let isEnabled = true
+#endif
+
+    let id: String
+    let rows: ArraySlice<NativeReaderDisplayBlock>
+
+    static func plan(_ prepared: NativeReaderPreparedDocument) -> [Self] {
+        let blocks = prepared.displayBlocks
+        var groups: [Self] = []
+        var start = blocks.startIndex
+        while start < blocks.endIndex {
+            let first = blocks[start]
+            var end = start + 1
+            var length = first.block.plainText.utf16.count
+            if first.block.kind == .paragraph || (first.block.kind == .heading && NativeReaderHeadingPresentation(block: first.block).style == .provision) {
+                let target = prepared.navigationIndex[first.id]?.sectionTargetIndex
+                while end < blocks.endIndex && end - start < 6 {
+                    let next = blocks[end]
+                    guard next.block.kind == .paragraph,
+                          prepared.navigationIndex[next.id]?.sectionTargetIndex == target else { break }
+                    // Some editions attach the source section ID only to the heading.
+                    // Every paragraph in a group must share its definition scope.
+                    let inheritsHeading = end == start + 1 && first.block.kind == .heading && target != nil
+                        && (first.block.sectionID == nil || next.block.sectionID == nil)
+                    guard inheritsHeading || next.block.sectionID == blocks[end - 1].block.sectionID else { break }
+                    length += 1 + next.block.plainText.utf16.count
+                    guard length <= 3_000 else { break }
+                    end += 1
+                }
+            }
+            groups.append(Self(id: first.id, rows: blocks[start..<end]))
+            start = end
+        }
+        return groups
+    }
+}
+
+/// Uses the same selectable UIKit text host as the live reader. Each grouped
+/// passage adds its typography and authored links to the shared text storage.
+struct NativeReaderGroupedTextView: View, Equatable {
+    let group: NativeReaderTextGroup
+    let routeID: String
+    let theme: ReaderTheme
+    let accent: UIColor
+    let saved: NativeReaderSavedText
+    let selection: NativeChapterSelectionController
+    let onOpenLink: (URL) -> Void
+    let onResearch: (String) -> Void
+
+    @Environment(\.readerDefinitionContext) private var definitionContext
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.group == rhs.group && lhs.saved == rhs.saved && lhs.selection === rhs.selection && lhs.routeID == rhs.routeID && lhs.theme == rhs.theme && lhs.accent.isEqual(rhs.accent)
+    }
+
+    var body: some View {
+        // Dynamic Type invalidates the scaled fonts inside the source blocks.
+        let _ = dynamicTypeSize
+        let first = group.rows.first!
+        let last = group.rows.last!
+        let heading = first.block.kind == .heading ? NativeReaderHeadingPresentation(block: first.block) : nil
+        let topInset: CGFloat = switch heading?.style {
+        case .provision: 16
+        case .majorSection: 20
+        default: 0
+        }
+        let content = compose()
+        AttributedTextView(attributedText: content.text, onOpenLink: onOpenLink, onResearchSelection: onResearch,
+                           chapterSelectionTarget: NativeChapterSelectionTarget(controller: selection,
+                               address: .init(block: group.rows.startIndex), components: content.components),
+                           supportsInlineImages: false, definitionsAlreadyApplied: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .topLeading) {
+                if let heading, heading.style == .provision {
+                    let headingText = baseText(for: first, role: .heading(level: heading.level))
+                    Text(AttributedString(headingText))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .hidden()
+                        .overlay(alignment: .leading) {
+                            Capsule().fill(Color(uiColor: accent)).frame(width: 3).offset(x: -12)
+                        }
+                        .padding(.leading, heading.indentation + 12)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
+            }
+            .padding(.top, topInset)
+            .padding(.bottom, gap(after: last))
+            .accessibilityIdentifier("native-reader-text-group-\(group.id)")
+            .accessibilityValue(group.rows.indices.contains(where: saved.contains(block:)) ? "Saved text" : "")
+    }
+
+    private func compose() -> (text: NSAttributedString, components: [NSRange]) {
+        let text = NSMutableAttributedString()
+        var components: [NSRange] = []
+        for (index, row) in group.rows.enumerated() {
+            var role = NativeReaderTypographyRole.body
+            var indent = row.hierarchyIndentation
+            if row.block.kind == .heading {
+                let heading = NativeReaderHeadingPresentation(block: row.block)
+                if heading.style == .provision {
+                    role = .heading(level: heading.level)
+                    indent = heading.indentation + 12
+                } else {
+                    role = .majorHeading(level: heading.level)
+                    indent = 0
+                }
+            }
+            let base = baseText(for: row, role: role)
+            let decorated = row.block.kind == .paragraph
+                ? definitionContext.map { ReaderDefinitionStore.shared.matcher(for: $0).decorating(base) } ?? base
+                : base
+            let source = saved.applying(to: decorated,
+                                        address: .init(block: group.rows.startIndex + index), accent: accent)
+            components.append(NSRange(location: text.length, length: source.length))
+            guard source.length > 0 else { continue }
+            let component = NSMutableAttributedString(attributedString: source)
+            let style = (source.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle)?
+                .mutableCopy() as? NSMutableParagraphStyle ?? NSMutableParagraphStyle()
+            style.headIndent = indent
+            style.firstLineHeadIndent = indent
+            component.addAttribute(.paragraphStyle, value: style.copy() as! NSParagraphStyle,
+                                   range: NSRange(location: 0, length: component.length))
+            if index < group.rows.count - 1 {
+                let endStyle = style.mutableCopy() as! NSMutableParagraphStyle
+                endStyle.paragraphSpacing = gap(after: row)
+                let lastParagraph = (component.string as NSString).paragraphRange(
+                    for: NSRange(location: component.length - 1, length: 1)
+                )
+                let paragraphStyle = endStyle.copy() as! NSParagraphStyle
+                component.addAttribute(.paragraphStyle, value: paragraphStyle, range: lastParagraph)
+                var separator = component.attributes(at: component.length - 1, effectiveRange: nil)
+                separator.removeValue(forKey: .link)
+                component.append(NSAttributedString(string: "\n", attributes: separator))
+            }
+            text.append(component)
+        }
+        return (text.copy() as! NSAttributedString, components)
+    }
+
+    private func baseText(for row: NativeReaderDisplayBlock, role: NativeReaderTypographyRole) -> NSAttributedString {
+        let id = NativeReaderAttributedTextCacheKey.block(routeID: routeID, blockID: row.id, role: role)
+        return NativeReaderAttributedTextCache.shared.baseAttributedText(
+            cacheKey: NativeReaderAttributedTextCacheKey.base(cacheID: id, theme: theme, accentColor: accent),
+            runs: row.block.runs, fallbackText: row.block.plainText, theme: theme, role: role, accentColor: accent
+        )
+    }
+
+    private func gap(after row: NativeReaderDisplayBlock) -> CGFloat {
+        if row.block.kind == .heading {
+            return NativeReaderHeadingPresentation(block: row.block).level <= 2 ? 14 : 8
+        }
+        return max(CGFloat(theme.paragraphSpacing), row.usesCompactSpacing ? 12 : 8)
     }
 }

@@ -318,6 +318,33 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testReaderRecoversInvalidCategoryAndKeepsItsSourceAcrossTabs() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
+                               "--permitext-disable-clerk", "-browseLeftCodeSectionID", "4294960000"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+            "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        app.buttons["main-tab-reader"].tap()
+        let chapters = app.scrollViews["reader-chapter-browser-primary"]
+        XCTAssertTrue(chapters.waitForExistence(timeout: 15))
+        let primary = app.buttons["reader-session-primary"]
+        XCTAssertFalse(primary.label.contains("All Sections"))
+        primary.tap()
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label BEGINSWITH %@",
+            "reader-code-", "Mechanical Code")).firstMatch.tap()
+        let selected = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            primary.label.contains("Mechanical Code")
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [selected], timeout: 15), .completed)
+        app.buttons["main-tab-search"].tap()
+        XCTAssertTrue(element(in: app, identifier: "bottom-search-bar").waitForExistence(timeout: 10))
+        app.buttons["main-tab-reader"].tap()
+        XCTAssertTrue(chapters.isHittable)
+        XCTAssertTrue(primary.label.contains("Mechanical Code"))
+    }
+
     func testSecondaryReaderKeepsCurrentChaptersVisibleUntilReady() throws {
 #if !DEBUG
         throw XCTSkip("Requires the isolated Reader loading fixture.")
@@ -419,16 +446,20 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(secondary.exists)
         XCTAssertGreaterThan(findControls.frame.midY, app.frame.midY)
         keepScreenshot(named: "Find in Chapter replaces the Reader selectors above the keyboard", from: app)
-        // The iOS keyboard accessibility frame may omit the suggestion strip.
-        let distanceToKeys = app.keyboards.firstMatch.frame.minY - findControls.frame.maxY
-        XCTAssertGreaterThanOrEqual(distanceToKeys, 0)
-        XCTAssertLessThanOrEqual(distanceToKeys, 60)
+        // Simulator can expose the software keyboard to accessibility while
+        // a connected hardware keyboard keeps the software keyboard offscreen.
+        let keyboardTop = app.keyboards.firstMatch.frame.minY
+        if keyboardTop < app.frame.maxY {
+            let distanceToKeys = keyboardTop - findControls.frame.maxY
+            XCTAssertGreaterThanOrEqual(distanceToKeys, 0)
+            XCTAssertLessThanOrEqual(distanceToKeys, 60)
+        }
         findField.typeText("this code")
         XCTAssertTrue(sections.isHittable)
         let nextMatch = app.buttons["Next match"]
         let hasMatches = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: nextMatch)
         XCTAssertEqual(XCTWaiter.wait(for: [hasMatches], timeout: 10), .completed)
-        app.keyboards.buttons["Search"].tap()
+        findField.typeText("\n")
         XCTAssertTrue(waitForNonexistence(app.keyboards.firstMatch))
         XCTAssertEqual(findControls.frame.minY, selectorFrame.minY, accuracy: 4)
         nextMatch.tap()
@@ -892,7 +923,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         reveal(evidence, in: app)
         evidence.tap()
         XCTAssertTrue(app.navigationBars["Evidence"].waitForExistence(timeout: 10))
-        let actions = app.buttons["Evidence actions"]
+        let actions = app.buttons["Sort evidence"]
         let selectSections = app.buttons["Select sections"]
         XCTAssertTrue(actions.isHittable)
         XCTAssertTrue(selectSections.isHittable)
@@ -905,10 +936,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(title.waitForExistence(timeout: 10))
         XCTAssertTrue(scope.waitForExistence(timeout: 10))
         XCTAssertLessThan(title.frame.minY, scope.frame.minY)
+        XCTAssertFalse(app.staticTexts["Syncing"].exists)
+        XCTAssertFalse(app.staticTexts["Saved on this device · Waiting to sync"].exists)
 
         actions.tap()
         XCTAssertFalse(app.buttons["Export project (2)"].exists)
-        app.buttons["Sort"].tap()
         XCTAssertFalse(app.buttons["Code Book"].exists)
         app.buttons["Title"].tap()
         XCTAssertLessThan(scope.frame.minY, title.frame.minY)
@@ -1399,6 +1431,36 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testZoningOverviewCanHideSourcesAndOmitsEmptyFacts() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
+                               "--native-project-overview-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+            "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        app.buttons["project-section-overview"].tap()
+        app.buttons["Zoning"].tap()
+        let sourceToggle = app.buttons["Source information"]
+        let sourceDetails = app.staticTexts["Synthetic fixture"]
+        XCTAssertTrue(app.staticTexts["R7-2, R7A"].exists)
+        XCTAssertTrue(app.staticTexts["No mapped intersection found"].exists)
+        XCTAssertFalse(app.staticTexts["Sourced"].exists)
+        XCTAssertFalse(app.staticTexts["Commercial Overlay(s)"].exists)
+        XCTAssertFalse(app.staticTexts["Special Purpose District(s)"].exists)
+        reveal(sourceToggle, in: app)
+        XCTAssertTrue(sourceToggle.isHittable)
+        XCTAssertFalse(sourceDetails.exists)
+        sourceToggle.tap()
+        XCTAssertTrue(sourceDetails.waitForExistence(timeout: 3))
+        sourceToggle.tap()
+        XCTAssertTrue(waitForNonexistence(sourceDetails, timeout: 3))
+
+        app.buttons["project-zoning-edit"].tap()
+        XCTAssertTrue(app.staticTexts["Commercial Overlay(s)"].exists)
+        XCTAssertTrue(app.staticTexts["Special Purpose District(s)"].exists)
+    }
+
     private func verifySavedProjectNavigation(largeText: Bool) throws {
 #if !DEBUG
         throw XCTSkip("Saved navigation acceptance uses the isolated Debug fixture.")
@@ -1631,6 +1693,17 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "identifier BEGINSWITH %@ AND label CONTAINS %@", "search-result-", "23-372")).firstMatch
         XCTAssertTrue(topResult.waitForExistence(timeout: 45), app.debugDescription)
         XCTAssertTrue(topBook.label.localizedCaseInsensitiveContains("Zoning Resolution"))
+        let searchBar = element(in: app, identifier: "bottom-search-bar")
+        let edition = app.buttons.matching(NSPredicate(format:
+            "identifier BEGINSWITH %@ AND label BEGINSWITH %@", "search-group-", "Zoning Resolution")).firstMatch
+        XCTAssertTrue(searchBar.exists)
+        XCTAssertTrue(edition.exists)
+        XCTAssertEqual(topBook.frame.minX, searchBar.frame.minX, accuracy: 1)
+        for row in [edition, topResult] {
+            XCTAssertEqual(row.frame.minX, searchBar.frame.minX, accuracy: 1)
+            XCTAssertEqual(row.frame.maxX, searchBar.frame.maxX, accuracy: 1)
+        }
+        keepScreenshot(named: "Search results aligned to the search bar edges", from: app)
         topResult.tap()
         let close = app.buttons["Close passage"]
         XCTAssertTrue(close.waitForExistence(timeout: 20))
@@ -2557,7 +2630,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         verifyNativePartialLookup(largeText: true)
     }
 
-    func testNameOnlyProjectAndDesktopReportLink() throws {
+    func testNameOnlyProjectHasNoDesktopReportPrompt() throws {
 #if !DEBUG
         throw XCTSkip("Project acceptance uses the isolated Debug fixture.")
 #else
@@ -2578,12 +2651,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let reports = app.buttons["project-section-reports"]
         reveal(reports, in: app)
         reports.tap()
-        let copy = app.buttons["reports-copy-desktop-project-link"]
-        XCTAssertTrue(copy.waitForExistence(timeout: 10))
-        XCTAssertEqual(copy.label, "Copy project link for desktop")
-        copy.tap()
-        XCTAssertEqual(copy.label, "Project link copied")
-        keepScreenshot(named: "Name-only project copies a desktop workspace link", from: app)
+        XCTAssertTrue(app.navigationBars["Reports"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["reports-copy-desktop-project-link"].exists)
+        XCTAssertFalse(app.staticTexts["No saved PDFs yet. Open Report on desktop and choose Save PDF to Project."].exists)
 #endif
     }
 
@@ -2647,14 +2717,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let cachedDraft = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Local unsynchronized analysis")).firstMatch
         XCTAssertTrue(cachedDraft.waitForExistence(timeout: 30), app.debugDescription)
         XCTAssertTrue(app.buttons["New Note"].exists, "Conflict acceptance must begin in the real Notebook list.")
-        XCTAssertTrue(app.staticTexts["Latest saved analysis"].exists, "The list must retain the separately saved server revision.")
         let savedRow = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Latest saved analysis")).firstMatch
-        let savedDate = try XCTUnwrap(ISO8601DateFormatter().date(from: "2026-09-04T13:00:00Z"))
-        XCTAssertTrue(savedRow.label.contains(savedDate.formatted(date: .abbreviated, time: .omitted)))
-        XCTAssertFalse(savedRow.label.contains("Another device saved this analysis."))
+        XCTAssertFalse(savedRow.exists, "The server revision and its local draft belong to one row.")
+        XCTAssertFalse(app.staticTexts["Drafts on this iPhone"].exists)
         XCTAssertFalse(cachedDraft.label.contains("Unsynchronized draft"))
         XCTAssertTrue(cachedDraft.isHittable)
-        keepScreenshot(named: "Notebook list retains local draft and newer saved revision", from: app)
+        keepScreenshot(named: "Notebook lists the conflicting note once", from: app)
         cachedDraft.tap()
         let review = app.buttons["native-notebook-review-conflict"]
         XCTAssertTrue(review.waitForExistence(timeout: 30))
@@ -2664,7 +2732,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(back.exists && back.isHittable)
         back.tap()
         XCTAssertTrue(cachedDraft.waitForExistence(timeout: 5))
-        XCTAssertTrue(savedRow.exists, "Back preserves the server revision while keeping the unreviewed draft locally.")
+        XCTAssertFalse(savedRow.exists, "Closing a conflicting note should keep one row for that note.")
         cachedDraft.tap()
         XCTAssertTrue(review.waitForExistence(timeout: 10), "Conflict review must remain available after reopening.")
         XCTAssertFalse(app.buttons["native-notebook-retry-save"].exists, "An ordinary retry must not bypass conflict review.")
@@ -2679,7 +2747,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(screenshot)
         app.buttons["native-notebook-confirm-conflict"].tap()
         XCTAssertTrue(waitForValue("saved", on: element(in: app, identifier: "native-notebook-save-status"), timeout: 10))
-        XCTAssertEqual(app.staticTexts["native-notebook-sync-status"].label, "Synced")
+        XCTAssertTrue(waitForNonexistence(app.staticTexts["native-notebook-sync-status"], timeout: 5))
         let title = app.textFields["Note title"]
         title.tap()
         title.typeText(" updated")
@@ -2696,7 +2764,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Notes displays the shared selection controls", from: app)
         app.buttons["Move selected notes to Trash"].tap()
         let selectionTrash = app.alerts["Move this note to Trash?"]
-        XCTAssertTrue(selectionTrash.staticTexts["You can restore this note from Trash for 30 days."].exists)
+        let recoveryMessage = "You can restore this note in Settings under Trash / Undo deletion for 30 days."
+        XCTAssertTrue(selectionTrash.staticTexts[recoveryMessage].waitForExistence(timeout: 5))
         if fromEditor {
             selectionTrash.buttons["Cancel"].tap()
             app.buttons["Cancel"].tap()
@@ -2712,7 +2781,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             let deletionAlert = app.alerts["Move this note to Trash?"]
             XCTAssertTrue(deletionAlert.waitForExistence(timeout: 5),
                           "Move to Trash must present a separate explicit confirmation.\n\(app.debugDescription)")
-            XCTAssertTrue(deletionAlert.staticTexts["You can restore this note from Trash for 30 days."].exists)
+            XCTAssertTrue(deletionAlert.staticTexts[recoveryMessage].exists)
             let confirmDelete = deletionAlert.buttons["Move to Trash"]
             XCTAssertTrue(confirmDelete.isHittable && deletionAlert.buttons["Cancel"].isHittable, app.debugDescription)
             XCTAssertFalse(app.staticTexts["No Notes yet"].exists, "Opening confirmation must not delete the note.")
@@ -2762,6 +2831,52 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(app.buttons["research-cancel-request"].exists)
     }
 
+    func testResearchAnswerPreservesKeyboardAndStartsAtTopWhileTyping() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
+                               "--phase3-seeded-selection-fixture", "--research-delayed-response-fixture"]
+
+        for hideKeyboard in [false, true] {
+            app.launch()
+            let composer = element(in: app, identifier: "research-composer")
+            let keyboard = app.keyboards.firstMatch
+            XCTAssertTrue(composer.waitForExistence(timeout: 45), phase3LaunchFailureDescription(in: app))
+            composer.tap()
+            XCTAssertTrue(keyboard.waitForExistence(timeout: 5))
+            composer.typeText("Synthetic keyboard behavior question")
+            app.buttons["Send message"].tap()
+            let disclosure = app.buttons["Continue to Assistant"]
+            if disclosure.waitForExistence(timeout: 1) {
+                disclosure.tap()
+                composer.tap()
+            }
+            XCTAssertTrue(app.buttons["research-cancel-request"].waitForExistence(timeout: 3))
+            XCTAssertTrue(keyboard.exists, "Sending should preserve the open keyboard.")
+            let sentQuestion = app.staticTexts["Synthetic keyboard behavior question"]
+            XCTAssertTrue(sentQuestion.waitForExistence(timeout: 2))
+            XCTAssertLessThan(sentQuestion.frame.maxY, composer.frame.minY)
+            XCTAssertTrue(element(in: app, identifier: "research-question-progress").exists)
+            XCTAssertFalse(app.staticTexts["per codes is researching…"].exists)
+
+            if hideKeyboard {
+                app.coordinate(withNormalizedOffset: CGVector(dx: 0.52, dy: 0.39)).tap()
+                XCTAssertTrue(waitForNonexistence(keyboard, timeout: 3))
+            }
+
+            let answer = element(in: app, identifier: "research-answer")
+            XCTAssertTrue(answer.waitForExistence(timeout: 15))
+            if hideKeyboard {
+                XCTAssertFalse(keyboard.exists, "An answer should not reopen a dismissed keyboard.")
+            } else { XCTAssertTrue(keyboard.exists) }
+            let atTop = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                answer.frame.minY > app.frame.minY && answer.frame.minY < app.frame.height * 0.3
+            }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [atTop], timeout: 4), .completed,
+                "The answer should start above the composer near the top of the screen. Frame: \(answer.frame)")
+            app.terminate()
+        }
+    }
+
     func testResearchAnswerGuidesReviewBeforeNotebookAndWebReport() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--phase3-seeded-selection-fixture"]
@@ -2793,14 +2908,24 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let details = app.buttons["Sources & details"]
         revealAboveComposer(details)
         XCTAssertTrue(details.isHittable)
+        var previous = details
+        let expectedSpacing = app.frame.width * 0.17
         for title in ["Copy answer", "Helpful", "Report a problem", "Add to Notebook"] {
             let action = app.buttons[title]
             XCTAssertTrue(action.isHittable)
             XCTAssertEqual(action.frame.midY, details.frame.midY, accuracy: 1)
+            XCTAssertGreaterThanOrEqual(action.frame.midX - previous.frame.midX, expectedSpacing)
+            previous = action
         }
         app.buttons["Helpful"].tap()
         XCTAssertTrue(app.buttons["Helpful"].wait(for: \.isSelected, toEqual: true, timeout: 5))
         XCTAssertFalse(app.staticTexts["Feedback: Received"].exists)
+        let report = app.buttons["Report a problem"]
+        report.tap()
+        XCTAssertTrue(app.navigationBars["Assistant feedback"].waitForExistence(timeout: 5))
+        app.buttons["Submit"].tap()
+        XCTAssertTrue(report.wait(for: \.isSelected, toEqual: true, timeout: 5))
+        XCTAssertFalse(app.buttons["Helpful"].isSelected)
         app.buttons["Add to Notebook"].tap()
         let notebook = app.navigationBars["Add to Notebook"]
         XCTAssertTrue(notebook.waitForExistence(timeout: 10))
@@ -2867,6 +2992,36 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(composer.isHittable)
         XCTAssertFalse(app.textFields["Search codes"].exists)
         XCTAssertEqual(details.value as? String, "Expanded")
+    }
+
+    func testAssistantPinsInHistoryAndKeepsChatMenuFocused() throws {
+#if !DEBUG
+        throw XCTSkip("Requires the isolated Assistant pin fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
+                               "--phase3-seeded-selection-fixture", "--research-delayed-pin-fixture"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "research-composer").waitForExistence(timeout: 45))
+        app.buttons["Assistant actions"].tap()
+        XCTAssertTrue(app.buttons["Rename"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Pin"].exists)
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.24, dy: 0.50)).tap()
+        app.buttons["Assistant history"].tap()
+        let options = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "research-history-options-")).firstMatch
+        XCTAssertTrue(options.waitForExistence(timeout: 10))
+        options.tap()
+        app.buttons["Pin"].tap()
+        let row = app.buttons.matching(identifier: "research-history-row").firstMatch
+        XCTAssertTrue(app.staticTexts["Pinned"].waitForExistence(timeout: 2))
+        XCTAssertTrue(row.isEnabled)
+        options.tap()
+        let unpin = app.buttons["Unpin"]
+        XCTAssertTrue(unpin.wait(for: \.isEnabled, toEqual: true, timeout: 8))
+        unpin.tap()
+        XCTAssertTrue(waitForNonexistence(app.staticTexts["Pinned"], timeout: 3))
+        XCTAssertTrue(row.isEnabled)
+#endif
     }
 
     func testOneHundredReaderBookmarkProjectsCycles() {
@@ -3029,6 +3184,83 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         runCycles(1, in: app, captureSavedList: true)
     }
 
+    private func openFixtureBuildingChapterOne(in app: XCUIApplication) {
+        app.buttons["main-tab-reader"].tap()
+        let primary = app.buttons["reader-session-primary"]
+        XCTAssertTrue(primary.waitForExistence(timeout: 15))
+        primary.tap()
+        let code = app.buttons.matching(NSPredicate(format: "identifier CONTAINS %@ AND label BEGINSWITH %@",
+            "2022-construction-codes", "Building Code")).firstMatch
+        XCTAssertTrue(code.waitForExistence(timeout: 10))
+        code.tap()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 1:")).firstMatch.tap()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 30))
+    }
+
+    private func launchFixtureProjectReader() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
+                               "--native-reader-bookmark-alignment-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+            "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        openFixtureBuildingChapterOne(in: app)
+        return app
+    }
+
+    func testSavedProjectPassagesHighlightedWhenOpeningReader() {
+        let app = launchFixtureProjectReader()
+        let saved = app.textViews.matching(NSPredicate(
+            format: "label CONTAINS %@ AND value CONTAINS %@", "The provisions of this code shall apply", "Saved text"
+        )).firstMatch
+        XCTAssertTrue(saved.waitForExistence(timeout: 10), app.debugDescription)
+    }
+
+    func testReaderSavedColorAndSelectionOnlyActions() {
+        let app = launchFixtureProjectReader()
+        let passage = app.textViews.matching(NSPredicate(format: "label CONTAINS %@", "The other codes listed")).firstMatch
+        reveal(passage, in: app)
+        // A grouped heading can be hittable while its paragraph is under the
+        // floating tab bar. Bring the gesture coordinates into the reading area.
+        let visibleBottom = app.frame.maxY - app.frame.height * 0.23
+        for _ in 0..<4 where passage.frame.maxY > visibleBottom {
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.60, dy: 0.71))
+            let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.60, dy: 0.42))
+            start.press(forDuration: 0.05, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.25)
+        }
+        XCTAssertTrue(passage.isHittable)
+        XCTAssertLessThan(passage.frame.maxY, visibleBottom)
+        XCTAssertGreaterThan(passage.frame.maxY, app.frame.minY + app.frame.height * 0.20)
+        XCTAssertTrue(passage.identifier.hasPrefix("native-reader-text-group-"), "Exercise selection in the grouped passage.")
+        let left = passage.coordinate(withNormalizedOffset: CGVector(dx: 0.27, dy: 0.70))
+        let right = passage.coordinate(withNormalizedOffset: CGVector(dx: 0.64, dy: 0.70))
+        right.press(forDuration: 0.05, thenDragTo: left)
+        XCTAssertFalse(app.buttons["Ask Assistant about this passage"].exists)
+        left.press(forDuration: 0.65)
+        let expand = app.menuItems["Select Passage"].firstMatch
+        XCTAssertTrue(expand.waitForExistence(timeout: 5), app.debugDescription)
+        expand.tap()
+        let save = app.menuItems["Save to Evidence"].firstMatch
+        XCTAssertTrue(save.waitForExistence(timeout: 5), app.debugDescription)
+        save.tap()
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "value CONTAINS %@", "Saved text"), object: passage)], timeout: 10), .completed)
+        // Observe the passage long enough for local persistence and the fixture's
+        // asynchronous refresh to finish. Either can invalidate a new highlight.
+        let deadline = ContinuousClock.now + .seconds(3)
+        repeat {
+            guard (passage.value as? String)?.contains("Saved text") == true else {
+                XCTFail("The saved highlight disappeared while this passage was still open.")
+                return
+            }
+            RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.1))
+        } while ContinuousClock.now < deadline
+        app.buttons["main-tab-saved"].tap()
+        app.buttons["main-tab-reader"].tap()
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "value CONTAINS %@", "Saved text"), object: passage)], timeout: 10), .completed)
+        keepScreenshot(named: "Evidence selection after returning to grouped Reader", from: app)
+    }
+
     func testReaderBookmarkProjectCycle() {
         let app = XCUIApplication()
         app.launchArguments += [
@@ -3146,9 +3378,66 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "EBC15 exact eager viewport restored after Saved visit", from: app)
     }
 
+    func testCompareGroupedChapterScrollFrameDelivery() {
+        compareChapterScrollFrames(fixture: "--native-reader-2014-building-chapter-7", chapterNumber: "7",
+                                   firstPassage: "The provisions of this chapter shall govern")
+    }
+
+    func testCompareGroupedTableChapterScrollFrameDelivery() {
+        compareChapterScrollFrames(fixture: "--native-reader-physical-stress", chapterNumber: "6",
+                                   firstPassage: "classification of buildings as to type of construction")
+    }
+
+    private func compareChapterScrollFrames(fixture: String, chapterNumber: String, firstPassage: String) {
+        executionTimeAllowance = 360
+        let app = XCUIApplication()
+        let runID = UUID().uuidString
+        NSLog("Reader frame comparison run %@", runID)
+        for (trial, grouped) in [false, true, true, false].enumerated() {
+            let arm = grouped ? "grouped" : "baseline"
+            app.launchArguments = ["--permitext-disable-clerk", fixture, "--native-reader-browse-opening"]
+            if !grouped { app.launchArguments.append("--native-reader-ungrouped-text") }
+            app.launchEnvironment["PERMITEXT_READER_FRAME_TRIAL"] = "\(runID)-\(trial + 1)-\(arm)"
+            app.launch()
+            let chapter = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter \(chapterNumber):")).firstMatch
+            let cardReady = chapter.wait(for: \.isHittable, toEqual: true, timeout: 30)
+            XCTAssertTrue(cardReady)
+            chapter.tap()
+            let first = app.textViews.matching(NSPredicate(format: "label CONTAINS %@", firstPassage)).firstMatch
+            XCTAssertTrue(first.wait(for: \.isHittable, toEqual: true, timeout: 30))
+            assertGroupedRenderer(in: app, enabled: grouped)
+            let originalY = first.frame.minY
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.68))
+            let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.30))
+            for _ in 0..<3 {
+                start.press(forDuration: 0.05, thenDragTo: end, withVelocity: .fast, thenHoldForDuration: 0)
+                RunLoop.current.run(until: Date(timeIntervalSinceNow: 3))
+            }
+            XCTAssertTrue(!first.isHittable || first.frame.minY < originalY - 40, "The reader must scroll in each arm")
+            app.terminate()
+        }
+    }
+
+    private func assertGroupedRenderer(in app: XCUIApplication, enabled: Bool) {
+        let groupedRows = app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-text-group-")
+        )
+        XCTAssertEqual(groupedRows.allElementsBoundByIndex.contains(where: \.isHittable), enabled,
+                   "Confirm the actual renderer before measuring.")
+    }
+
     func testLargeChapterScrollPerformance() {
+        measureLargeChapterScroll(grouped: false)
+    }
+
+    func testGroupedLargeChapterScrollPerformance() {
+        measureLargeChapterScroll(grouped: true)
+    }
+
+    private func measureLargeChapterScroll(grouped: Bool) {
         let app = XCUIApplication()
         app.launchArguments = ["--permitext-disable-clerk", "--native-reader-2014-building-chapter-7", "--native-reader-browse-opening"]
+        if !grouped { app.launchArguments.append("--native-reader-ungrouped-text") }
         let options = XCTMeasureOptions()
         options.iterationCount = 5
         options.invocationOptions = [.manuallyStart, .manuallyStop]
@@ -3164,9 +3453,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertTrue(chapter.wait(for: \.isHittable, toEqual: true, timeout: 30))
             chapter.tap()
             let firstPassage = app.textViews.matching(NSPredicate(
-                format: "label BEGINSWITH %@", "The provisions of this chapter shall govern"
+                format: "label CONTAINS %@", "The provisions of this chapter shall govern"
             )).firstMatch
             XCTAssertTrue(firstPassage.wait(for: \.isHittable, toEqual: true, timeout: 30))
+            assertGroupedRenderer(in: app, enabled: grouped)
             let originalY = firstPassage.frame.minY
             let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.68))
             let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3))
@@ -3470,7 +3760,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         DispatchQueue.main.asyncAfter(deadline: .now() + 30) { settled.fulfill() }
         wait(for: [settled], timeout: 32)
         let chapterTitle = app.staticTexts["reader-chapter-title"]
-        let heading = app.textViews["native-reader-block-fd7e757403c87c3ac0352632161b361cfde526ea10047b7e4a79ed09786dae18"]
+        let heading = app.textViews.matching(NSPredicate(
+            format: "identifier ENDSWITH %@ AND label BEGINSWITH %@",
+            "fd7e757403c87c3ac0352632161b361cfde526ea10047b7e4a79ed09786dae18", "27-2120 Injunctions"
+        )).firstMatch
         keepScreenshot(named: "HMC initial before accessibility target query", from: app)
         print("Permitext navigation regression initial section: \(chapterTitle.value ?? "missing")")
         let initialDump = XCTAttachment(string: app.debugDescription)
@@ -4524,7 +4817,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let next = app.buttons["Next match"]
         XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"),
                                                                   object: next)], timeout: 15), .completed)
-        app.keyboards.buttons["Search"].tap()
+        let keyboardSearch = app.keyboards.buttons["Search"]
+        if keyboardSearch.exists && keyboardSearch.isHittable { keyboardSearch.tap() }
         next.tap()
         app.buttons["Close chapter find"].tap()
         let footnote = app.textViews.matching(NSPredicate(format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@",
@@ -4996,10 +5290,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #if !DEBUG
         throw XCTSkip("Chapter selection uses the isolated Assistant fixture.")
 #else
-        let app = XCUIApplication()
-        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
-        app.launch()
-        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        let app = launchFixtureProjectReader()
 
         func paragraph(containing text: String) -> XCUIElement {
             app.textViews.matching(NSPredicate(format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@", text, text)).firstMatch
@@ -5008,6 +5299,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let second = paragraph(containing: "The provisions of this code shall apply")
         XCTAssertTrue(first.waitForExistence(timeout: 20) && first.isHittable)
         XCTAssertTrue(second.isHittable)
+        XCTAssertTrue([first, second].contains { $0.identifier.hasPrefix("native-reader-text-group-") },
+                      "Exercise cross-provision selection with grouped text.")
         let start = first.coordinate(withNormalizedOffset: CGVector(dx: 0.27, dy: 0.5))
         let end = second.coordinate(withNormalizedOffset: CGVector(dx: 0.58, dy: 0.22))
         start.press(forDuration: 0.6, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.1)
@@ -5037,11 +5330,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(project.waitForExistence(timeout: 10))
         project.tap()
         XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
-        app.buttons["main-tab-reader"].tap()
-        let browser = app.scrollViews["reader-chapter-browser-primary"]
-        let chapter = browser.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 1:")).firstMatch
-        XCTAssertTrue(chapter.waitForExistence(timeout: 15))
-        chapter.tap()
+        openFixtureBuildingChapterOne(in: app)
 
         func paragraph(containing text: String) -> XCUIElement {
             app.textViews.matching(NSPredicate(format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@", text, text)).firstMatch
@@ -5055,6 +5344,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
                        withVelocity: .slow, thenHoldForDuration: 0)
         }
         XCTAssertTrue(first.isHittable && second.isHittable)
+        XCTAssertTrue([first, second].contains { $0.identifier.hasPrefix("native-reader-text-group-") },
+                      "Exercise cross-provision selection with grouped text.")
         let start = first.coordinate(withNormalizedOffset: CGVector(dx: 0.27, dy: 0.5))
         let end = second.coordinate(withNormalizedOffset: CGVector(dx: 0.58, dy: 0.22))
         start.press(forDuration: 0.6, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.1)

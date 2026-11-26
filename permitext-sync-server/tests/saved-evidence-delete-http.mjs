@@ -106,5 +106,38 @@ try {
   assert.equal((await scopeList('scope-b')).body.entries.length,1);
   await post('/content/trash',{auth,action:'purge',id:recoveryID,projectID:'scope-b',confirmation:'DELETE'},token);
   assert.equal((await scopeList('scope-b')).body.entries.length,0);
-  console.log("Batch delete HTTP passed: 101 items, authenticated isolation, bounds, shared destination, notes, concurrent retries, cascaded workspace deletion and scoped inspect/restore/purge.");
+  // The ordinary sync API accepts web and iOS aliases in one batch and emits
+  // the union on the canonical link, including positions from older offline edits.
+  const quote = "lot line";
+  const link = (id, second, extra = {}) => ({projectSection: {
+    id, sectionID: 11899, folderClientID: "batch-p", userID, codeVersion,
+    updatedAt: new Date(1700000000000 + second * 1000).toISOString(), ...extra
+  }});
+  const send = async (...mutations) => {
+    const result = await post("/sync/push", {auth, batch: {user: {id: userID}, mutations}}, token);
+    assert.equal(result.status, 200, JSON.stringify(result.body));
+    return result.body;
+  };
+  const selected = n => ({selectedExcerpts: [quote], selectedExcerptOccurrences: {[quote]: [n]}});
+  const web = link("web-link", 2, selected(1));
+  const ios = link("iphone-link", 1, selected(0));
+  assert((await send(web, ios)).acceptedMutationIDs.includes("iphone-link"));
+  await send(link("legacy-client", 4));
+  const duplicate = await send(link("another-device", 3, selected(2)));
+  assert(duplicate.acceptedMutationIDs.includes("another-device"));
+  const active = async () => (await post("/sync/pull", {auth}, token)).body.mutations
+    .find(m => m.projectSection?.sectionID === 11899 && !m.projectSection.deletedAt)?.projectSection;
+  assert.deepEqual((await active()).selectedExcerptOccurrences, {[quote]: [0, 1, 2]});
+  const removedSelection = link("remove-link", 5);
+  removedSelection.projectSection.deletedAt = removedSelection.projectSection.updatedAt;
+  await send(removedSelection);
+  await send(link("new-link", 6, selected(1)));
+  assert((await send(ios)).rejectedMutationIDs.includes("iphone-link"));
+  assert.deepEqual((await active()).selectedExcerptOccurrences, {[quote]: [1]});
+  const queuedRemoval = link("queued-removal", 7);
+  queuedRemoval.projectSection.deletedAt = queuedRemoval.projectSection.updatedAt;
+  await send(link("queued-resave", 8, selected(0)), queuedRemoval);
+  assert.deepEqual((await active()).selectedExcerptOccurrences, {[quote]: [0]});
+  assert((await send(web)).rejectedMutationIDs.includes("web-link"));
+  console.log("Batch delete HTTP passed: 101 items, authenticated isolation, bounds, shared destination, notes, concurrent retries, cascaded workspace deletion, scoped inspect/restore/purge, and repeat-selection sync across aliases and deletion.");
 } finally { await new Promise(resolve=>server.close(resolve)); await rm(directory,{recursive:true,force:true}); }

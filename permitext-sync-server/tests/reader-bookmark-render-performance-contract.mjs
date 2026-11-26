@@ -1,3 +1,4 @@
+import { createReaderEvidenceSection, mergeReaderExcerptFields } from "../public/reader-evidence-selection.js";
 import assert from "node:assert/strict";
 import { renderReaderBlockBatches } from "../public/reader-render-batches.js";
 import { readFile } from "node:fs/promises";
@@ -14,6 +15,7 @@ function actual(name) {
 }
 class Node {
   constructor(tag) { this.tagName=tag; this.className=""; this.dataset={}; this.children=[]; this.attrs={}; this.events={}; this.hidden=false; this.disabled=false; this.parentNode=null; this.style={setProperty(){}}; }
+  get firstElementChild() { return this.children[0] ?? null; }
   get classList() {
     return { contains:name=>this.className.split(/\s+/).includes(name),
       add:(...names)=>{this.className=[...new Set([...this.className.split(/\s+/).filter(Boolean),...names])].join(" ");},
@@ -43,6 +45,7 @@ links.push({ sectionID: "section", codeVersion: "NYC2014", blockID: "paragraph-1
 links.push({ sectionID: "section", codeVersion: defaultSyncCodeVersion, blockID: "", folderID: "p1" });
 const panel = new Node("article"); panel.connected = true;
 const context = vm.createContext({
+  createReaderEvidenceSection, mergeReaderExcerptFields,
   createWorkspaceAccessGate, workspaceAccessState: null, activeWorkspaceID: "workspace", accountRuntimeGeneration: 1,
   syncedContent: { userID: "a", workspacePresentationAccess: "verified" }, syncLoadPromise: null,
   state: { utilityInstances: [] }, captureAccountRequest: () => "a", isCurrentAccountRequest: () => permitted,

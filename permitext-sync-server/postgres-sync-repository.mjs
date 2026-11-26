@@ -3,6 +3,7 @@ import {workspaceContentRetirements} from './workspace-content.mjs';
 import { captureTrash, restoreTrash, trashSummary, trashContents, trashBatchForWorkspace, trashBatchWithoutWorkspace } from "./trash-recovery.mjs";
 import { freePlanMutationDecision } from "./entitlement-contract.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
+import { mergeProjectSectionSelection } from "./project-section-selections.mjs";
 
 function safeJSON(value, fallback) {
   if (value === null || value === undefined) return fallback;
@@ -136,11 +137,20 @@ export function createPostgresSyncRepository(sql) {
     return sql`TRUE`;
   }
 
-  function compatibilityQuery(userID, mutation, restoring = false) {
+  function compatibilityQuery(userID, mutation, restoring = false, preserveProjectFields = false) {
     const recordID = mutationRecordID(mutation);
     const { kind, record } = mutationEntry(mutation);
     const ownerUserID = record.userID || userID;
     const mutationJSON = JSON.stringify(mutation);
+    // Older and partial project writes omit unrelated collections. Merge them
+    // from the row being updated, so a concurrent write cannot supply stale values.
+    const incomingMutation = preserveProjectFields ? sql`
+      jsonb_set(EXCLUDED.mutation, '{project}', COALESCE((
+        SELECT jsonb_object_agg(field.key, field.value)
+        FROM jsonb_each(permitext_user_content_records.mutation->'project') AS field
+        WHERE field.key IN ('structuredFacts', 'recordsChecklist', 'openQuestions')
+      ), '{}'::jsonb) || (EXCLUDED.mutation->'project'))
+    ` : sql`EXCLUDED.mutation`;
     return sql`
       INSERT INTO permitext_user_content_records (
         record_id, user_id, entity_kind, code_version, mutation,
@@ -155,7 +165,7 @@ export function createPostgresSyncRepository(sql) {
         user_id = EXCLUDED.user_id,
         entity_kind = EXCLUDED.entity_kind,
         code_version = EXCLUDED.code_version,
-        mutation = EXCLUDED.mutation,
+        mutation = ${incomingMutation},
         updated_at = EXCLUDED.updated_at,
         deleted_at = EXCLUDED.deleted_at,
         server_version = permitext_user_content_records.server_version + 1
@@ -169,10 +179,10 @@ export function createPostgresSyncRepository(sql) {
           permitext_user_content_records.updated_at < EXCLUDED.updated_at
           OR (
             permitext_user_content_records.updated_at = EXCLUDED.updated_at
-            AND permitext_user_content_records.mutation = EXCLUDED.mutation
+            AND permitext_user_content_records.mutation = ${incomingMutation}
           )
         )
-      RETURNING record_id
+      RETURNING record_id, mutation
     `;
   }
 
@@ -334,8 +344,6 @@ export function createPostgresSyncRepository(sql) {
     const recordID = mutationRecordID(mutation);
     const { record } = mutationEntry(mutation);
     const ownerUserID = record.userID || userID;
-    const mutationJSON = JSON.stringify(mutation);
-    const accepted = acceptedMutationPredicate(recordID, ownerUserID, mutationJSON);
     return sql`
       INSERT INTO permitext_projects (
         record_id, user_id, code_version, client_id, local_folder_id, name,
@@ -345,9 +353,10 @@ export function createPostgresSyncRepository(sql) {
       SELECT ${recordID}, ${ownerUserID}, ${record.codeVersion}, ${record.clientID || null},
         ${record.localFolderID || null}, ${record.name ?? null}, ${record.address ?? null},
         ${record.description ?? null}, ${record.folderType || "project"}, ${record.colorHex ?? null}, ${record.sortOrder ?? null},
-        ${mutationJSON}::jsonb, ${updatedAt(record)}::timestamptz,
+        accepted_project.mutation, ${updatedAt(record)}::timestamptz,
         ${deletedAt(record)}::timestamptz, 1
-      WHERE ${accepted}
+      FROM accepted_project
+      WHERE TRUE
       ON CONFLICT (record_id) DO UPDATE SET
         user_id = EXCLUDED.user_id,
         code_version = EXCLUDED.code_version,
@@ -365,6 +374,19 @@ export function createPostgresSyncRepository(sql) {
         server_version = permitext_projects.server_version + 1
       WHERE permitext_projects.mutation IS DISTINCT FROM EXCLUDED.mutation
       RETURNING record_id
+    `;
+  }
+
+  function projectWriteQuery(userID, mutation, restoring) {
+    const { record } = mutationEntry(mutation);
+    const preserveFields = !restoring && !deletedAt(record) &&
+      ["structuredFacts", "recordsChecklist", "openQuestions"].some(key => !Object.hasOwn(record, key));
+    // Both projections and the delta event must publish the accepted, merged row.
+    return sql`
+      WITH accepted_project AS (${compatibilityQuery(userID, mutation, restoring, preserveFields)}),
+           projected_project AS (${projectQuery(userID, mutation)}),
+           project_event AS (${eventQuery(userID, mutation, true)})
+      SELECT record_id FROM accepted_project
     `;
   }
 
@@ -438,25 +460,26 @@ export function createPostgresSyncRepository(sql) {
     const { kind } = mutationEntry(mutation);
     if (kind === "savedItem") return savedItemQuery(userID, mutation);
     if (kind === "annotation") return annotationQuery(userID, mutation);
-    if (kind === "project") return projectQuery(userID, mutation);
     if (kind === "projectSection") return projectSectionQuery(userID, mutation);
     if (kind === "comment") return commentQuery(userID, mutation);
     return null;
   }
 
-  function eventQuery(userID, mutation) {
+  function eventQuery(userID, mutation, projectWrite = false) {
     const recordID = mutationRecordID(mutation);
     const { kind, record } = mutationEntry(mutation);
     const ownerUserID = record.userID || userID;
     const mutationJSON = JSON.stringify(mutation);
-    const accepted = acceptedMutationPredicate(recordID, ownerUserID, mutationJSON);
+    const accepted = projectWrite
+      ? sql`FROM accepted_project WHERE TRUE`
+      : sql`WHERE ${acceptedMutationPredicate(recordID, ownerUserID, mutationJSON)}`;
     return sql`
       INSERT INTO permitext_sync_events (
         record_id, user_id, entity_kind, code_version, mutation_updated_at, mutation
       )
       SELECT ${recordID}, ${ownerUserID}, ${kind}, ${record.codeVersion || null},
-        ${updatedAt(record)}::timestamptz, ${mutationJSON}::jsonb
-      WHERE ${accepted}
+        ${updatedAt(record)}::timestamptz, ${projectWrite ? sql`accepted_project.mutation` : sql`${mutationJSON}::jsonb`}
+      ${accepted}
       ON CONFLICT (record_id, mutation_updated_at) DO NOTHING
       RETURNING event_id
     `;
@@ -525,6 +548,33 @@ export function createPostgresSyncRepository(sql) {
   }
 
   async function push(userID, mutations, recoveryBatch = null, deleteInput = null, recoveryRemainder = null, recoveryExpected = null) {
+    const ids = mutations.flatMap(({ projectSection }) => projectSection && !projectSection.deletedAt ? [projectSection.id] : []);
+    if (!ids.length || recoveryBatch || deleteInput) {
+      return writeBatch(userID, mutations, recoveryBatch, deleteInput, recoveryRemainder, recoveryExpected);
+    }
+    // Offline devices can submit independent excerpts on the same active link.
+    // Guard the snapshot used to merge them inside the same transaction that
+    // writes the compatibility record, the project item, and the sync event.
+    const links = sql`FROM permitext_user_content_records
+      WHERE user_id = ${userID} AND record_id IN (SELECT jsonb_array_elements_text(${JSON.stringify(ids)}::jsonb))`;
+    for (let attempt = 1; ; attempt++) {
+      const rows = await sql`SELECT record_id, mutation, server_version ${links}`;
+      const previous = new Map(rows.map(row => [row.record_id, safeJSON(row.mutation, {}).projectSection]));
+      const versions = Object.fromEntries(rows.map(row => [row.record_id, Number(row.server_version)]));
+      const merged = mutations.map(mutation => mutation.projectSection && !mutation.projectSection.deletedAt
+        ? { projectSection: mergeProjectSectionSelection(previous.get(mutation.projectSection.id), mutation.projectSection) }
+        : mutation);
+      const guard = sql`SELECT 1 / CASE WHEN (SELECT COALESCE(jsonb_object_agg(record_id, server_version), '{}'::jsonb)
+        ${links}) = ${JSON.stringify(versions)}::jsonb THEN 1 ELSE 0 END AS selection_snapshot_guard`;
+      try {
+        return await writeBatch(userID, merged, null, null, null, null, guard);
+      } catch (error) {
+        if (!["22012", "40001"].includes(error?.code) || attempt >= 3) throw error;
+      }
+    }
+  }
+
+  async function writeBatch(userID, mutations, recoveryBatch, deleteInput, recoveryRemainder, recoveryExpected, selectionGuard = null) {
     let deletePlan = null;
     let cascade = [];
     const needsRecovery = deleteInput || recoveryBatch || mutations.some(m => m.codeVersionClear || Object.values(m).some(r => r?.deletedAt || (m.annotation && !String(r?.noteBody || "").trim())));
@@ -542,7 +592,11 @@ export function createPostgresSyncRepository(sql) {
       }
       if (recoveryBatch) {
         const plan = restoreTrash(recoveryBatch, original);
-        mutations = plan.mutations;
+        const removedLinks = new Map(original.flatMap(({projectSection}) =>
+          projectSection?.deletedAt ? [[projectSection.id, projectSection]] : []));
+        mutations = plan.mutations.map(mutation => mutation.projectSection
+          ? {projectSection: mergeProjectSectionSelection(removedLinks.get(mutation.projectSection.id), mutation.projectSection)}
+          : mutation);
         skipped = plan.skipped;
       } else {
         cascade = workspaceContentRetirements(userID, original, mutations);
@@ -553,7 +607,7 @@ export function createPostgresSyncRepository(sql) {
     }
     const continuityMutations = mutations.filter(({ continuity }) => Boolean(continuity));
     const standardMutations = mutations.filter(({ continuity }) => !continuity);
-    const queries = [];
+    const queries = selectionGuard ? [selectionGuard] : [];
     if (needsRecovery) {
       queries.push(sql`SELECT 1 / CASE WHEN (SELECT COALESCE(MAX(event_id),0) FROM permitext_sync_events WHERE user_id = ${userID}) = ${expectedEvent} THEN 1 ELSE 0 END AS recovery_guard`);
     }
@@ -564,10 +618,15 @@ export function createPostgresSyncRepository(sql) {
     const rejectionContextIndexes = [];
     for (const mutation of standardMutations) {
       acceptanceIndexes.push(queries.length);
-      queries.push(compatibilityQuery(userID, mutation, Boolean(recoveryBatch || deleteInput) || cascade.includes(mutation)));
-      const recordQuery = domainQuery(userID, mutation);
-      if (recordQuery) queries.push(recordQuery);
-      queries.push(eventQuery(userID, mutation));
+      const restoring = Boolean(recoveryBatch || deleteInput) || cascade.includes(mutation);
+      if (mutation.project) {
+        queries.push(projectWriteQuery(userID, mutation, restoring));
+      } else {
+        queries.push(compatibilityQuery(userID, mutation, restoring));
+        const recordQuery = domainQuery(userID, mutation);
+        if (recordQuery) queries.push(recordQuery);
+        queries.push(eventQuery(userID, mutation));
+      }
       rejectionContextIndexes.push(queries.length);
       queries.push(rejectionContextQuery(userID, mutation));
     }

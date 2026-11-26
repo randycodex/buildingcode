@@ -19,10 +19,9 @@ const picker = await readFile(new URL('../../NYC CC APP/permitext/Views/ChapterS
 const depthStart = picker.indexOf('    nonisolated static func depth(');
 const pickerDepth = picker.slice(depthStart, picker.indexOf('\n    }', depthStart) + 6);
 const rows = between('    private func readerBlocks(', '    @ViewBuilder\n    private func openingPassage');
-const destination = rows.match(/let destinationID = [^\n]+/)[0];
-const memberships = rows.match(/let memberships = [^\n]+/)[0];
-const bookmarkState = rows.match(/isBookmarked: ([^\n]+),/)[1];
-assert.ok(rows.indexOf(destination) < rows.indexOf('ForEach(blocks)'), 'resolve the selected project once per group');
+assert.match(source, /let evidence = library\.readerEvidence/);
+assert.match(source, /evidence\[sectionID\]\?\[projectID\]/);
+assert.match(rows, /savedText\(for: location\?\.sectionTargetIndex/);
 const parser = between('enum NativeReaderSectionNavigator {', '    static func targets(')
  + between('    static func target(\n        forSourceBlockID', '    static func sectionNumber(from heading:')
  + between('    static func sectionNumber(from heading:', '\nstruct NativeReaderSearchMatch:');
@@ -45,13 +44,6 @@ struct NativeReaderRuntimeBlock {
 struct Anchor { let blockID: String?; let id: String }
 struct NativeReaderRuntimeDocument { let blocks: [NativeReaderRuntimeBlock]; let anchors: [Anchor] }
 struct NativeReaderDisplayBlock { let id: String; let sourceBlockID: String }
-struct Project { let id: Int64 }
-struct Library { let readerSaveDestinationProject: Project?; let folderMembership: [Int64: [Int64]] }
-func isSaved(library: Library, bookmarkSectionID: Int64?) -> Bool {
- DESTINATION
- MEMBERSHIPS
- return BOOKMARK_STATE
-}
 struct Remembered { var wrappedValue: Int64? }
 struct Reader {
  var sectionTargets: [NativeReaderSectionTarget]
@@ -134,14 +126,6 @@ let synthetic = NativeReaderRuntimeDocument(blocks: [
 ], anchors: [Anchor(blockID: "first", id: "earlier"), Anchor(blockID: "first", id: "later"), Anchor(blockID: nil, id: "unmapped")])
 verifyNavigation(synthetic, [])
 verifyNavigation(NativeReaderRuntimeDocument(blocks: [], anchors: []), [])
-let membershipsBySection: [Int64: [Int64]] = [5: [7, 8], 6: [], 9: [9]]
-for selected: Int64? in [nil, 7, 9, 10] {
- let library = Library(readerSaveDestinationProject: selected.map(Project.init), folderMembership: membershipsBySection)
- for section: Int64? in [nil, 5, 6, 9, 10] {
-  let expected = selected.map { project in section.map { membershipsBySection[$0]?.contains(project) == true } ?? false } ?? false
-  check(isSaved(library: library, bookmarkSectionID: section) == expected, "Only current project membership marks a row saved")
- }
-}
 let prepared = try json(root.appendingPathComponent("2022-construction-codes/prepared/chapters/1.json"))
 let sections = (prepared["groups"] as! [[String: Any]]).flatMap { $0["sections"] as! [[String: Any]] }
 var summaries = Dictionary(uniqueKeysWithValues: sections.map { ("1:" + ($0["sectionNumber"] as! String), Int64($0["id"] as! Int)) })
@@ -162,7 +146,7 @@ for (number, expectedID) in [("101.1", Int64(1)), ("101.2", Int64(2)), ("102.3",
  let paragraph = sourceBlocks.first { ($0["kind"] as? String) == "paragraph" && ($0["sourceOrder"] as! Int) > heading.sourceOrder }!
  let target = NativeReaderSectionNavigator.target(forSourceBlockID: paragraph["id"] as! String, in: runtime, targets: targets)
  check(target?.sectionNumber == number, "Swipe must resolve the paragraph's own provision")
- check(target.flatMap(reader.sectionSummary(for:))?.id == expectedID, "Swipe must save the exact database section, not the currently visible or remembered section")
+ check(target.flatMap(reader.sectionSummary(for:))?.id == expectedID, "Selection must save the exact database section, not the currently visible or remembered section")
 }
 check(NativeReaderSectionNavigator.target(forSourceBlockID: "missing", in: runtime, targets: targets) == nil,
  "Unknown paragraph must not guess a bookmark target")
@@ -186,7 +170,7 @@ let missing = NativeReaderSectionTarget(id: "missing", blockID: "missing", sourc
 reader.sectionTargets = [missing, leaf]; reader.currentSectionTarget = missing
 check(reader.bookmark == nil, "Numeric prefix10 must not include unrelated101.1")
 print("PASS: actual 2022 BC Chapter 1 and split-row navigation/anchors, current project membership, chapter/group/leaf identities; same-level headings, sibling/code boundaries, unknown/unloaded targets and pending navigation.")
-`.replace(' PROPERTY', property).replace(' DESTINATION', destination).replace(' MEMBERSHIPS', memberships).replace(' BOOKMARK_STATE', ' ' + bookmarkState);
+`.replace(' PROPERTY', property);
 const dir = await mkdtemp(join(tmpdir(), 'permitext-bookmark-target-'));
 try {
  const swift = `import Foundation\nimport Compression\n${target}\nenum ChapterSectionPickerRow {\n${pickerDepth}\n}\n${navigation}\n${parser}\n${resolver}\n${fixture}`;

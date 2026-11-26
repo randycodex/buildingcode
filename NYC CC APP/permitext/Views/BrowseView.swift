@@ -30,9 +30,7 @@ struct BrowseView: View {
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
-    @Namespace private var chapterTileNamespace
     @State private var showsCodeSources = false
     @State private var showsReaderCodeLibrary = false
     @State private var showsPickerCodeSources = false
@@ -79,9 +77,6 @@ struct BrowseView: View {
                     CodeAppBackdrop.color.ignoresSafeArea()
                 } else {
                     browseContent
-                        .onAppear {
-                            seedBrowseSectionIfNeeded()
-                        }
                 }
             }
             .navigationTitle("")
@@ -101,7 +96,7 @@ struct BrowseView: View {
         .preference(key: ReaderSessionSummaryKey.self, value: [browserContext: ReaderSessionSummary(
             source: selectedCodeSectionName + " · " + selectedVersionName,
             versionFileName: hasSeededBrowseSection && library.isInitialContentLoaded ? library.selectedVersionFileName : nil,
-            codeSectionID: browseCodeSectionID
+            codeSectionID: activeCodeSectionID
         )])
         .onPreferenceChange(ReaderBrowseHeadingPreferenceKey.self) { boundaries in
             let heading = ReaderBrowseHeaderSelection.heading(at: boundaries)
@@ -129,11 +124,15 @@ struct BrowseView: View {
             }
         }
         .onAppear {
-            restoreReaderVersionIfNeeded()
+            seedBrowseSectionIfNeeded()
         }
         .task(id: "\(readerHandoff.requests[browserContext]?.id.uuidString ?? "none"):\(isBrowserTabActive)") {
-            guard isBrowserTabActive, let request = readerHandoff.requests[browserContext] else { return }
-            await acceptReaderHandoff(request)
+            guard isBrowserTabActive else { return }
+            if let request = readerHandoff.requests[browserContext] {
+                await acceptReaderHandoff(request)
+            } else {
+                seedBrowseSectionIfNeeded()
+            }
         }
         .task(id: chapterWarmupScope) {
             guard canResumeChapterWarmups else { return }
@@ -141,7 +140,7 @@ struct BrowseView: View {
             // edition, tab, search state or navigation cancels this delay.
             do { try await Task.sleep(for: .milliseconds(200)) } catch { return }
             guard !Task.isCancelled, canResumeChapterWarmups else { return }
-            library.prewarmCodeSectionForBrowsing(id: browseCodeSectionID)
+            library.prewarmCodeSectionForBrowsing(id: activeCodeSectionID)
         }
         .onChange(of: openedChapter) { _, chapter in
             if chapter == nil { preparedNativeOpening = nil }
@@ -171,23 +170,28 @@ struct BrowseView: View {
         .onChange(of: library.codeSections) { _, _ in
             resolvePendingReaderCodeSelection()
         }
+        .onChange(of: library.selectedVersionFileName) { _, _ in
+            resolvePendingReaderCodeSelection()
+            seedBrowseSectionIfNeeded()
+        }
         .onChange(of: library.isInitialContentLoaded) { _, isLoaded in
             guard isLoaded else { return }
             resolvePendingReaderCodeSelection()
+            seedBrowseSectionIfNeeded()
         }
     }
 
     private var selectedBrowseSourceIsDisabled: Bool {
         guard library.activeCodeSources != nil else { return false }
-        if let selected = browseCodeSectionID,
-           library.codeSections.contains(where: { $0.id == selected }) {
+        if let selected = activeCodeSectionID {
             return !library.enabledBrowseCodeSections.contains(where: { $0.id == selected })
         }
         return !library.codeSections.isEmpty && library.enabledBrowseCodeSections.isEmpty
     }
 
     private var browseContent: some View {
-        let chapters = library.browseChapters(for: browseCodeSectionID)
+        let sourceID = activeCodeSectionID
+        let chapters = canBrowseSelectedSource ? library.browseChapters(for: sourceID) : []
 
         return ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
@@ -209,7 +213,7 @@ struct BrowseView: View {
                             : (selectedBrowseSourceIsDisabled
                                 ? "Enable this source in Settings to browse its chapters. Your saved passages and open Readers are preserved."
                                 : "The selected code section does not have any chapters yet."),
-                        accent: Color(uiColor: library.accentColor(for: browseCodeSectionID))
+                        accent: accentColor
                     )
                     .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                     if selectedBrowseSourceIsDisabled || library.activeCodeSources == nil {
@@ -219,23 +223,10 @@ struct BrowseView: View {
                             .accessibilityIdentifier("browse-manage-code-sources")
                     }
                 } else {
-                    let codeSectionName = selectedCodeSectionName
-                    let chapterGroups = groupedChapterGroups(
-                        from: chapters,
-                        selectedCodeSectionName: codeSectionName
-                    )
-
-                    ForEach(Array(chapterGroups.enumerated()), id: \.element.id) { index, group in
-                        if !group.chapterItems.isEmpty {
-                            chapterGrid(group, kind: .chapter, order: index * 2,
-                                        showsGroupHeader: codeSectionName == "All Sections")
-                        }
-
-                        if !group.appendixItems.isEmpty {
-                            chapterGrid(group, kind: .appendix, order: index * 2 + 1,
-                                        showsGroupHeader: group.chapterItems.isEmpty && codeSectionName == "All Sections")
-                        }
-                    }
+                    let chapterItems = chapters.filter { !isAppendix($0) }
+                    let appendices = visibleAppendixItems(from: chapters)
+                    if !chapterItems.isEmpty { chapterGrid(chapterItems, kind: .chapter, order: 0) }
+                    if !appendices.isEmpty { chapterGrid(appendices, kind: .appendix, order: 1) }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -246,7 +237,7 @@ struct BrowseView: View {
         .scrollIndicators(.hidden)
         .codeNavigationTopScrollEdge()
         .background(
-            CodeAppBackdrop(accent: Color(uiColor: library.accentColor(for: browseCodeSectionID)))
+            CodeAppBackdrop(accent: accentColor)
                 .ignoresSafeArea()
         )
         .accessibilityElement(children: .contain)
@@ -254,20 +245,16 @@ struct BrowseView: View {
         .accessibilityIdentifier("reader-chapter-browser-\(browserContext.rawValue)")
     }
 
-    private func chapterGrid(_ group: BrowseChapterGroup, kind: ChapterTileKind, order: Int,
-                             showsGroupHeader: Bool) -> some View {
+    private func chapterGrid(_ chapters: [CodeChapter], kind: ChapterTileKind, order: Int) -> some View {
         let isAppendix = kind == .appendix
         let headingSpacing: CGFloat = 12
         let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
         return VStack(alignment: .leading, spacing: headingSpacing) {
-            if showsGroupHeader {
-                codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
-            }
             if isAppendix {
                 ReaderAppendixSectionHeading(cardSpacing: headingSpacing)
             }
             LazyVGrid(columns: columns, spacing: 12) {
-                ForEach(isAppendix ? group.appendixItems : group.chapterItems) { chapter in
+                ForEach(chapters) { chapter in
                     chapterOpeningButton(chapter, kind: kind)
                 }
             }
@@ -280,7 +267,7 @@ struct BrowseView: View {
 
     private var canResumeChapterWarmups: Bool {
         isBrowserTabActive && hasSeededBrowseSection && library.isInitialContentLoaded
-            && !library.isSearchInProgress && openedChapter == nil && preparingChapter == nil
+            && canBrowseSelectedSource && !library.isSearchInProgress && openedChapter == nil && preparingChapter == nil
     }
 
     private var chapterWarmupScope: String {
@@ -288,7 +275,7 @@ struct BrowseView: View {
     }
 
     private var chapterPreparationScope: String {
-        "\(library.selectedVersionFileName)|\(browseCodeSectionID.map(String.init) ?? "all")|\(library.signedInAccount?.appUserID ?? "guest")|\(library.activeCodeSourceRevision.uuidString)"
+        "\(library.selectedVersionFileName)|\(activeCodeSectionID.map(String.init) ?? "none")|\(library.signedInAccount?.appUserID ?? "guest")|\(library.activeCodeSourceRevision.uuidString)"
     }
 
     private func chapterOpeningButton(_ chapter: CodeChapter, kind: ChapterTileKind) -> some View {
@@ -296,11 +283,11 @@ struct BrowseView: View {
             ChapterTile(chapter: chapter, palette: tilePalette(for: chapter), kind: kind)
         }
         .buttonStyle(.plain)
-        .cardZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         .onAppear { library.prewarmChapterForBrowsing(chapter) }
     }
 
     private func cancelChapterPreparation() {
+        guard preparationTask != nil || preparationTimeoutTask != nil || preparationError != nil else { return }
         preparationGeneration = UUID()
         preparationTask?.cancel()
         preparationTask = nil
@@ -344,6 +331,7 @@ struct BrowseView: View {
                 preparationTimeoutTask = nil
                 preparationTask = nil
                 preparingChapter = nil
+                preparationSource = nil
                 #if PERMITEXT_LOCAL_PERFORMANCE
                 LocalPerformanceRecorder.record(.chapterDestinationPrepared)
                 #endif
@@ -358,6 +346,7 @@ struct BrowseView: View {
                 preparationTimeoutTask = nil
                 preparationTask = nil
                 preparingChapter = nil
+                preparationSource = nil
                 preparationError = error.localizedDescription
                 failedChapter = chapter
             }
@@ -384,13 +373,11 @@ struct BrowseView: View {
                 rememberedScrollOffset: rememberedScrollOffset,
                 preparedNativeOpening: preparedNativeOpening
             )
-            .cardZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         } else {
             ChapterLaunchView(
                 chapter: chapter,
                 rememberedSectionID: rememberedSectionID
             )
-            .cardZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         }
     }
 
@@ -565,7 +552,8 @@ struct BrowseView: View {
     }
 
     private func resolvePendingReaderCodeSelection() {
-        guard let pendingReaderCodeSectionName else { return }
+        guard let pendingReaderCodeSectionName,
+              BrowserContextID.storedVersionFileName(for: browserContext) == library.selectedVersionFileName else { return }
         let targetName = normalizedReaderCodeName(pendingReaderCodeSectionName)
         guard let codeSection = library.enabledBrowseCodeSections.first(where: {
             normalizedReaderCodeName(
@@ -578,22 +566,6 @@ struct BrowseView: View {
 
     private func normalizedReaderCodeName(_ value: String) -> String {
         ReaderCodePickerIdentity.normalizedName(value)
-    }
-
-    private func restoreReaderVersionIfNeeded() {
-        // A deliberate passage handoff takes precedence over the last edition.
-        // In particular, a cold second Reader must not start two corpus loads.
-        guard readerHandoff.shouldRestoreVersion(in: browserContext) else { return }
-        guard let storedVersion = BrowserContextID.storedVersionFileName(for: browserContext),
-              storedVersion != library.selectedVersionFileName,
-              library.availableVersions.contains(where: { $0.fileName == storedVersion })
-        else {
-            if let currentVersion = library.selectedVersion {
-                BrowserContextID.persistVersionFileName(currentVersion.fileName, for: browserContext)
-            }
-            return
-        }
-        library.updateSelectedVersion(fileName: storedVersion)
     }
 
     private func codeSectionPickerLabel(_ title: String, isSelected: Bool) -> some View {
@@ -636,11 +608,24 @@ struct BrowseView: View {
     }
 
     private var activeCodeSectionID: Int64? {
-        browseCodeSectionID
+        let stored = browseCodeSectionID ?? BrowserContextID.storedCodeSectionID(for: browserContext)
+        if let stored, library.codeSections.contains(where: { $0.id == stored }) { return stored }
+
+        let enabled = library.enabledBrowseCodeSections
+        if browserContext == .secondary, !hasSeededBrowseSection {
+            let primary = BrowserContextID.storedCodeSectionID(for: .primary) ?? library.selectedCodeSectionID
+            if let alternate = enabled.first(where: { $0.id != primary }) { return alternate.id }
+        }
+        return enabled.first(where: { $0.id == library.selectedCodeSectionID })?.id ?? enabled.first?.id
+    }
+
+    private var canBrowseSelectedSource: Bool {
+        activeCodeSectionID != nil || library.selectedVersion?.contentKind == .sqlite
     }
 
     private var selectedCodeSectionName: String {
-        library.codeSectionName(id: browseCodeSectionID)
+        guard let activeCodeSectionID else { return "Reader" }
+        return library.codeSectionName(id: activeCodeSectionID)
     }
 
     @MainActor
@@ -651,6 +636,7 @@ struct BrowseView: View {
             return
         }
         cancelChapterPreparation()
+        pendingReaderCodeSectionName = nil
         openedChapter = nil
         handoffInitialSection = nil
         preparationError = nil
@@ -787,34 +773,18 @@ struct BrowseView: View {
     }
 
     private func seedBrowseSectionIfNeeded() {
-        guard !hasSeededBrowseSection else { return }
+        guard !hasSeededBrowseSection, library.isInitialContentLoaded else { return }
+        // A pending passage handoff owns the edition until its target is ready.
+        guard readerHandoff.shouldRestoreVersion(in: browserContext) else { return }
         if let storedVersion = BrowserContextID.storedVersionFileName(for: browserContext),
            storedVersion != library.selectedVersionFileName,
            library.availableVersions.contains(where: { $0.fileName == storedVersion }) {
             library.updateSelectedVersion(fileName: storedVersion)
             return
         }
+        browseCodeSectionID = activeCodeSectionID
         hasSeededBrowseSection = true
-        if let currentVersion = library.selectedVersion {
-            BrowserContextID.persistVersionFileName(currentVersion.fileName, for: browserContext)
-        }
-
-        let stored = BrowserContextID.storedCodeSectionID(for: browserContext)
-
-        switch browserContext {
-        case .primary:
-            browseCodeSectionID = stored
-                ?? library.selectedCodeSectionID
-                ?? library.enabledBrowseCodeSections.first?.id
-        case .secondary:
-            let primarySectionID = BrowserContextID.storedCodeSectionID(for: .primary)
-                ?? library.selectedCodeSectionID
-                ?? library.enabledBrowseCodeSections.first?.id
-            browseCodeSectionID = stored
-                ?? library.enabledBrowseCodeSections.first(where: { $0.id != primarySectionID })?.id
-                ?? primarySectionID
-        }
-
+        BrowserContextID.persistVersionFileName(library.selectedVersionFileName, for: browserContext)
         BrowserContextID.persistCodeSectionID(browseCodeSectionID, for: browserContext)
     }
 
@@ -852,59 +822,6 @@ struct BrowseView: View {
             .fill(Color(uiColor: .separator))
             .frame(height: 1)
             .frame(maxWidth: .infinity)
-    }
-
-    private func codeSectionGroupHeader(title: String, color: Color) -> some View {
-        Text(title)
-            .font(.system(size: 13, weight: .semibold))
-            .foregroundStyle(color)
-            .textCase(.uppercase)
-            .tracking(0.8)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.bottom, 4)
-    }
-
-    private func groupedChapterGroups(
-        from chapters: [CodeChapter],
-        selectedCodeSectionName: String
-    ) -> [BrowseChapterGroup] {
-        let chapterItems = chapters.filter { !isAppendix($0) }
-        let appendixItems = visibleAppendixItems(from: chapters)
-
-        guard selectedCodeSectionName == "All Sections" else {
-            return [
-                BrowseChapterGroup(
-                    id: selectedCodeSectionName,
-                    title: selectedCodeSectionName,
-                    palette: tilePalette(forCodeSectionName: selectedCodeSectionName),
-                    chapterItems: chapterItems,
-                    appendixItems: appendixItems
-                )
-            ]
-        }
-
-        let groupedChapters = Dictionary(grouping: chapterItems, by: { codeSectionTitle(for: $0) })
-        let groupedAppendices = Dictionary(grouping: appendixItems, by: { codeSectionTitle(for: $0) })
-        let orderedTitles = library.enabledBrowseCodeSections
-            .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
-            .filter { groupedChapters[$0] != nil || groupedAppendices[$0] != nil }
-
-        return orderedTitles.map { title in
-                BrowseChapterGroup(
-                    id: title,
-                    title: title,
-                    palette: tilePalette(forCodeSectionName: title),
-                    chapterItems: groupedChapters[title] ?? [],
-                    appendixItems: groupedAppendices[title] ?? []
-                )
-        }
-    }
-
-    private func codeSectionTitle(for chapter: CodeChapter) -> String {
-        library.codeSections
-            .first(where: { $0.id == chapter.codeSectionID })
-            .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
-            ?? "All Sections"
     }
 
     private func tilePalette(forCodeSectionName name: String) -> ChapterTilePalette {
@@ -946,14 +863,6 @@ struct BrowseView: View {
             .name ?? ""
         return tilePalette(forCodeSectionName: codeSectionName)
     }
-}
-
-private struct BrowseChapterGroup: Identifiable {
-    let id: String
-    let title: String
-    let palette: ChapterTilePalette
-    let chapterItems: [CodeChapter]
-    let appendixItems: [CodeChapter]
 }
 
 private struct ChapterLaunchView: View {
@@ -1487,11 +1396,7 @@ enum CodeScreenMetrics {
     static let researchComposerCornerRadius: CGFloat = 24
     static let bottomSearchContentClearance: CGFloat = bottomControlHeight + (rowVerticalPadding * 2)
     static let projectEvidenceHeadingHeight: CGFloat = 36
-    static let readerPassageActionSpacing: CGFloat = 8
-    static let readerPassageActionGap: CGFloat = 12
-    static var readerPassageActionTrayWidth: CGFloat { toolbarButtonSize * 2 + readerPassageActionSpacing }
-    static var readerPassageRevealWidth: CGFloat { readerPassageActionTrayWidth + readerPassageActionGap }
-    static let readerPassageLeadingEdgeExclusion: CGFloat = 32
+
     static let screenHorizontalPadding: CGFloat = 16
     /// Floating controls immediately above the system tab bar align to the
     /// tab bar's visible outer edge rather than the wider content grid.

@@ -37,4 +37,42 @@ identity=2;inputs()[0].value='Wrong account';inputs()[0].dispatch('input');await
 assert.equal(project.openQuestions[0].question,'Retain me');
 assert.throws(()=>normalizeProjectQuestions([{id:'q',question:42,answer:''}]));
 assert.throws(()=>normalizeProjectQuestions([{id:'q',question:'',answer:''},{id:'q',question:'',answer:''}]));
+
+{
+  const prior = {id:'one',name:'Project',openQuestions:[{id:'old-question'}],recordsChecklist:[{id:'old-record'}]};
+  const writes = [];
+  const state = {localProjects:[],syncOutbox:[]};
+  const noop = () => {};
+  const context = vm.createContext({
+    state, hasCapability:()=>true, requirePrivateWorkspaceWritable:noop, captureAccountRequest:()=>1,
+    projectRecordID:project=>project.id, projectDetailMatches:(a,b)=>a.id===b.id,
+    visibleProjectRecords:projects=>projects, currentContentSummary:()=>({projects:[prior]}),
+    folderType:()=> 'project', projectColor:()=> '#334455', syncCodeVersion:()=> 'nyc-2022',
+    projectStructuredFacts:()=>[], normalizeRecordsChecklist:records=>records, normalizeProjectQuestions,
+    activeAccount:()=>({userID:'owner'}), syncProjectWorkspaceURL:noop,
+    openProjectDetails:()=>[], setOpenProjectDetails:noop, saveWorkspaceState:noop,
+    refreshOpenProjectPaneTheme:noop, refreshOpenSettingsWorkspace:noop, refreshProjectURLCatalog:noop,
+    requireCurrentAccountRequest:noop, isSessionAuthenticationError:()=>false, projectIdentity:project=>project,
+    projectDetailKey:project=>project.id, visibleProjectArtifactIDs:()=>[],
+    projectMutationForRecord:project=>({project:{...project}}),
+    syncMutationRecordID:mutation=>`owner:project:${mutation.project.id}`,
+    pushMutation:async mutation=>writes.push(mutation.project)
+  });
+  const start = source.indexOf('async function updateProjectFolder(');
+  vm.runInContext(source.slice(start,source.indexOf('\n}',start)+2),context);
+  await context.updateProjectFolder(prior,{description:'Changed context'});
+  assert(!Object.hasOwn(writes[0],'openQuestions') && !Object.hasOwn(writes[0],'recordsChecklist'));
+
+  const pendingQuestions = [{id:'pending-question',question:'Keep my offline edit.',answer:''}];
+  state.syncOutbox = [
+    {accountUserID:'other',recordID:'owner:project:one',mutation:{project:{openQuestions:[{id:'other-account'}]}}},
+    {accountUserID:'owner',recordID:'owner:project:one',mutation:{project:{openQuestions:pendingQuestions}}}
+  ];
+  await context.updateProjectFolder(prior,{recordsChecklist:[]});
+  assert.deepEqual(writes[1].openQuestions,pendingQuestions);
+  assert.deepEqual(writes[1].recordsChecklist,[]);
+  await context.updateProjectFolder(prior,{openQuestions:[]});
+  assert.deepEqual(writes[2].openQuestions,[]);
+  assert(!Object.hasOwn(writes[2],'recordsChecklist'));
+}
 console.log('Project questions: inline numbered pairs, queued edits, failure retention, retry and account guard passed.');

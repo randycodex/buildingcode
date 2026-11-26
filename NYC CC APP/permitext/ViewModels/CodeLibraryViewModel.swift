@@ -212,6 +212,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let blockID: String
         let noteBody: String?
         var selectedExcerpts: [Int64: [String]] = [:]
+        var excerptOccurrences: [Int64: [String: [Int]]] = [:]
     }
     @Published private(set) var projectSaveRequest: ProjectSaveRequest?
     @Published private(set) var currentPlan: AppPlan {
@@ -330,6 +331,9 @@ final class CodeLibraryViewModel: ObservableObject {
     /// up front so the Reader and Saved screens don't make per-section DB
     /// round trips when rendering the Projects row.
     @Published private(set) var folderMembership: [Int64: [Int64]] = [:]
+    @Published private(set) var readerEvidence: [Int64: [Int64: ReaderEvidenceText]] = [:]
+    private var readerEvidenceSession: UUID?
+    private var readerEvidenceVersion: String?
     @Published var selectedVersionFileName: String = ""
     @Published var selectedJurisdictionKey: String = ""
     @Published var selectedCodeSectionID: Int64?
@@ -356,8 +360,9 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var selectedReaderContext: BrowserContextID = .primary
     @Published var selectedTab: AppTab = .browse {
         didSet {
-            if selectedTab == .browse { selectedReaderContext = .primary }
-            if selectedTab == .browseSecondary { selectedReaderContext = .secondary }
+            guard selectedTab != oldValue else { return }
+            if selectedTab == .browse, selectedReaderContext != .primary { selectedReaderContext = .primary }
+            if selectedTab == .browseSecondary, selectedReaderContext != .secondary { selectedReaderContext = .secondary }
             persistWorkspaceSelection()
         }
     }
@@ -496,6 +501,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var bookmarkedSectionIDs: Set<Int64> = []
     private var versionLoadTask: Task<Void, Never>?
     private var contentLoadTask: Task<Void, Never>?
+    private var loadingContentVersionFileName: String?
     private var citationNavigationTask: Task<Void, Never>?
     #if DEBUG
     var debugContentLoadTask: Task<Void, Never>? { contentLoadTask }
@@ -949,6 +955,7 @@ final class CodeLibraryViewModel: ObservableObject {
                         preferredVersionFileName: String? = nil, preferredCodeSectionID: Int64? = nil) {
         versionLoadTask?.cancel()
         contentLoadTask?.cancel()
+        loadingContentVersionFileName = nil
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
         initialLoadProgress = 0
@@ -1028,10 +1035,12 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func updateSelectedVersion(fileName: String) {
+        guard loadingContentVersionFileName != fileName else { return }
         if fileName == selectedVersionFileName, isInitialContentLoaded,
            authoredCodeStore != nil || codeDatabase != nil {
             contentLoadTask?.cancel()
             contentLoadTask = nil
+            loadingContentVersionFileName = nil
             statusMessage = nil
             initialLoadProgress = 1
             return
@@ -1440,15 +1449,12 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func updateSelectedCodeSection(id: Int64?) {
-        let selectionChanged = selectedCodeSectionID != id
+        guard selectedCodeSectionID != id else { return }
         selectedCodeSectionID = id
         persistContinuityContext()
         guard let authoredCodeStore else { return }
-        codeSections = Self.sortedCodeSections(authoredCodeStore.codeSections())
         chapters = authoredCodeStore.chapters(codeSectionID: id)
-        // Tab restoration can select the same category again. Preserve its
-        // completed Search; real changes invalidate and resubmit the query.
-        if selectionChanged { resetSearchForContentReplacement() }
+        resetSearchForContentReplacement()
         prewarmCodeSectionForBrowsing(id: id)
     }
 
@@ -1458,7 +1464,8 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func syncSelectedCodeSection(from context: BrowserContextID) {
         let codeSectionID: Int64?
-        if let stored = BrowserContextID.storedCodeSectionID(for: context) {
+        if let stored = BrowserContextID.storedCodeSectionID(for: context),
+           codeSections.contains(where: { $0.id == stored }) {
             codeSectionID = stored
         } else if context == .primary {
             codeSectionID = selectedCodeSectionID
@@ -1924,6 +1931,19 @@ final class CodeLibraryViewModel: ObservableObject {
         activeProjectID = sharedLibrary.activeProjectID
         readerSaveDestinationChoice = sharedLibrary.readerSaveDestinationChoice
         updateReaderTheme(sharedLibrary.readerTheme)
+    }
+
+    func makeIndependentReader(context: BrowserContextID) -> CodeLibraryViewModel {
+        let defaults = UserDefaults(suiteName: "com.permitext.reader.\(context.rawValue).continuity") ?? .standard
+        return CodeLibraryViewModel(
+            userContentRepository: userContentRepository,
+            continuityStore: ContinuityStore(defaults: defaults),
+            readerThemeStore: ReaderThemeStore(defaults: .standard),
+            loadsInitialContent: false,
+            loadsPersistedAccount: false,
+            initialSignedInAccount: signedInAccount,
+            ownsAccountSync: false
+        )
     }
 
     func prepareIndependentReader(from owner: CodeLibraryViewModel, context: BrowserContextID) {
@@ -3144,8 +3164,9 @@ final class CodeLibraryViewModel: ObservableObject {
         // evidence a second time.
         savedPresentationRefreshTask?.cancel()
         savedPresentationRefreshTask = nil
-        // Invalidate even when the account/corpus scope has become unavailable.
-        cancelProjectPresentationRefresh()
+        // Reader highlights use committed membership even if hydrating notes or
+        // reconstructing the Saved list fails later in this refresh.
+        refreshFolders()
 
         guard let selectedVersion, let userContentRepository else {
             let didChange = !bookmarkedSectionIDs.isEmpty || !bookmarks.isEmpty
@@ -3168,7 +3189,6 @@ final class CodeLibraryViewModel: ObservableObject {
                 // Keep complete prior rows visible until the actor publishes a
                 // complete replacement. Synchronous export callers still hydrate.
                 hasDeferredSavedPresentation = true
-                refreshFolders()
             } catch {
                 statusMessage = error.localizedDescription
             }
@@ -3251,10 +3271,6 @@ final class CodeLibraryViewModel: ObservableObject {
             bookmarkRevision &+= 1
         }
 
-        // Folder metadata and current-version membership are cheap enough to
-        // reconcile immediately. Account-wide Project evidence is scheduled
-        // separately by refreshFolders() so Reader feedback never waits for it.
-        refreshFolders()
     }
 
     // MARK: - Folders
@@ -3262,6 +3278,9 @@ final class CodeLibraryViewModel: ObservableObject {
     func refreshFolders(scheduleProjectPresentation: Bool = true) {
         guard let selectedVersion, let userContentRepository else {
             cancelProjectPresentationRefresh()
+            readerEvidence = [:]
+            readerEvidenceSession = nil
+            readerEvidenceVersion = nil
             folders = []
             folderMembership = [:]
             projectBookmarksByFolderID = [:]
@@ -3272,6 +3291,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         do {
             let records = try userContentRepository.allFolders()
+            let evidence = try userContentRepository.readerEvidence(codeVersion: selectedVersion.codeVersion)
             folders = records.map { record in
                 CodeFolder(
                     id: record.id,
@@ -3294,7 +3314,10 @@ final class CodeLibraryViewModel: ObservableObject {
                     updatedAt: ISO8601DateFormatter().date(from: record.updatedAt) ?? Date()
                 )
             }
-            folderMembership = (try? userContentRepository.folderMembership(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            readerEvidenceSession = privateSessionID
+            readerEvidenceVersion = selectedVersion.codeVersion
+            if readerEvidence != evidence { readerEvidence = evidence }
+            folderMembership = evidence.mapValues { $0.keys.sorted() }
             validateReaderSaveDestination()
             if let activeProjectID, folders.contains(where: { $0.id == activeProjectID }) == false {
                 self.activeProjectID = nil
@@ -3306,6 +3329,10 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             cancelProjectPresentationRefresh()
             statusMessage = error.localizedDescription
+            // A failed refresh is not a deletion. Keep the last committed state
+            // only while reading the same account and edition.
+            if readerEvidenceSession == privateSessionID && readerEvidenceVersion == selectedVersion.codeVersion { return }
+            readerEvidence = [:]
             folders = []
             folderMembership = [:]
             projectBookmarksByFolderID = [:]
@@ -3666,35 +3693,19 @@ final class CodeLibraryViewModel: ObservableObject {
             }
         }
 
-        let previousBookmarkedSectionIDs = bookmarkedSectionIDs
-        let previousBookmarks = bookmarks
-        let previousFolderMembership = folderMembership
-        let previousProjectBookmarks = projectBookmarksByFolderID
-        let previousProjectCounts = projectEvidenceRecordCountByFolderID
-        applyOptimisticBookmarkState(
-            sectionID: sectionID,
-            isBookmarked: true,
-            codeVersion: selectedVersion.codeVersion
-        )
-        applyOptimisticFolderMembership(sectionID: sectionID, folderIDs: folderIDs)
-
         do {
             try userContentRepository.saveSection(
                 sectionID,
                 toFolderIDs: folderIDs,
                 codeVersion: selectedVersion.codeVersion
             )
+            applyOptimisticBookmarkState(sectionID: sectionID, isBookmarked: true, codeVersion: selectedVersion.codeVersion)
+            applyOptimisticFolderMembership(sectionID: sectionID, folderIDs: folderIDs)
             scheduleProjectPresentationRefresh()
             scheduleUserContentAutoSync()
             NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
             return true
         } catch {
-            bookmarkedSectionIDs = previousBookmarkedSectionIDs
-            bookmarks = previousBookmarks
-            folderMembership = previousFolderMembership
-            projectBookmarksByFolderID = previousProjectBookmarks
-            projectEvidenceRecordCountByFolderID = previousProjectCounts
-            bookmarkRevision &+= 1
             statusMessage = error.localizedDescription
             return false
         }
@@ -3723,11 +3734,7 @@ final class CodeLibraryViewModel: ObservableObject {
                UserContentSyncCodeVersion.server(selectedVersion.codeVersion)
                 == UserContentSyncCodeVersion.server(targetCodeVersion) {
                 let remaining = Set(folderMembership[sectionID] ?? []).subtracting([folderID])
-                if remaining.isEmpty {
-                    folderMembership.removeValue(forKey: sectionID)
-                } else {
-                    folderMembership[sectionID] = remaining.sorted()
-                }
+                updateReaderMembership(sectionID: sectionID, folderIDs: remaining)
             }
             projectBookmarksByFolderID[folderID]?.removeAll { $0.id == sectionID }
             projectEvidenceRecordCountByFolderID[folderID] = projectBookmarksByFolderID[folderID]?.count ?? 0
@@ -3738,9 +3745,18 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    private func updateReaderMembership(sectionID: Int64, folderIDs: Set<Int64>) {
+        let previous = readerEvidence[sectionID] ?? [:]
+        let memberships = Dictionary(uniqueKeysWithValues: folderIDs.map { id in
+            (id, previous[id] ?? ReaderEvidenceText(excerpts: []))
+        })
+        readerEvidence[sectionID] = memberships.isEmpty ? nil : memberships
+        folderMembership[sectionID] = folderIDs.isEmpty ? nil : folderIDs.sorted()
+    }
+
     private func applyOptimisticFolderMembership(sectionID: Int64, folderIDs: Set<Int64>) {
         let previousFolderIDs = Set(folderMembership[sectionID] ?? [])
-        folderMembership[sectionID] = folderIDs.sorted()
+        updateReaderMembership(sectionID: sectionID, folderIDs: folderIDs)
         let affectedFolderIDs = previousFolderIDs.union(folderIDs)
         let sectionRows = ProjectEvidenceConsolidator.consolidated(
             bookmarks.filter { $0.id == sectionID }
@@ -5695,8 +5711,18 @@ final class CodeLibraryViewModel: ObservableObject {
             if report.appliedRemoteContinuity {
                 refreshContinuityStateFromStore()
             }
-            if report.appliedCount > 0 {
+            let receivedEvidence = report.mergePlan.decisions.contains {
+                $0.entityKind == .projectSection && ($0.action == .applyServer || $0.action == .noChange)
+            }
+            if report.appliedCount > 0 || receivedEvidence {
+                let revision = bookmarkRevision
                 refreshBookmarks(deferRowHydration: true)
+                if receivedEvidence {
+                    // An excerpt may change on web while the same provision is still open
+                    // in a different iPhone Reader or edition. Its bookmark ID won't change.
+                    if revision == bookmarkRevision { bookmarkRevision &+= 1 }
+                    NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
+                }
             }
             refreshUserContentSyncCheckpoint()
             // Checkpoint-skipped automatic pulls are silent; only surface meaningful results.
@@ -5947,14 +5973,10 @@ final class CodeLibraryViewModel: ObservableObject {
         return "Synced"
     }
 
-    var projectDeviceSyncStatus: String? {
+    var projectDeviceSyncIssue: String? {
         guard signedInAccount != nil else { return nil }
         if !userContentSyncConflicts.isEmpty { return "Needs attention · Sync conflicts" }
-        if pendingUserContentSyncCount > 0 { return "Saved on this device · Waiting to sync" }
         if userContentSyncCheckpoint?.lastErrorMessage != nil { return "Needs attention · Sync paused" }
-        if isAccountBusy { return "Syncing" }
-        if userContentSyncCheckpoint?.lastSuccessfulPushAt != nil ||
-            userContentSyncCheckpoint?.lastSuccessfulPullAt != nil { return "Synced" }
         return nil
     }
 
@@ -6848,7 +6870,7 @@ final class CodeLibraryViewModel: ObservableObject {
         owner.projectSaveRequest = nil
     }
 
-    func saveReaderSelectionToEvidence(_ passages: [ResearchSelectionRequest]) -> Bool {
+    func saveReaderSelectionToEvidence(_ passages: [ResearchSelectionRequest], occurrences: [Int64: [String: [Int]]] = [:]) -> Bool {
         let owner = sharedAccountLibrary ?? self
         guard owner.requireSavedWorkAccess(), owner.requireProjectAccess(),
               let codeVersion = selectedVersion?.codeVersion else { return false }
@@ -6860,18 +6882,24 @@ final class CodeLibraryViewModel: ObservableObject {
         guard !excerpts.isEmpty else { return false }
         guard let project = readerSaveDestinationProject else {
             owner.projectSaveRequest = ProjectSaveRequest(accountID: owner.signedInAccount?.appUserID,
-                codeVersion: codeVersion, sectionID: nil, blockID: "", noteBody: nil, selectedExcerpts: excerpts)
+                codeVersion: codeVersion, sectionID: nil, blockID: "", noteBody: nil, selectedExcerpts: excerpts, excerptOccurrences: occurrences)
             return true
         }
-        return owner.storeReaderSelection(excerpts, in: project, codeVersion: codeVersion)
+        let saved = owner.storeReaderSelection(excerpts, in: project, codeVersion: codeVersion, occurrences: occurrences)
+        if saved, owner !== self { refreshFolders(scheduleProjectPresentation: false) }
+        return saved
     }
 
-    private func storeReaderSelection(_ excerpts: [Int64: [String]], in project: CodeFolder, codeVersion: String) -> Bool {
+    private func storeReaderSelection(_ excerpts: [Int64: [String]], in project: CodeFolder, codeVersion: String, occurrences: [Int64: [String: [Int]]]) -> Bool {
         guard requireSavedWorkAccess(), requireProjectAccess(), let userContentRepository else { return false }
         do {
             try userContentRepository.saveSelection(excerpts, toProject: project.id, clientID: project.clientID,
-                                                    codeVersion: codeVersion)
+                                                    codeVersion: codeVersion, occurrences: occurrences)
+            let previousRevision = bookmarkRevision
             refreshBookmarks()
+            // Other open readers observe this revision. Adding another excerpt
+            // to an existing bookmark can leave every Saved-list row unchanged.
+            if previousRevision == bookmarkRevision { bookmarkRevision &+= 1 }
             scheduleUserContentAutoSync()
             NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
             let message = "Saved to \(project.name)"
@@ -6895,7 +6923,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let identity = owner.privateRequestIdentity
         owner.selectReaderSaveDestination(.project(project.clientID))
         if !request.selectedExcerpts.isEmpty, let version = request.codeVersion {
-            guard owner.storeReaderSelection(request.selectedExcerpts, in: project, codeVersion: version) else { return false }
+            guard owner.storeReaderSelection(request.selectedExcerpts, in: project, codeVersion: version, occurrences: request.excerptOccurrences) else { return false }
             owner.projectSaveRequest = nil
             return true
         }
@@ -7196,6 +7224,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func openSelectedContent(versionFileName: String? = nil, codeSectionID: Int64? = nil) {
         contentLoadTask?.cancel()
+        loadingContentVersionFileName = nil
         startupWarmupTask?.cancel()
         let hasLoadedContent = isInitialContentLoaded && (authoredCodeStore != nil || codeDatabase != nil)
         let requestedVersion = versionFileName.flatMap { requested in
@@ -7220,11 +7249,13 @@ final class CodeLibraryViewModel: ObservableObject {
         // its replacement is ready. The selected edition changes atomically
         // with the content, so old text never receives a new edition heading.
         statusMessage = hasLoadedContent ? nil : "Loading \(selectedVersion.displayName)..."
+        loadingContentVersionFileName = selectedVersion.fileName
 
         switch selectedVersion.contentKind {
         case .sqlite:
             contentLoadTask = Task { [weak self] in
                 guard let self else { return }
+                defer { if !Task.isCancelled { self.loadingContentVersionFileName = nil } }
                 do {
                     let snapshot = try await Task.detached(priority: .userInitiated) {
                         try Self.loadSQLiteContentSnapshot(version: selectedVersion)
@@ -7280,6 +7311,7 @@ final class CodeLibraryViewModel: ObservableObject {
             let reusableStore = sharedAccountLibrary?.reusableAuthoredStore(for: selectedVersion)
             contentLoadTask = Task { [weak self] in
                 guard let self else { return }
+                defer { if !Task.isCancelled { self.loadingContentVersionFileName = nil } }
                 do {
                     let snapshot = try await Task.detached(priority: .userInitiated) {
                         try Self.loadAuthoredContentSnapshot(

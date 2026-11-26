@@ -19646,7 +19646,13 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
   text-align: center;
   cursor: pointer;
 }
-.reader-selection-research-action[hidden] { display: none; }
+.reader-selection-research-action { padding: 0 4px; }
+.reader-selection-research-action > button {
+  padding: 0 10px; height: 100%; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer;
+}
+.reader-selection-research-action > button + button:not([hidden]) { border-left: 1px solid var(--border); }
+.reader-selection-research-action[hidden], .reader-selection-research-action > [hidden] { display: none; }
+::highlight(reader-saved-evidence) { color: var(--reader-notes-active-text); }
 
 /* Keep answer actions on one shared center line, including reported answers. */
 .research-answer-review-row > .research-evidence-reviewed {

@@ -37,7 +37,7 @@ assert.match(browse,/persistVersionFileName\(library.selectedVersionFileName, fo
 assert.match(browse,/guard !Task.isCancelled, request.permits\(library.captureCodeSourceNavigationContext\(\)\)/);
 assert.match(search,/didResolveAutomaticExpansion = true/);
 assert.match(search,/let preview = result.snippet.isEmpty\s*\? await library.searchPreview[\s\S]*?: result.snippet/, 'Parent metadata must not cause existing snippets to hydrate full passage');
-assert.match(browse,/private func restoreReaderVersionIfNeeded\(\) \{[\s\S]*?guard readerHandoff.shouldRestoreVersion\(in: browserContext\) else \{ return \}/);
+assert.match(browse,/private func seedBrowseSectionIfNeeded\(\) \{[\s\S]*?guard readerHandoff.shouldRestoreVersion\(in: browserContext\) else \{ return \}/);
 for (const start of ['private func prepareAndOpenChapter(', 'private func selectReaderCode(']) {
  const method = browse.slice(browse.indexOf(start), browse.indexOf('\n    }',browse.indexOf(start)));
  assert.match(method,/readerHandoff.cancel\(in: browserContext\)/, 'Manual navigation supersedes pending explicit handoff');
@@ -86,9 +86,10 @@ final class Repository {
  var activeProjectID:Int64?; var continuityCalls=0
  var openProjectID:Int64?; var projectWorkspaceSessionID=UUID()
  var activeResearchConversationID:String?; var pendingResearchSelections:[String]=[]
+ var pendingResearchPrompt:String?
  var researchHistoryProjectFilter="all"; var researchHistoryIsPresented=false
  func backendProjectID(for id:Int64)->String? { folders.first{$0.id == id}?.clientID }
- func persistContinuityContext() { continuityCalls += 1 }
+ func persistContinuityContext(deferSyncQueue:Bool = false) { continuityCalls += 1 }
  var statusMessage:String?; var saveCalls=0; var toggleCalls=0; var syncCalls=0; var projectRequests=0
  func requestProjectSelection(sectionID:Int64? = nil) { projectRequests += 1 }
  func preservePendingProSave(sectionID:Int64) {}

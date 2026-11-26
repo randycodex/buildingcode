@@ -43,6 +43,7 @@ ${source.slice(start, end)}
  let library = Harness()
  var isBrowserTabActive = true
  var hasSeededBrowseSection = true
+ var canBrowseSelectedSource = true
  var openedChapter: Int? = nil
  var preparingChapter: Int? = nil
 ${view.slice(gateStart, gateEnd).replace('private var', 'var')}
@@ -74,6 +75,8 @@ ${view.slice(gateStart, gateEnd).replace('private var', 'var')}
   precondition(h.speculativeChapterIDs == [21,22])
   let v = ViewHarness()
   precondition(v.canResumeChapterWarmups)
+  v.canBrowseSelectedSource = false; precondition(!v.canResumeChapterWarmups)
+  v.canBrowseSelectedSource = true
   v.isBrowserTabActive = false; precondition(!v.canResumeChapterWarmups)
   v.isBrowserTabActive = true; v.openedChapter = 1; precondition(!v.canResumeChapterWarmups)
   v.openedChapter = nil; v.preparingChapter = 1; precondition(!v.canResumeChapterWarmups)

@@ -967,6 +967,9 @@ private struct Phase3EntitledResearchHarness: View {
             ("building-area", "Building Area", "9,600 gross sq ft above grade"),
             ("building-height", "Building Height", "46 ft to main roof"),
             ("zoning-districts", "Zoning District(s)", "R7-2, R7A"),
+            ("commercial-overlays", "Commercial Overlay(s)", " "),
+            ("special-purpose-districts", "Special Purpose District(s)", "Not provided"),
+            ("pending-zoning-map-amendments", "Pending Zoning Map Amendments", "No mapped intersection found"),
             ("work-type", "Work type", "Alteration"),
             ("location", "Location", "New York City"),
             ("edition", "Code edition", "2022")
@@ -996,6 +999,13 @@ private struct Phase3EntitledResearchHarness: View {
         }
         if overviewFixture {
             _ = library.saveSection(sectionID: section1011.id, toFolderIDs: [acceptanceProject.id])
+        }
+        if ProcessInfo.processInfo.arguments.contains("--native-reader-bookmark-alignment-fixture") {
+            library.selectReaderSaveDestination(.project(acceptanceProject.clientID))
+            let numbers = Set(["101.1", "101.2", "101.3"])
+            for section in library.sections(for: chapterOne) where numbers.contains(section.sectionNumber) {
+                _ = library.saveSection(sectionID: section.id, toFolderIDs: [acceptanceProject.id])
+            }
         }
         if overviewFixture, ProcessInfo.processInfo.arguments.contains("--native-project-overview-delayed-load"),
            let account = library.signedInAccount, let projectID = library.backendProjectID(for: acceptanceProject.id) {
@@ -2040,7 +2050,7 @@ struct FirstUseResearchExample: Sendable {
 /// Gives the second permanent Reader its own content loader, search work,
 /// selected version, and navigation model. Saved work still uses the shared
 /// on-device repository and is reconciled through `permitextSavedWorkDidChange`.
-/// The model is created when the second Reader is requested.
+/// The model can warm while the first Reader is on screen.
 private struct IndependentReaderHost: View {
     let browserContext: BrowserContextID
 
@@ -2058,7 +2068,7 @@ private struct IndependentReaderHost: View {
             } else {
                 Color.clear
                     .task {
-                        let model = makeReaderLibrary()
+                        let model = sharedLibrary.makeIndependentReader(context: browserContext)
                         #if DEBUG
                         if ProcessInfo.processInfo.arguments.contains("--native-secondary-reader-loading-fixture") {
                             model.debugBeforeContentPublication = { _ in try? await Task.sleep(for: .seconds(7)) }
@@ -2071,21 +2081,6 @@ private struct IndependentReaderHost: View {
         }
     }
 
-    @MainActor
-    private func makeReaderLibrary() -> CodeLibraryViewModel {
-        let continuityDefaults = UserDefaults(
-            suiteName: "com.permitext.reader.\(browserContext.rawValue).continuity"
-        ) ?? .standard
-        return CodeLibraryViewModel(
-            continuityStore: ContinuityStore(defaults: continuityDefaults),
-            readerThemeStore: ReaderThemeStore(defaults: .standard),
-            preferencesDefaults: .standard,
-            entitlementService: LocalEntitlementService(defaults: .standard),
-            loadsInitialContent: false,
-            loadsPersistedAccount: false,
-            ownsAccountSync: false
-        )
-    }
 }
 
 private struct SecondaryReaderReadyKey: PreferenceKey {
@@ -2240,7 +2235,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     @Environment(\.layoutDirection) private var layoutDirection
     @State private var hasOpenedSecondary = false
     @State private var isSecondaryReaderReady = false
-    @State private var isOpeningSecondaryReader = false
+    @State private var requestedReaderContext: BrowserContextID?
     @State private var summaries: [BrowserContextID: ReaderSessionSummary] = [:]
     @State private var chapterFindOwners: [BrowserContextID: UUID] = [:]
     @State private var rememberedSources = BrowserContextID.rememberedSources()
@@ -2259,7 +2254,12 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     }
 
     private var highlightedReaderContext: BrowserContextID {
-        isOpeningSecondaryReader ? .secondary : library.selectedReaderContext
+        requestedReaderContext ?? library.selectedReaderContext
+    }
+
+    private var readyRequestedReaderContext: BrowserContextID? {
+        if requestedReaderContext == .secondary && !secondaryIsReady { return nil }
+        return requestedReaderContext
     }
 
     private var selection: Binding<String> {
@@ -2299,7 +2299,25 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
         .onAppear { activateSelectedReading() }
         .onChange(of: library.selectedReaderContext) { _, _ in activateSelectedReading() }
         .onChange(of: library.selectedTab) { _, tab in
-            if tab != .browse { isOpeningSecondaryReader = false }
+            if tab != .browse && tab != .browseSecondary { requestedReaderContext = nil }
+        }
+        .task(id: library.selectedTab == .browse) {
+            guard waitsForSecondaryReader, library.selectedTab == .browse, !hasOpenedSecondary else { return }
+            #if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("--native-secondary-reader-loading-fixture") { return }
+            #endif
+            do { try await Task.sleep(for: .milliseconds(750)) } catch { return }
+            guard library.selectedTab == .browse, !hasOpenedSecondary else { return }
+            hasOpenedSecondary = true
+        }
+        .task(id: readyRequestedReaderContext) {
+            guard let context = readyRequestedReaderContext else { return }
+            // Commit the touch feedback before updating both navigation stacks.
+            do { try await Task.sleep(for: .milliseconds(20)) } catch { return }
+            guard readyRequestedReaderContext == context,
+                  library.selectedTab == .browse || library.selectedTab == .browseSecondary else { return }
+            library.selectedTab = context == .primary ? .browse : .browseSecondary
+            requestedReaderContext = nil
         }
     }
 
@@ -2330,9 +2348,6 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 CodeScreenMetrics.readerControlsTopPadding + CodeScreenMetrics.bottomControlTabBarGap)
             .onPreferenceChange(SecondaryReaderReadyKey.self) { ready in
                 isSecondaryReaderReady = ready
-                guard ready, isOpeningSecondaryReader, library.selectedTab == .browse else { return }
-                library.selectedTab = .browseSecondary
-                isOpeningSecondaryReader = false
             }
             .onPreferenceChange(ReaderSessionSummaryKey.self) { updated in
                 summaries = updated
@@ -2361,10 +2376,10 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
             ForEach(BrowserContextID.allCases) { context in
                 let selected = highlightedReaderContext == context
                 let preparing = context == .secondary && !secondaryIsReady &&
-                    (isOpeningSecondaryReader || library.selectedReaderContext == .secondary)
+                    (requestedReaderContext == .secondary || library.selectedReaderContext == .secondary)
                 let hint = if preparing {
                     ""
-                } else if context == .primary, isOpeningSecondaryReader {
+                } else if context == visibleReaderContext, requestedReaderContext != nil {
                     "Cancel switching Readers"
                 } else {
                     selected ? "Return to Chapters, then choose a code on the next tap" : "Switch to this Reader"
@@ -2374,16 +2389,13 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     library.availableVersions.contains(where: { $0.fileName == source.versionFileName }) ? source : nil
                 }
                 Button {
-                    if context == .primary, isOpeningSecondaryReader {
-                        isOpeningSecondaryReader = false
-                    } else if context == .secondary, !secondaryIsReady {
-                        hasOpenedSecondary = true
-                        isOpeningSecondaryReader = library.selectedTab == .browse
-                    } else if library.selectedReaderContext == context {
+                    if requestedReaderContext != nil && context == visibleReaderContext {
+                        requestedReaderContext = nil
+                    } else if library.selectedReaderContext == context, !preparing {
                         NativeReaderHandoff.shared.reselect(context)
                     } else {
+                        requestedReaderContext = context
                         if context == .secondary { hasOpenedSecondary = true }
-                        library.selectedTab = context == .primary ? .browse : .browseSecondary
                     }
                 } label: {
                     Text(summary?.source ?? remembered?.source ?? (context == .primary ? "Reader 1" : "Reader 2"))

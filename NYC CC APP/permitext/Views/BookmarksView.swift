@@ -1304,7 +1304,11 @@ private struct ProjectFactsView: View {
 
     @ViewBuilder
     private var savedFacts: some View {
-        let facts = folder?.structuredFacts ?? []
+        let facts = (folder?.structuredFacts ?? []).filter { fact in
+            guard fact.status.caseInsensitiveCompare("unknown") != .orderedSame else { return false }
+            let value = fact.value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            return !["", "-", "–", "—", "unknown", "not provided", "not available", "no information", "no data", "n/a"].contains(value)
+        }
         if facts.isEmpty {
             Text("No facts yet.").font(.subheadline).foregroundStyle(.secondary)
         } else {
@@ -1471,7 +1475,6 @@ struct ProjectView: View {
     @State private var collapsedEvidenceGroupIDs: Set<String> = []
     @State private var evidenceSearchQuery = ""
     @State private var isEvidenceSearchPresented = false
-    @State private var copiedDesktopProjectLink = false
     @State private var showsResearchSelectionLimit = false
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
@@ -1707,91 +1710,67 @@ struct ProjectView: View {
     private var projectReportSummary: some View {
         let reports = projectHubSnapshot?.reports ?? []
         VStack(alignment: .leading, spacing: 8) {
-            if reports.isEmpty {
-                projectHubEmpty("No saved PDFs yet. Open Report on desktop and choose Save PDF to Project.")
-                if let projectID = library.backendProjectID(for: folderID) {
-                    Button {
-                        var link = URLComponents()
-                        link.scheme = "https"
-                        link.host = "per.codes"
-                        link.path = "/workspace"
-                        let pathCharacters = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-._~"))
-                        guard let encodedID = projectID.addingPercentEncoding(withAllowedCharacters: pathCharacters) else { return }
-                        link.percentEncodedFragment = "cq/project/\(encodedID)"
-                        guard let url = link.url else { return }
-                        UIPasteboard.general.url = url
-                        copiedDesktopProjectLink = true
-                        UIAccessibility.post(notification: .announcement, argument: "Project link copied")
-                    } label: {
-                        Label(copiedDesktopProjectLink ? "Project link copied" : "Copy project link for desktop",
-                              systemImage: copiedDesktopProjectLink ? "checkmark" : "link")
-                    }
-                    .buttonStyle(.bordered)
-                    .accessibilityIdentifier("reports-copy-desktop-project-link")
-                }
-            } else {
-                ForEach(reports) { report in
-                    VStack(alignment: .leading, spacing: 7) {
-                        HStack(alignment: .firstTextBaseline) {
-                            Text("REPORT V\(report.reportVersion)")
-                                .font(.caption2.weight(.bold))
-                                .foregroundStyle(accentColor)
-                            Spacer(minLength: 8)
-                            Text(ListTimestamp.date(from: report.createdAt)?.formatted(date: .abbreviated, time: .shortened) ?? "")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                        Text(report.title)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.primary)
-                        Text("\(report.itemCount) \(report.itemCount == 1 ? "item" : "items") · \(report.author.displayName)")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                        if let files = report.files, !files.isEmpty {
-                            Text(
-                                "Stored: " + Array(Set(
-                                    files.map { $0.format == "ios-pdf" ? "iOS PDF" : "Web PDF" }
-                                ))
-                                    .sorted()
-                                    .joined(separator: " · ")
-                            )
+            ForEach(reports) { report in
+                VStack(alignment: .leading, spacing: 7) {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text("REPORT V\(report.reportVersion)")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(accentColor)
+                        Spacer(minLength: 8)
+                        Text(ListTimestamp.date(from: report.createdAt)?.formatted(date: .abbreviated, time: .shortened) ?? "")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
-                        }
-                        Button {
-                            buildProjectReportPDF(report)
-                        } label: {
-                            Label(
-                                isProjectReportBuilding ? "Opening PDF…" : "Open PDF",
-                                systemImage: "doc.richtext"
-                            )
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(accentColor)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(
-                                Capsule(style: .continuous)
-                                    .fill(accentColor.opacity(0.14))
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(isProjectReportBuilding)
-                        if let url = SavedProjectReportLink(projectID: report.projectID, manifestID: report.id).url {
-                            Button("Copy link", systemImage: "link") {
-                                UIPasteboard.general.url = url
-                                UIAccessibility.post(notification: .announcement, argument: "Link copied for version \(report.reportVersion)")
-                            }
-                            .font(.footnote.weight(.semibold))
-                            .accessibilityIdentifier("reports-copy-version-link")
-                        }
                     }
-                    .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(accentColor.opacity(0.08))
-                    )
+                    Text(report.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text("\(report.itemCount) \(report.itemCount == 1 ? "item" : "items") · \(report.author.displayName)")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    if let files = report.files, !files.isEmpty {
+                        Text(
+                            "Stored: " + Array(Set(
+                                files.map { $0.format == "ios-pdf" ? "iOS PDF" : "Web PDF" }
+                            ))
+                                .sorted()
+                                .joined(separator: " · ")
+                        )
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    }
+                    Button {
+                        buildProjectReportPDF(report)
+                    } label: {
+                        Label(
+                            isProjectReportBuilding ? "Opening PDF…" : "Open PDF",
+                            systemImage: "doc.richtext"
+                        )
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(accentColor)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(accentColor.opacity(0.14))
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isProjectReportBuilding)
+                    if let url = SavedProjectReportLink(projectID: report.projectID, manifestID: report.id).url {
+                        Button("Copy link", systemImage: "link") {
+                            UIPasteboard.general.url = url
+                            UIAccessibility.post(notification: .announcement, argument: "Link copied for version \(report.reportVersion)")
+                        }
+                        .font(.footnote.weight(.semibold))
+                        .accessibilityIdentifier("reports-copy-version-link")
+                    }
                 }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(accentColor.opacity(0.08))
+                )
             }
             if let projectReportBuildError {
                 Text(projectReportBuildError)
@@ -1961,7 +1940,7 @@ struct ProjectView: View {
         VStack(alignment: .leading, spacing: compact ? 8 : CodeScreenMetrics.contentSpacingBelowTitle) {
             projectHeader
                 .fixedSize(horizontal: false, vertical: true)
-            projectDeviceSyncStatus
+            projectDeviceSyncIssue
             projectSectionCards(compact: compact, expandsCards: expandsCards)
         }
         .padding(.horizontal, contentHorizontalInset)
@@ -2237,7 +2216,7 @@ struct ProjectView: View {
     private var evidenceScreen: some View {
         ProjectSectionScreen(title: isProjectFolder ? "Evidence" : folder?.name ?? "Reference", accentColor: accentColor) {
             if !isProjectFolder { projectHeader }
-            if isProjectFolder { projectDeviceSyncStatus }
+            if isProjectFolder { projectDeviceSyncIssue }
             if projectBookmarks.isEmpty {
                 projectHubEmpty("No Saved Evidence yet.")
             } else if visibleProjectBookmarks.isEmpty {
@@ -2282,7 +2261,7 @@ struct ProjectView: View {
                     if !visibleProjectBookmarks.isEmpty {
                         ListSelectButton(title: "Select sections", action: startSelectingEvidence)
                     }
-                    evidenceActionsMenu
+                    projectEvidenceSortMenu
                 }
             } else {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -2300,8 +2279,8 @@ struct ProjectView: View {
     }
 
     @ViewBuilder
-    private var projectDeviceSyncStatus: some View {
-        if let status = library.projectDeviceSyncStatus {
+    private var projectDeviceSyncIssue: some View {
+        if let status = library.projectDeviceSyncIssue {
             Label(status, systemImage: "arrow.triangle.2.circlepath")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -2335,16 +2314,33 @@ struct ProjectView: View {
         }
     }
 
+    private var projectEvidenceSortMenu: some View {
+        Menu {
+            evidenceSortPicker
+        } label: {
+            ToolbarActionIcon(systemImage: "arrow.up.arrow.down")
+                .foregroundStyle(Color.appChrome)
+        }
+        .menuStyle(.button)
+        .menuIndicator(.hidden)
+        .accessibilityLabel("Sort evidence")
+        .disabled(projectBookmarks.isEmpty)
+    }
+
+    private var evidenceSortPicker: some View {
+        Picker("Sort evidence", selection: $sortMode) {
+            ForEach(BookmarkSortMode.allCases.filter { !isProjectFolder || $0 != .codeBook }) { mode in
+                Label(mode.label, systemImage: mode.systemImage).tag(mode)
+            }
+        }
+        .pickerStyle(.inline)
+    }
+
     private var evidenceActionsMenu: some View {
         let bookmarks = projectBookmarks
         return Menu {
             Menu("Sort", systemImage: "arrow.up.arrow.down") {
-                Picker("Sort evidence", selection: $sortMode) {
-                    ForEach(BookmarkSortMode.allCases.filter { !isProjectFolder || $0 != .codeBook }) { mode in
-                        Label(mode.label, systemImage: mode.systemImage).tag(mode)
-                    }
-                }
-                .pickerStyle(.inline)
+                evidenceSortPicker
             }
             .disabled(bookmarks.isEmpty)
             if !isProjectFolder {

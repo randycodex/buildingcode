@@ -7,11 +7,12 @@ const button = await readFile(new URL('../../NYC CC APP/permitext/Views/ChapterR
 const text = await readFile(new URL('../../NYC CC APP/permitext/Views/NativeChapterTextReaderView.swift', import.meta.url), 'utf8');
 const a = button.indexOf('        Button {', button.indexOf('struct ReaderCurrentSectionBookmarkButton:'));
 const b = button.indexOf('        } label:', a);
-const c = text.indexOf('    private func savedText(');
-const d = text.indexOf('    private var allowsDefinitionLinks:', c);
+const c = text.indexOf('enum NativeReaderSavedText:');
+const d = text.indexOf('struct NativeReaderPassageText', c);
 assert.ok(a > 0 && b > a && c > 0 && d > c);
 const fixture = `import Foundation
 extension NSAttributedString.Key {
+ static let nativeReaderSavedForeground = Self("nativeReaderSavedForeground")
  static let foregroundColor = Self("foregroundColor")
  static let backgroundColor = Self("backgroundColor")
  static let link = Self("link")
@@ -61,21 +62,20 @@ let blocked = ButtonFixture()
 blocked.library.hasDestination = false
 blocked.tap()
 precondition(!blocked.library.saved && !blocked.displayedIsBookmarked && blocked.message == nil && blocked.library.selectionRequests == 1)
-struct Presentation {
- let isBookmarked: Bool
- let accentColor = "accent"
- ${text.slice(c, d).replace('private func savedText', 'func savedText')}
-}
+typealias UIColor = String
+struct NativeChapterSelectionAddress: Hashable { let block: Int }
+${text.slice(c, d)}
+let address = NativeChapterSelectionAddress(block: 1)
 let source = NSMutableAttributedString(string: "normal linked highlighted", attributes: [.foregroundColor:"original"])
 source.addAttribute(.link, value:"https://example.test", range:NSRange(location:7,length:6))
 source.addAttribute(.backgroundColor, value:"search", range:NSRange(location:14,length:11))
-let saved = Presentation(isBookmarked:true).savedText(source)
+let saved = NativeReaderSavedText.whole.applying(to: source, address: address, accent: "accent")
 precondition(saved.string == source.string)
 precondition(saved.attribute(.foregroundColor, at:0, effectiveRange:nil) as? String == "accent")
 precondition(saved.attribute(.link, at:8, effectiveRange:nil) as? String == "https://example.test")
 precondition(saved.attribute(.foregroundColor, at:16, effectiveRange:nil) as? String == "original")
 precondition(source.attribute(.foregroundColor, at:0, effectiveRange:nil) as? String == "original")
-precondition(Presentation(isBookmarked:false).savedText(source).isEqual(to:source))
+precondition(NativeReaderSavedText.none.applying(to: source, address: address, accent: "accent").isEqual(to:source))
 print("PASS: save/remove button toggles immediately, removal failures retain saved state; saved color preserves source cache, text, links and search highlights")
 `;
 const directory = await mkdtemp(join(tmpdir(), 'permitext-bookmark-actions-'));

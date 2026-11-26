@@ -36,9 +36,11 @@ struct Binding<Value> { let get: () -> Value; let set: (Value) -> Void }
 struct NavigationPath { }
 enum Tab { case search, reader }
 enum CodeSectionKind { case section }
+struct NativeFireCodeSubsection: Hashable {}
 struct CodeSearchResult {
  let id: Int64; let sourceVersion: String?; let codeSectionID: Int64?
  let chapterNumber: String; let sectionNumber: String; let title: String; let kind: CodeSectionKind
+ let fireSubsection: NativeFireCodeSubsection? = nil
 }
 struct ActiveCodeSourceNavigationTarget { }
 struct RecentEntry { let historyIdentity: String }
