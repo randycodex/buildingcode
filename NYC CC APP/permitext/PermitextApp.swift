@@ -2429,12 +2429,10 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 let segmentWidth = geometry.size.width / 2
                 let isPrimary = highlightedReaderContext == .primary
                 let isLeft = isPrimary == (layoutDirection == .leftToRight)
-                Capsule()
-                    .fill(Color.primary.opacity(0.15))
-                    .padding(3)
-                    .frame(width: segmentWidth, height: geometry.size.height)
+                readerSelectionIndicator
+                    .frame(width: max(0, segmentWidth - 6), height: max(0, geometry.size.height - 6))
                     .position(x: segmentWidth * (isLeft ? 0.5 : 1.5), y: geometry.size.height / 2)
-                    .animation(reduceMotion ? nil : .easeOut(duration: 0.08), value: highlightedReaderContext)
+                    .animation(reduceMotion ? nil : .smooth(duration: 0.28), value: highlightedReaderContext)
             }
             .allowsHitTesting(false)
             .accessibilityHidden(true)
@@ -2442,6 +2440,16 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
         .codeLiquidGlassCapsule()
         .padding(.top, CodeScreenMetrics.readerControlsTopPadding)
         .codePlacementAboveTabBar()
+    }
+
+    @ViewBuilder
+    private var readerSelectionIndicator: some View {
+        let tint = Color.primary.opacity(0.15)
+        if #available(iOS 26.0, *) {
+            Color.clear.glassEffect(.clear.tint(tint), in: Capsule())
+        } else {
+            Capsule().fill(tint)
+        }
     }
 
     @available(iOS 18.0, *)
