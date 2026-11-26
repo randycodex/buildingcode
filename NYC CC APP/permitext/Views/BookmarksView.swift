@@ -1275,6 +1275,18 @@ private struct ProjectFactDraft: Identifiable {
     }
 }
 
+private struct ProjectEvidenceRowButtonStyle: PrimitiveButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        // The standard NavigationLink can activate on a horizontal drag in a
+        // vertical ScrollView. Require a recognized tap for Evidence rows.
+        configuration.label
+            .onTapGesture { configuration.trigger() }
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction { configuration.trigger() }
+    }
+}
+
 private struct ProjectSectionScreen<Content: View>: View {
     let title: String
     let accentColor: Color
@@ -1543,7 +1555,7 @@ struct ProjectView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.scenePhase) private var scenePhase
     @State private var sortMode: BookmarkSortMode = .codeOrder
-    @State private var removedProjectSections: [BookmarkedSection] = []
+    @State private var removedProjectSections: [ProjectEvidenceRemoval] = []
     @State private var removalSessionID: UUID?
     @State private var removalFolderID: Int64?
     @State private var undoFailed = false
@@ -2308,8 +2320,8 @@ struct ProjectView: View {
                     .frame(minWidth: 44, minHeight: 44)
                     .accessibilityLabel("Dismiss Undo")
             }
+            .buttonStyle(.plain)
             .padding(.horizontal)
-            .background(.regularMaterial)
         }
     }
 
@@ -2484,6 +2496,7 @@ struct ProjectView: View {
                 .foregroundStyle(Color.appChrome)
         }
         .accessibilityLabel("Remove from project")
+        .disabled(selectedBookmarks.isEmpty)
     }
 
     @discardableResult
@@ -2513,8 +2526,8 @@ struct ProjectView: View {
         removalSessionID = library.privateSessionID
         removalFolderID = folderID
         let removed = library.removeSections(sections, fromFolder: folderID)
-        let existing = Set(removedProjectSections.map(\.rowID))
-        removedProjectSections.append(contentsOf: removed.filter { !existing.contains($0.rowID) })
+        guard !removed.isEmpty else { return }
+        removedProjectSections = removed
         undoFailed = false
     }
 
@@ -2562,17 +2575,9 @@ struct ProjectView: View {
                         Button("Ask Assistant", systemImage: "sparkle") { askAssistant(about: [bookmark]) }
                     }
                 }
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button {
-                        removeProjectEvidence([bookmark])
-                    } label: {
-                        Label("Remove from project", systemImage: "trash")
-                    }
-                    .tint(Color(uiColor: .darkGray))
-                }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ProjectEvidenceRowButtonStyle())
         .accessibilityIdentifier("project-bookmark-\(bookmark.rowID)")
         .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
     }
