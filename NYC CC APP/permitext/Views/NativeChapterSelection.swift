@@ -79,6 +79,17 @@ struct NativeChapterSelectionTarget: Equatable {
         return upper > lower ? NSRange(location: lower, length: upper - lower) : nil
     }
 
+    func localSavedSpans(_ ranges: [NativeChapterSelectionAddress: [NSRange]]) -> [NSRange] {
+        guard !components.isEmpty else { return ranges[address] ?? [] }
+        return components.enumerated().flatMap { index, component in
+            let block = NativeChapterSelectionAddress(block: address.block + index)
+            return (ranges[block] ?? []).compactMap { range -> NSRange? in
+                guard NSMaxRange(range) <= component.length else { return nil }
+                return NSRange(location: component.location + range.location, length: range.length)
+            }
+        }
+    }
+
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.controller === rhs.controller && lhs.address == rhs.address && lhs.components == rhs.components
     }
@@ -267,6 +278,21 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         return UIAction(title: "Save to Evidence", image: UIImage(systemName: "bookmark")) { [weak self] _ in
             guard let self, self.saveToEvidence?(passages, range) == true else { return }
             self.clear()
+        }
+    }
+
+    func showSavedEvidence(_ ranges: [NativeChapterSelectionAddress: [NSRange]], accent: UIColor) {
+        guard !ranges.isEmpty else { return }
+        // Install the committed foreground in the mounted text views before
+        // the action clears the selection. SwiftUI reconciles on its next update.
+        for entry in Array(mountedText.values) {
+            guard let view = entry.view, let target = view.chapterSelectionTarget else { continue }
+            let spans = target.localSavedSpans(ranges)
+            guard !spans.isEmpty, let source = view.attributedText else { continue }
+            // Find backgrounds are already installed in the mounted text.
+            let saved = NativeReaderSavedText.applying(to: source, spans: spans, accent: accent,
+                                                       preserveForegroundWithBackground: false)
+            if !source.isEqual(to: saved) { view.attributedText = saved }
         }
     }
 

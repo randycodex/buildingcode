@@ -455,20 +455,32 @@ struct NativeChapterTextReaderView: View {
                     return layout.passageRange(target)
                 }
                 selection.askAssistant = { [weak library] in library?.sendToResearch($0) }
-                selection.saveToEvidence = { [weak library, weak textLayout] passages, range in
+                selection.saveToEvidence = { [weak library, weak textLayout, weak selection] passages, range in
                     guard let library, let textLayout else { return false }
+                    let projectID = library.readerSaveDestinationProject?.id
                     var occurrences: [Int64: [String: [Int]]] = [:]
-                    var visited = Set<Int>()
+                    var sectionsByTarget: [Int: Int64] = [:]
                     for block in range.start.address.block...range.end.address.block where blocks.indices.contains(block) {
-                        guard let target = index[blocks[block].id]?.sectionTargetIndex, visited.insert(target).inserted,
+                        guard let target = index[blocks[block].id]?.sectionTargetIndex, sectionsByTarget[target] == nil,
                               let number = targets[target].sectionNumber,
                               let id = library.sectionSummary(sectionNumber: number, codeSectionID: codeSectionID)?.id,
                               let passage = passages.first(where: { $0.sectionID == String(id) }),
                               let location = textLayout.passage(target) else { continue }
                         let quote = passage.selectedText
                         occurrences[id, default: [:]][quote] = location.occurrences(for: range, quote: quote)
+                        sectionsByTarget[target] = id
                     }
-                    return library.saveReaderSelectionToEvidence(passages, occurrences: occurrences)
+                    guard library.saveReaderSelectionToEvidence(passages, occurrences: occurrences) else { return false }
+                    if let projectID {
+                        var savedRanges: [NativeChapterSelectionAddress: [NSRange]] = [:]
+                        for (target, id) in sectionsByTarget {
+                            guard let evidence = library.readerEvidence[id]?[projectID],
+                                  case let .ranges(ranges) = textLayout.savedText(evidence, target: target) else { continue }
+                            savedRanges.merge(ranges, uniquingKeysWith: +)
+                        }
+                        selection?.showSavedEvidence(savedRanges, accent: library.accentColor(for: codeSectionID))
+                    }
+                    return true
                 }
             })
         }
@@ -3022,12 +3034,22 @@ enum NativeReaderSavedText: Equatable {
         case .whole: spans = [NSRange(location: 0, length: source.length)]
         case .ranges(let ranges): spans = ranges[address] ?? []
         }
+        return Self.applying(to: source, spans: spans, accent: accent)
+    }
+
+    static func applying(to source: NSAttributedString, spans: [NSRange], accent: UIColor,
+                         preserveForegroundWithBackground: Bool = true) -> NSAttributedString {
         guard !spans.isEmpty else { return source }
         let result = NSMutableAttributedString(attributedString: source)
+        let colors: [NSAttributedString.Key: Any] = [.foregroundColor: accent, .nativeReaderSavedForeground: accent]
         for span in spans where NSMaxRange(span) <= source.length {
+            if !preserveForegroundWithBackground {
+                result.addAttributes(colors, range: span)
+                continue
+            }
             source.enumerateAttribute(.backgroundColor, in: span) { background, range, _ in
                 if background == nil {
-                    result.addAttributes([.foregroundColor: accent, .nativeReaderSavedForeground: accent], range: range)
+                    result.addAttributes(colors, range: range)
                 }
             }
         }

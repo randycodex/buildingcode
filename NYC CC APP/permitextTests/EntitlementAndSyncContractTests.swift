@@ -8449,6 +8449,38 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
     }
 
     @MainActor
+    func testMountedReaderTextAppliesCommittedColorBeforeSwiftUIRedraw() throws {
+        let selection = NativeChapterSelectionController()
+        let first = NativeChapterSelectionAddress(block: 10)
+        let second = NativeChapterSelectionAddress(block: 11)
+        let firstLine = "Room 🪟"
+        let secondLine = "Room again"
+        let secondOffset = firstLine.utf16.count + 1
+        let savedWord = NSRange(location: secondOffset, length: 4)
+        let original = NSAttributedString(string: "\(firstLine)\n\(secondLine)", attributes: [.foregroundColor: UIColor.label])
+        let tinted = NativeReaderFindTint.applying(to: original, ranges: [savedWord], activeRanges: [savedWord])
+        let view = RichTextView()
+        view.attributedText = tinted
+        view.chapterSelectionTarget = NativeChapterSelectionTarget(controller: selection, address: first, components: [
+            NSRange(location: 0, length: firstLine.utf16.count),
+            NSRange(location: secondOffset, length: secondLine.utf16.count)
+        ])
+        selection.register(view, address: first)
+
+        selection.showSavedEvidence([second: [NSRange(location: 0, length: 4)]], accent: .systemGreen)
+        selection.clear()
+        let displayed = try XCTUnwrap(view.attributedText)
+
+        XCTAssertEqual(displayed.string, original.string)
+        XCTAssertEqual(displayed.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? UIColor, .label)
+        XCTAssertEqual(displayed.attribute(.foregroundColor, at: secondOffset, effectiveRange: nil) as? UIColor, .systemGreen)
+        XCTAssertEqual(displayed.attribute(.nativeReaderSavedForeground, at: secondOffset + 3, effectiveRange: nil) as? UIColor, .systemGreen)
+        XCTAssertNil(displayed.attribute(.nativeReaderSavedForeground, at: secondOffset + 4, effectiveRange: nil))
+        XCTAssertEqual(displayed.attribute(.backgroundColor, at: secondOffset, effectiveRange: nil) as? UIColor,
+                       tinted.attribute(.backgroundColor, at: secondOffset, effectiveRange: nil) as? UIColor)
+    }
+
+    @MainActor
     func testGroupedReaderMapsSelectionAndTintsOnlySavedCharacters() throws {
         let lines = ["101.2 Scope.", "  Room 🪟 windows.  ", "Room again."]
         let blocks = NativeReaderDisplayBlock.blocks(from: lines.enumerated().map { index, text in
