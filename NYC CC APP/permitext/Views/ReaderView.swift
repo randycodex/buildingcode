@@ -184,10 +184,7 @@ struct ReaderView: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 CodeHairline().padding(.bottom, 4)
                                 Text("Comments").font(.headline)
-                                PassageCommentEditor(sectionID: sectionID, blockID: "", label: "")
-                                ForEach(library.noteBlockIDs(sectionID: sectionID).filter { !$0.isEmpty }, id: \.self) { blockID in
-                                    PassageCommentEditor(sectionID: sectionID, blockID: blockID, label: "Passage note")
-                                }
+                                ReaderPassageCommentFields(sectionID: sectionID)
                             }
                         }
                         if isBookmarked && library.hasCapability(.projects) {
@@ -882,6 +879,18 @@ private struct FigureImageView: View {
     .preferredColorScheme(.light)
 }
 #endif
+
+struct ReaderPassageCommentFields: View {
+    let sectionID: Int64
+    @EnvironmentObject private var library: CodeLibraryViewModel
+
+    var body: some View {
+        PassageCommentEditor(sectionID: sectionID, blockID: "", label: "")
+        ForEach(library.noteBlockIDs(sectionID: sectionID).filter { !$0.isEmpty }, id: \.self) { blockID in
+            PassageCommentEditor(sectionID: sectionID, blockID: blockID, label: "Passage note")
+        }
+    }
+}
 
 /// Uses the same section/block annotation identity as web Detail and the Reader.
 private struct PassageCommentEditor: View {

@@ -306,6 +306,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let targetAnchorID: String?
     let targetSearchText: String?
     let targetSearchRequestID: Int
+    var linkedPassage: LinkedReaderPassage? = nil
     let readerTheme: ReaderTheme
     let accentHex: String
     let colorScheme: ColorScheme
@@ -1351,6 +1352,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             let command = beginProgrammaticScroll()
             lastScrolledAnchorID = anchorID
             lastSearchScrollTarget = SearchScrollTarget(anchorID: anchorID, query: query, requestID: parent.targetSearchRequestID)
+            let linkedPassageJSON = parent.linkedPassage.flatMap { try? JSONEncoder().encode($0) }
+                .map { String(decoding: $0, as: UTF8.self) } ?? "null"
             let javascript = """
             (function() {
               var query = String(\(Self.javascriptString(query ?? ""))).trim();
@@ -1369,6 +1372,79 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               var resolvedAnchor = target.id || \(Self.javascriptString(anchorID));
               if (window.__nycccRevealAnchor) {
                 target = window.__nycccRevealAnchor(\(Self.javascriptString(anchorID))) || target;
+              }
+
+              var passage = \(linkedPassageJSON);
+              if (passage && !query) {
+                var anchor = document.getElementById(resolvedAnchor) || target;
+                var heading = anchor.closest('.Section, .Subsection') || anchor;
+                var root = heading.closest('.nyccc-section-card') || heading.parentElement;
+                var nextHeading = Array.from(root.querySelectorAll('.Section, .Subsection')).find(function(candidate) {
+                  return heading.compareDocumentPosition(candidate) & Node.DOCUMENT_POSITION_FOLLOWING;
+                });
+                var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+                var buffer = '', positions = [], lastBlock = null, node;
+                while ((node = walker.nextNode())) {
+                  if (!(heading.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING)) continue;
+                  if (nextHeading && !(node.compareDocumentPosition(nextHeading) & Node.DOCUMENT_POSITION_FOLLOWING)) break;
+                  if (node.parentElement.closest('button, script, style, .nyccc-block-actions')) continue;
+                  var block = node.parentElement.closest('p, li, td, th, div, .Section, .Subsection');
+                  if (lastBlock && lastBlock !== block && buffer && !buffer.endsWith(' ')) {
+                    buffer += ' ';
+                    positions.push({ node: node, index: 0 });
+                  }
+                  lastBlock = block;
+                  for (var i = 0; i < node.length; i++) {
+                    var char = node.nodeValue[i];
+                    if (/\\s/.test(char)) {
+                      if (buffer.endsWith(' ')) continue;
+                      char = ' ';
+                    }
+                    buffer += char;
+                    positions.push({ node: node, index: i });
+                  }
+                }
+                function fold(value) { return String(value || '').replace(/\\s+/g, ' ').trim(); }
+                var ranges = [];
+                passage.passages.forEach(function(quote) {
+                  var exact = fold(quote.exact);
+                  if (!exact) return;
+                  var matches = [];
+                  for (var index = buffer.indexOf(exact); index >= 0; index = buffer.indexOf(exact, index + 1)) matches.push(index);
+                  var ordinals = passage.occurrences[quote.exact] || [];
+                  var prefix = fold(quote.prefix), suffix = fold(quote.suffix);
+                  if (ordinals.length) {
+                    matches = matches.filter(function(_, ordinal) { return ordinals.includes(ordinal); });
+                  } else if (matches.length > 1) {
+                    matches = matches.filter(function(start) {
+                      return (prefix || suffix) && (!prefix || buffer.slice(0, start).trimEnd().endsWith(prefix)) &&
+                        (!suffix || buffer.slice(start + exact.length).trimStart().startsWith(suffix));
+                    });
+                    if (matches.length > 1) return;
+                  }
+                  matches.forEach(function(start) {
+                    var first = positions[start], last = positions[start + exact.length - 1];
+                    var range = document.createRange();
+                    range.setStart(first.node, first.index);
+                    range.setEnd(last.node, last.index + 1);
+                    ranges.push({ start: start, range: range });
+                  });
+                });
+                if (ranges.length) {
+                  ranges.sort(function(a, b) { return a.start - b.start; });
+                  if (window.Highlight && CSS.highlights) {
+                    var style = document.getElementById('nyccc-linked-passage') || document.createElement('style');
+                    style.id = 'nyccc-linked-passage';
+                    style.textContent = '::highlight(nyccc-linked-passage) { color: \(parent.accentHex); }';
+                    if (!style.parentNode) document.head.append(style);
+                    CSS.highlights.set('nyccc-linked-passage', new Highlight(...ranges.map(function(match) { return match.range; })));
+                  }
+                  var y = ranges[0].range.getBoundingClientRect().top + window.scrollY - Math.max(80, window.innerHeight * 0.22);
+                  window.scrollTo({ top: Math.max(0, y), behavior: 'auto' });
+                } else {
+                  heading.scrollIntoView({ block: 'start' });
+                }
+                return resolvedAnchor;
               }
 
               function normalized(value) {

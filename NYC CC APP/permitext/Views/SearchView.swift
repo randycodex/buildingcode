@@ -115,10 +115,10 @@ struct SearchReaderRoute: Hashable {
     let kind: CodeSectionKind?
     let fireSubsection: NativeFireCodeSubsection?
 
-    init(sectionID: Int64, sourceVersion: String? = nil) {
+    init(sectionID: Int64, sourceVersion: String? = nil, codeSectionID: Int64? = nil) {
         self.sectionID = sectionID
         self.sourceVersion = sourceVersion
-        self.codeSectionID = nil
+        self.codeSectionID = codeSectionID
         self.chapterNumber = nil
         self.sectionNumber = nil
         self.title = nil

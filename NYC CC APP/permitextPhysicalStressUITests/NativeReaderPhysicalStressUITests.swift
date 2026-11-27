@@ -2327,6 +2327,27 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         verifyNativeLinkedNoteCaret(largeText: false)
     }
 
+    func testNativeNotebookCitationOpensHighlightedChapterAndReturnsToNote() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
+                               "--native-notebook-reference-fixture", "--native-notebook-linked-passage-fixture"]
+        app.launch()
+        let editor = nativeNotebookBody(in: app)
+        XCTAssertTrue(editor.waitForExistence(timeout: 30), app.debugDescription)
+        let original = nativeNotebookBodyValue(editor)
+        let citation = app.webViews.buttons["Open Building Code § 101.2"]
+        XCTAssertTrue(citation.waitForExistence(timeout: 10), app.debugDescription)
+        reveal(citation, in: app)
+        citation.tap()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 20), app.debugDescription)
+        let quotation = app.textViews.matching(NSPredicate(format: "label CONTAINS %@ AND value CONTAINS %@",
+            "alteration, movement, addition, replacement, repair", "Saved text")).firstMatch
+        XCTAssertTrue(quotation.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(editor.waitForExistence(timeout: 10), app.debugDescription)
+        XCTAssertEqual(nativeNotebookBodyValue(editor), original)
+    }
+
     func testNativeLargeTextLinkedNoteReturnsToEditingCaret() {
         verifyNativeLinkedNoteCaret(largeText: true)
     }
@@ -3470,6 +3491,47 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             format: "label CONTAINS %@ AND value CONTAINS %@", "The provisions of this code shall apply", "Saved text"
         )).firstMatch
         XCTAssertTrue(saved.waitForExistence(timeout: 10), app.debugDescription)
+    }
+
+    func testProjectEvidenceOpensSeparateChapterAndPreservesReaderPosition() throws {
+        let app = launchFixtureProjectReader()
+        let passage = app.textViews.matching(NSPredicate(format: "label CONTAINS %@", "Refer to Chapter 1 of Title 28")).firstMatch
+        XCTAssertTrue(passage.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
+        let startY = passage.frame.minY
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.70))
+            .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.53)),
+                   withVelocity: .slow, thenHoldForDuration: 0)
+        let originalY = passage.frame.minY
+        XCTAssertTrue(passage.isHittable)
+        XCTAssertGreaterThan(startY - originalY, 30, "The main Reader must be scrolled before opening the preview.")
+
+        app.buttons["main-tab-saved"].tap()
+        let evidence = app.buttons["project-section-evidence"]
+        XCTAssertTrue(evidence.waitForExistence(timeout: 10), app.debugDescription)
+        evidence.tap()
+        let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+                                                   "project-bookmark-", "101.2")).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 10), app.debugDescription)
+        row.tap()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 20), app.debugDescription)
+        let scope = app.textViews.matching(NSPredicate(format: "label CONTAINS %@", "The provisions of this code shall apply")).firstMatch
+        XCTAssertTrue(scope.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
+        XCTAssertFalse(app.textFields["Add a comment"].exists)
+        let options = app.buttons["Passage options"]
+        XCTAssertTrue(options.isHittable, app.debugDescription)
+        options.tap()
+        XCTAssertTrue(app.buttons["Comments"].waitForExistence(timeout: 5))
+        app.buttons["Comments"].tap()
+        XCTAssertTrue(app.navigationBars["Comments"].waitForExistence(timeout: 5))
+        app.buttons["Done"].tap()
+        app.buttons["main-tab-reader"].tap()
+        XCTAssertTrue(passage.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
+        XCTAssertEqual(passage.frame.minY, originalY, accuracy: 5)
+
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(options.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.navigationBars["Evidence"].waitForExistence(timeout: 10))
     }
 
     func testReaderFindKeepsGroupedTextAndJumpsFromMatchList() {
@@ -5717,7 +5779,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(title.label.contains("designation \"BC\"."), title.label)
         XCTAssertTrue(scope.label.contains("101.2 Scope.") && scope.label.contains("The provisions"), scope.label)
         title.tap()
-        XCTAssertTrue(app.staticTexts["Saved selection"].waitForExistence(timeout: 10), app.debugDescription)
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 20), app.debugDescription)
+        let savedParagraph = app.textViews.matching(NSPredicate(format: "label CONTAINS %@ AND value CONTAINS %@",
+                                                              "designation \"BC\".", "Saved text")).firstMatch
+        XCTAssertTrue(savedParagraph.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
+        app.buttons["Passage options"].tap()
+        app.buttons["Saved passage"].tap()
+        XCTAssertTrue(app.navigationBars["Saved passage"].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "designation \"BC\".")).firstMatch.exists)
 #endif
     }
 

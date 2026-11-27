@@ -72,20 +72,9 @@ struct NativeNotebookReferenceDestination: View {
             if !isCurrentOwner {
                 ContentUnavailableView("Reference unavailable", systemImage: "lock", description: Text("Sign in again to open this Note’s sources."))
             } else if let readerTarget {
-                VStack(spacing: 0) {
-                    if !route.passages.isEmpty {
-                        DisclosureGroup(route.source?.scope == "section" ? "Saved section" : "Saved passage") {
-                            ScrollView {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    ForEach(Array(route.passages.enumerated()), id: \.offset) { _, passage in
-                                        Text(passage.exact).textSelection(.enabled)
-                                    }
-                                }.frame(maxWidth: .infinity, alignment: .leading)
-                            }.frame(maxHeight: 160)
-                        }.padding(.horizontal).padding(.vertical, 8)
-                    }
-                    NativeNotebookSourceReader(target: readerTarget, sharedLibrary: sharedLibrary)
-                }
+                LinkedChapterReaderDestination(sectionID: readerTarget.sectionID, codeVersion: readerTarget.codeVersion,
+                    codeSectionID: readerTarget.codeSectionID, passages: route.passages,
+                    isWholeSection: route.source?.scope == "section", sharedLibrary: sharedLibrary)
             } else if let answer, let conversation {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
@@ -256,26 +245,144 @@ struct NativeNotebookReferenceDestination: View {
     }
 }
 
-private struct NativeNotebookSourceReader: View {
-    let target: NativeNotebookReaderTarget
+/// Pushed on the originating stack. Its chapter, library and viewport belong to
+/// this destination, independently of the tabs and handoff for the main Reader.
+struct LinkedChapterReaderDestination: View {
+    let sectionID: Int64
+    let codeVersion: String
+    let codeSectionID: Int64?
+    let passages: [NotebookEvidencePassage]
+    var isWholeSection = false
+    var evidenceFolderID: Int64? = nil
     @ObservedObject private var sharedLibrary: CodeLibraryViewModel
-    @StateObject private var library: CodeLibraryViewModel
+    @State private var prepared: PreparedSearchReaderDestination?
+    @State private var fallbackLibrary: CodeLibraryViewModel?
     @State private var accountPresentationID = UUID()
+    @State private var showsSavedText = false
+    @State private var showsComments = false
+    @State private var rememberedSectionID: Int64?
+    @State private var rememberedBlockID: String?
+    @State private var rememberedViewport: NativeReaderViewportPosition?
+    @State private var rememberedAnchorID: String?
+    @State private var rememberedScrollOffset: Double?
+    @State private var sessionID: UUID
+    @State private var originTab: AppTab
 
-    init(target: NativeNotebookReaderTarget, sharedLibrary: CodeLibraryViewModel) {
-        self.target = target
+    init(sectionID: Int64, codeVersion: String, codeSectionID: Int64?, passages: [NotebookEvidencePassage],
+         isWholeSection: Bool = false, evidenceFolderID: Int64? = nil, sharedLibrary: CodeLibraryViewModel) {
+        self.sectionID = sectionID
+        self.codeVersion = codeVersion
+        self.codeSectionID = codeSectionID
+        self.passages = passages
+        self.isWholeSection = isWholeSection
+        self.evidenceFolderID = evidenceFolderID
         self.sharedLibrary = sharedLibrary
-        _library = StateObject(wrappedValue: sharedLibrary.makeSearchReaderLibrary(sourceVersion: target.codeVersion))
+        _sessionID = State(initialValue: sharedLibrary.privateSessionID)
+        _originTab = State(initialValue: sharedLibrary.selectedTab)
     }
 
+    private var isActive: Bool { sharedLibrary.selectedTab == originTab }
+
     var body: some View {
-        ReaderView(sectionID: target.sectionID, codeVersion: target.codeVersion, codeSectionID: target.codeSectionID, usesCompactSourceHeader: true)
-            .environmentObject(library)
-            .modifier(PermitextAccountFlowPresentation(library: sharedLibrary, ownerID: accountPresentationID))
-            .onAppear { sharedLibrary.accountPresentationOwnerID = accountPresentationID }
-            .onDisappear {
-                if sharedLibrary.accountPresentationOwnerID == accountPresentationID { sharedLibrary.accountPresentationOwnerID = nil }
+        Group {
+            if sharedLibrary.privateSessionID != sessionID {
+                ContentUnavailableView("Passage unavailable", systemImage: "lock")
+            } else if let prepared {
+                chapter(prepared)
+            } else if let fallbackLibrary {
+                readerSession(fallbackLibrary) {
+                    ReaderView(sectionID: sectionID, codeVersion: codeVersion, codeSectionID: codeSectionID,
+                        returnsToProjectsAfterRemoval: evidenceFolderID != nil, usesCompactSourceHeader: true,
+                        selectedExcerpts: isWholeSection ? [] : passages.map(\.exact))
+                }
+            } else {
+                ProgressView("Opening passage…")
             }
+        }
+        .task(id: sharedLibrary.activeCodeSourceRevision) {
+            guard prepared == nil, fallbackLibrary == nil, sharedLibrary.privateSessionID == sessionID else { return }
+            do {
+                let destination = try await PreparedSearchReaderDestination.prepare(
+                    route: SearchReaderRoute(sectionID: sectionID, sourceVersion: codeVersion, codeSectionID: codeSectionID),
+                    sharedLibrary: sharedLibrary)
+                guard !Task.isCancelled, sharedLibrary.privateSessionID == sessionID else { return }
+                prepared = destination
+            } catch {
+                guard !Task.isCancelled, sharedLibrary.privateSessionID == sessionID else { return }
+                // The single-section Reader retains source-enabling and legacy-edition recovery.
+                fallbackLibrary = sharedLibrary.makeSearchReaderLibrary(sourceVersion: codeVersion)
+            }
+        }
+    }
+
+    private func chapter(_ prepared: PreparedSearchReaderDestination) -> some View {
+        let library = prepared.library
+        let occurrences = evidenceFolderID.flatMap { library.readerEvidence[sectionID]?[$0]?.occurrences } ?? [:]
+        let linkedPassage = isWholeSection || passages.isEmpty ? nil : LinkedReaderPassage(passages: passages, occurrences: occurrences)
+        return readerSession(library) {
+            ChapterHTMLReaderView(chapter: prepared.chapter, initialSection: prepared.section,
+                rememberedNativeSectionID: $rememberedSectionID, rememberedNativeBlockID: $rememberedBlockID,
+                rememberedNativeViewport: $rememberedViewport, rememberedAnchorID: $rememberedAnchorID,
+                rememberedScrollOffset: $rememberedScrollOffset, preparedNativeOpening: prepared.nativeOpening,
+                linkedPassage: linkedPassage)
+                .toolbar {
+                    if !passages.isEmpty || library.hasCapability(.notes) {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Menu {
+                                if !passages.isEmpty {
+                                    Button(isWholeSection ? "Saved section" : "Saved passage", systemImage: "quote.bubble") {
+                                        showsSavedText = true
+                                    }
+                                }
+                                if library.hasCapability(.notes) {
+                                    Button("Comments", systemImage: "text.bubble") { showsComments = true }
+                                }
+                            } label: {
+                                Image(systemName: "ellipsis")
+                            }
+                            .accessibilityLabel("Passage options")
+                        }
+                    }
+                }
+                .sheet(isPresented: $showsSavedText) {
+                    passageSheet(isWholeSection ? "Saved section" : "Saved passage", isPresented: $showsSavedText) {
+                        ForEach(Array(passages.enumerated()), id: \.offset) { _, passage in
+                            Text(passage.exact).textSelection(.enabled)
+                        }
+                    }
+                }
+                .sheet(isPresented: $showsComments) {
+                    passageSheet("Comments", isPresented: $showsComments) {
+                        ReaderPassageCommentFields(sectionID: sectionID)
+                    }
+                }
+        }
+    }
+
+    private func passageSheet<Content: View>(_ title: String, isPresented: Binding<Bool>, @ViewBuilder content: () -> Content) -> some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12, content: content)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+            }
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) { Button("Done") { isPresented.wrappedValue = false } }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func readerSession<Content: View>(_ library: CodeLibraryViewModel, @ViewBuilder content: () -> Content) -> some View {
+        content()
+            .environmentObject(library)
+            .environment(\.isBrowserTabActive, isActive)
+            .modifier(PermitextAccountFlowPresentation(library: sharedLibrary, ownerID: accountPresentationID))
+            .onAppear { updateAccountPresentation(active: isActive) }
+            .onChange(of: isActive) { _, active in updateAccountPresentation(active: active) }
+            .onDisappear { updateAccountPresentation(active: false) }
             .onChange(of: sharedLibrary.privateSessionID) { _, _ in library.synchronizeIndependentReaderSession(from: sharedLibrary) }
             .onChange(of: sharedLibrary.readerTheme) { _, _ in library.synchronizeIndependentReaderSession(from: sharedLibrary) }
             .onChange(of: sharedLibrary.currentCapabilityContract) { _, _ in library.synchronizeIndependentReaderSession(from: sharedLibrary) }
@@ -288,5 +395,13 @@ private struct NativeNotebookSourceReader: View {
                 for selection in selections { sharedLibrary.sendToResearch(selection) }
                 library.acknowledgePendingResearchSelections(selections)
             }
+    }
+
+    private func updateAccountPresentation(active: Bool) {
+        if active {
+            sharedLibrary.accountPresentationOwnerID = accountPresentationID
+        } else if sharedLibrary.accountPresentationOwnerID == accountPresentationID {
+            sharedLibrary.accountPresentationOwnerID = nil
+        }
     }
 }

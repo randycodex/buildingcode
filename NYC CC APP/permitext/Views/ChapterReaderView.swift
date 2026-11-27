@@ -15,6 +15,7 @@ struct ChapterReaderView: View {
     var rememberedNativeBlockID: Binding<String?> = .constant(nil)
     var rememberedNativeViewport: Binding<NativeReaderViewportPosition?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
+    var linkedPassage: LinkedReaderPassage? = nil
     var onNativeFallbackToHTML: ((String, String?) -> Void)? = nil
     var onNativeOpenReference: ((CodeSectionSummary) -> Void)? = nil
 
@@ -84,6 +85,7 @@ struct ChapterReaderView: View {
                     rememberedBlockID: rememberedNativeBlockID,
                     rememberedViewport: rememberedNativeViewport,
                     rememberedAnchorID: rememberedAnchorID,
+                    linkedPassage: linkedPassage,
                     onFallbackToHTML: onNativeFallbackToHTML,
                     onOpenReference: onNativeOpenReference
                 )

@@ -85,6 +85,7 @@ struct ChapterHTMLReaderView: View {
     var rememberedAnchorID: Binding<String?> = .constant(nil)
     var rememberedScrollOffset: Binding<Double?> = .constant(nil)
     var preparedNativeOpening: NativeReaderPreparedOpening? = nil
+    var linkedPassage: LinkedReaderPassage? = nil
 
     @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @EnvironmentObject private var library: CodeLibraryViewModel
@@ -302,7 +303,7 @@ struct ChapterHTMLReaderView: View {
 
     private var effectiveTargetAnchorID: String? {
         guard let targetAnchorID else { return nil }
-        if chapterSearchScrollRequestID > 0 || nativeFallbackIgnoresSavedOffset { return targetAnchorID }
+        if chapterSearchScrollRequestID > 0 || nativeFallbackIgnoresSavedOffset || linkedPassage != nil { return targetAnchorID }
         guard !opensAtChapterTop, (rememberedScrollOffset.wrappedValue ?? 0) <= 0 else { return nil }
         if rememberedAnchorID.wrappedValue == targetAnchorID { return targetAnchorID }
         return firstContentAnchor?.anchorID == targetAnchorID ? nil : targetAnchorID
@@ -327,6 +328,7 @@ struct ChapterHTMLReaderView: View {
                         rememberedNativeBlockID: rememberedNativeBlockID,
                         rememberedNativeViewport: rememberedNativeViewport,
                         rememberedAnchorID: rememberedAnchorID,
+                        linkedPassage: linkedPassage,
                         onNativeFallbackToHTML: { message, requestedAnchorID in
                             if let requestedAnchorID {
                                 targetAnchorID = requestedAnchorID
@@ -590,6 +592,7 @@ struct ChapterHTMLReaderView: View {
             targetAnchorID: effectiveTargetAnchorID,
             targetSearchText: chapterSearchScrollQuery,
             targetSearchRequestID: chapterSearchScrollRequestID,
+            linkedPassage: targetAnchorID == initialAnchor?.anchorID ? linkedPassage : nil,
             readerTheme: library.readerTheme,
             accentHex: library.accentHex(for: chapter.codeSectionID, colorScheme: colorScheme),
             colorScheme: colorScheme,

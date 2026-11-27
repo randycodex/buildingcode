@@ -3488,6 +3488,19 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                     mixedReference,
                     .reference(kind: "notebookCard", id: "native-reference-missing", label: "Unavailable sample note")])
             )
+            if ProcessInfo.processInfo.arguments.contains("--native-notebook-linked-passage-fixture") {
+                let edition = UserContentSyncCodeVersion.canonicalNYC2022
+                let source = NotebookEvidenceSource(jurisdiction: "New York City", codePrefix: "BC", codeEdition: "2022",
+                    codeVersion: edition, sourceID: "2", sectionID: "2", sectionNumber: "101.2", sectionTitle: "Scope.",
+                    sourceLibraryVersion: edition, scope: "passage")
+                let link = NotebookEvidenceLink(id: "native-reference-passage", label: "Building Code § 101.2",
+                    relationshipRole: "context", projectID: "native-notebook-fixture", notebookCardID: "native-reference-card",
+                    source: source, passages: [.init(exact: "alteration, movement, addition, replacement, repair",
+                        prefix: "", suffix: "", start: nil, end: nil)], createdAt: "2026-09-15T12:00:00Z",
+                    noteTarget: .init(scope: "card", blockID: "", exact: ""))
+                notebookFixtureCard?.document.document.append(.reference(kind: "selectedPassage", id: link.id, label: link.label))
+                notebookFixtureCard?.evidenceLinks.append(link)
+            }
             notebookReferenceTarget = NotebookCard(
                 id: "native-reference-target", version: 1, createdAt: "2026-09-15T12:00:00Z", updatedAt: "2026-09-15T12:00:00Z",
                 projectIDs: ["native-notebook-fixture"], title: "Linked sample note",

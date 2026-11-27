@@ -2559,13 +2559,15 @@ struct ProjectView: View {
                 .accessibilityAddTraits(isSelected ? .isSelected : [])
             } else {
                 NavigationLink {
-                    ReaderView(
-                        sectionID: bookmark.id,
-                        codeVersion: bookmark.codeVersion,
-                        codeSectionID: bookmark.codeSectionID,
-                        returnsToProjectsAfterRemoval: true,
-                        selectedExcerpts: bookmark.selectedExcerpts
-                    )
+                    if isProjectFolder {
+                        LinkedChapterReaderDestination(sectionID: bookmark.id, codeVersion: bookmark.codeVersion,
+                            codeSectionID: bookmark.codeSectionID, passages: bookmark.selectedExcerpts.map {
+                                NotebookEvidencePassage(exact: $0, prefix: "", suffix: "", start: nil, end: nil)
+                            }, evidenceFolderID: folderID, sharedLibrary: library)
+                    } else {
+                        ReaderView(sectionID: bookmark.id, codeVersion: bookmark.codeVersion, codeSectionID: bookmark.codeSectionID,
+                            returnsToProjectsAfterRemoval: true, selectedExcerpts: bookmark.selectedExcerpts)
+                    }
                 } label: {
                     projectBookmarkContent(bookmark, showsSource: showsSource)
                         .contentShape(Rectangle())

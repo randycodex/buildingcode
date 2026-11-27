@@ -8605,6 +8605,15 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         let saved = passage.highlight(.init(excerpts: ["Room"], occurrences: ["Room": [1]]))
         XCTAssertEqual(saved, .ranges([last: [NSRange(location: 0, length: 4)]]))
         XCTAssertEqual(passage.highlight(.init(excerpts: ["Room"])), .ranges([:]))
+        func linkedRoom(prefix: String = "", suffix: String = "", occurrences: [String: [Int]] = [:]) -> LinkedReaderPassage {
+            .init(passages: [.init(exact: "Room", prefix: prefix, suffix: suffix, start: nil, end: nil)], occurrences: occurrences)
+        }
+        XCTAssertEqual(passage.linkedRanges(linkedRoom()), [:])
+        XCTAssertEqual(passage.linkedRanges(linkedRoom(prefix: "windows.", suffix: "again.")),
+                       [last: [NSRange(location: 0, length: 4)]])
+        XCTAssertEqual(passage.linkedRanges(linkedRoom(occurrences: ["Room": [1]])),
+                       [last: [NSRange(location: 0, length: 4)]])
+        XCTAssertEqual(passage.linkedRanges(linkedRoom(suffix: "missing context")), [:])
         XCTAssertEqual(passage.occurrences(for: word, quote: "Room"), [1])
         XCTAssertEqual(passage.highlight(.init(excerpts: ["again."], occurrences: ["again.": [1]])), .ranges([:]))
         XCTAssertEqual(passage.highlight(.init(excerpts: ["again."], offsets: ["again.": [9999]])),
