@@ -18,7 +18,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261127-note-sync-v2716";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261127-note-open-sync-v2717";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -180,7 +180,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261127-note-sync-v2716";
+} from "./offline-storage.js?v=20261127-note-open-sync-v2717";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -32579,6 +32579,7 @@ async function renderProjectNotebook(project, options = {}) {
   let disposed = false;
   const notebookObjectURLs = new Set();
   let notebookAutosaveTimer = null;
+  let noteOpenVersionTimer = null;
   let notebookIdlePrefetchTimer = null;
   let notebookIdlePrefetchHandle = null;
   let flushNotebookAutosave = async () => !dirty;
@@ -32636,6 +32637,7 @@ async function renderProjectNotebook(project, options = {}) {
       void persistFocusedDraft().catch(() => {});
       disposed = true;
       window.clearTimeout(notebookAutosaveTimer);
+      window.clearTimeout(noteOpenVersionTimer);
       window.clearInterval(noteVersionTimer);
       document.removeEventListener("visibilitychange", checkNoteOnReturn);
       window.removeEventListener("online", checkNoteOnReturn);
@@ -32655,7 +32657,6 @@ async function renderProjectNotebook(project, options = {}) {
   };
   let checkingVersion = null;
   async function checkNoteVersion() {
-    if (checkingVersion) return checkingVersion;
     const card = activeCard;
     const revision = notebookRevision;
     const generation = notebookCardLoadGeneration;
@@ -32665,17 +32666,27 @@ async function renderProjectNotebook(project, options = {}) {
     if (!card?.id || !current() || panel.classList.contains("is-collapsed") || !panel.getClientRects().length) return;
     const rect = panel.getBoundingClientRect();
     if (rect.right <= 0 || rect.left >= window.innerWidth) return;
-    checkingVersion = (async () => {
+    if (checkingVersion?.card === card && checkingVersion.generation === generation) return checkingVersion.promise;
+    const check = {card, generation, promise: null};
+    check.promise = (async () => {
       let remote;
       try { remote = await notebookRequest("/notebook/cards/get", {projectID, cardID: card.id, versionOnly: true}); }
       catch (error) { if (error.status !== 404) throw error; }
       if (!current() || generation !== notebookCardLoadGeneration) return;
       if (remote && Number(remote.version ?? remote.card?.version) === Number(card.version) && !remote.archivedAt) return;
       await refreshNotebookCards({shouldApply: current});
-    })().finally(() => { checkingVersion = null; });
-    return checkingVersion;
+    })().finally(() => { if (checkingVersion === check) checkingVersion = null; });
+    checkingVersion = check;
+    return check.promise;
   }
   const checkNoteOnReturn = () => { void checkNoteVersion().catch(() => {}); };
+  function scheduleNoteOpenVersionCheck(card, generation) {
+    window.clearTimeout(noteOpenVersionTimer);
+    noteOpenVersionTimer = window.setTimeout(() => {
+      noteOpenVersionTimer = null;
+      if (activeCard === card && notebookCardLoadGeneration === generation) checkNoteOnReturn();
+    }, 4000);
+  }
   const noteVersionTimer = window.setInterval(checkNoteOnReturn, 60_000);
   document.addEventListener("visibilitychange", checkNoteOnReturn);
   window.addEventListener("online", checkNoteOnReturn);
@@ -33122,7 +33133,10 @@ async function renderProjectNotebook(project, options = {}) {
       }
       renderCardList();
       await renderFocusedCard({module:preparedModule, candidates:preparedCandidates});
-      if (isCurrent() && activeCard === candidateCard && dirty) scheduleNotebookAutosave();
+      if (isCurrent() && activeCard === candidateCard) {
+        if (dirty) scheduleNotebookAutosave();
+        if (options.followUpVersionCheck !== false) scheduleNoteOpenVersionCheck(candidateCard, loadGeneration);
+      }
     }
     mountState.focusCard = loadCard;
     mountState.insertionTarget = () => !disposed && !notebookReadOnly && !saveConflict && activeCard && editorMount
@@ -33371,7 +33385,7 @@ async function renderProjectNotebook(project, options = {}) {
         Number(focusedSummary.version || 0) !== Number(activeCard?.version || 0) ||
         String(focusedSummary.updatedAt || "") !== String(activeCard?.updatedAt || "")
       ) {
-        await loadCard(focusedCardID, options);
+        await loadCard(focusedCardID, {...options, followUpVersionCheck: false});
       }
       return true;
     };

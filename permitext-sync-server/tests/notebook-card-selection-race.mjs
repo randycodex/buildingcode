@@ -8,6 +8,10 @@ const start = source.indexOf('    async function loadCard(cardID, options = {}) 
 const end = source.indexOf('    mountState.focusCard = loadCard;', start);
 assert.ok(start > 0 && end > start);
 const implementation = source.slice(start, end);
+const versionStart = source.indexOf('  let checkingVersion = null;');
+const versionEnd = source.indexOf('  const noteVersionTimer = ', versionStart);
+assert.ok(versionStart > 0 && versionEnd > versionStart);
+const versionImplementation = source.slice(versionStart, versionEnd);
 const identityStart = source.indexOf('  const notebookCardIdentities = new WeakMap();');
 const identityEnd = source.indexOf('  let cards = [];', identityStart);
 assert.ok(identityStart > 0 && identityEnd > identityStart);
@@ -22,6 +26,7 @@ const tick = () => new Promise(resolve => setImmediate(resolve));
 function harness() {
   const gates = new Map(), counts = new Map(), calls = [], published = [], saved = [], scheduled = [], statuses = [];
   const drafts = new Map(), responses = [];
+  const timers = new Map(), remoteVersions = new Map();
   const waitAt = async (stage, id, value) => {
     const base = `${stage}:${id}`, occurrence = (counts.get(base) || 0) + 1;
     counts.set(base, occurrence);
@@ -39,18 +44,29 @@ function harness() {
     notebookRevision: 0, persistedDraft: null, persistedCardID: 'original', persistedRevision: 0,
     cards: [], identity:{id:'project'}, foundation:{}, editorMount: {getEditingPosition: () => ({from: 1, to: 1})},
     notebookEditingPositions: new Map(), focus: {querySelector: () => ({scrollTop: 13})}, shell: {scrollTop: 21},
+    noteOpenVersionTimer: null, returnScrollContext: {workspaceID: 'workspace'},
+    canRunForegroundSync: () => true,
+    panel: {isConnected: true, classList: {contains: () => false}, getClientRects: () => [1],
+      getBoundingClientRect: () => ({left: 0, right: 500})},
+    window: {innerWidth: 1000, setTimeout(callback, delay) {
+      const id = Symbol(); timers.set(id, {callback, delay}); return id;
+    }, clearTimeout(id) { timers.delete(id); }},
     captureNotebookReturnScroll() {},
     newButton: {addEventListener(name, listener) { assert.equal(name, 'click'); c.createNew = listener; }},
     emptyNotebookDocument: () => ({cardID: '', text: ''}),
     isCurrentAccountRequest: identity => identity === c.owner,
     requireCurrentAccountRequest: identity => { if (identity !== c.owner) throw new Error('Account changed'); },
-    async notebookRequest(path, {cardID}) {
+    async notebookRequest(path, {cardID, versionOnly}) {
       assert.equal(path, '/notebook/cards/get');
+      if (versionOnly) return waitAt('version', cardID, {version: remoteVersions.get(cardID) ?? 1});
       const occurrence = (counts.get(`network:${cardID}`) || 0) + 1;
       const card = {id: cardID, title: `Remote ${cardID} ${occurrence}`, version: occurrence,
         document: {cardID, text: `Body ${cardID} ${occurrence}`}, evidenceLinks: []};
       responses.push(card);
       return waitAt('network', cardID, {card});
+    },
+    async refreshNotebookCards(options) {
+      await c.load(c.activeCard.id, {...options, followUpVersionCheck: false});
     },
     saveNotebookCardSnapshot: (account, project, card) => waitAt('snapshot', card.id, undefined),
     loadNotebookDraft: (account, project, id) => waitAt('draft', id, drafts.get(id) || null),
@@ -79,9 +95,17 @@ function harness() {
     },
     confirmWebWarning: async () => true
   });
-  vm.runInContext(identityImplementation + implementation + '\nglobalThis.load = loadCard;', c);
+  vm.runInContext(identityImplementation + versionImplementation + implementation + '\nglobalThis.load = loadCard;', c);
   vm.runInContext(newImplementation+'\nglobalThis.createNew=createLocalNotebookNote;', c);
-  return {c, calls, drafts, responses, published, saved, scheduled, statuses,
+  return {c, calls, drafts, responses, published, saved, scheduled, statuses, timers, remoteVersions,
+    async fireOpenCheck() {
+      assert.equal(timers.size, 1);
+      const [id, {callback, delay}] = timers.entries().next().value;
+      assert.equal(delay, 4000);
+      timers.delete(id);
+      callback();
+      await tick();
+    },
     hold(stage, id, occurrence = 1) {
       let release;
       const promise = new Promise(resolve => { release = resolve; });
@@ -97,6 +121,49 @@ function harness() {
     }
   };
 }
+
+{
+  const h = harness();
+  await h.c.load('A');
+  assert.equal(h.c.draftDocument.text, 'Body A 1');
+  h.remoteVersions.set('A', 2);
+  await h.fireOpenCheck();
+  assert.deepEqual(h.calls.filter(key => /^(network|version):/.test(key)), ['network:A:1', 'version:A:1', 'network:A:2']);
+  assert.equal(h.c.draftDocument.text, 'Body A 2', 'A newer Note received after opening replaces the clean visible body');
+  assert.equal(h.timers.size, 0, 'Refreshing a Note must not schedule another follow-up');
+}
+{
+  const h = harness();
+  await h.c.load('A');
+  await h.fireOpenCheck();
+  assert.deepEqual(h.calls.filter(key => /^(network|version):/.test(key)), ['network:A:1', 'version:A:1'],
+    'An unchanged Note only requests the version');
+}
+{
+  const h = harness();
+  await h.c.load('A');
+  const releaseA = h.hold('version', 'A');
+  h.remoteVersions.set('A', 2);
+  await h.fireOpenCheck();
+  await h.c.load('B');
+  h.remoteVersions.set('B', 2);
+  await h.fireOpenCheck();
+  releaseA(); await tick();
+  assert.equal(h.c.draftDocument.text, 'Body B 2', 'A previous Note check cannot delay or overwrite the selected Note');
+}
+{
+  const h = harness();
+  await h.c.load('A');
+  const release = h.hold('version', 'A');
+  h.remoteVersions.set('A', 2);
+  await h.fireOpenCheck();
+  h.c.draftDocument.text = 'Web edit while checking';
+  h.c.dirty = true; h.c.notebookRevision++;
+  release(); await tick();
+  assert.equal(h.c.draftDocument.text, 'Web edit while checking');
+  assert.ok(!h.calls.includes('network:A:2'), 'A background check must not replace edits made after it starts');
+}
+console.log('Notebook opening check passed: latest body, unchanged version, switching Notes, and edits during the check.');
 
 {
   const h = harness(), releaseA = h.hold('network', 'A'), releaseB = h.hold('network', 'B');
