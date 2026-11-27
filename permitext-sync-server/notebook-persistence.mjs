@@ -67,7 +67,7 @@ export function applyNotebookCardMutation(store, userID, {
 
 export async function commitPostgresNotebookCardMutation(sql, userID, {
   artifact, expectedVersion, expectedDeletedAt = null, links = [], expectedLinks = [], events = [], requireEmptyProjectNoteProjectID = null
-}) {
+}, revisions = null) {
   const artifactType = artifact.envelope.type;
   if (!Number.isSafeInteger(expectedVersion) || expectedVersion < 0 ||
       !["notebookCard", "projectNote", "projectCalculation"].includes(artifactType) ||
@@ -137,7 +137,8 @@ export async function commitPostgresNotebookCardMutation(sql, userID, {
     ON CONFLICT (id) DO NOTHING
   `);
   try {
-    await sql.transaction(queries, { isolationLevel: "Serializable" });
+    const results = await sql.transaction([...queries, ...(revisions?.queries || [])], { isolationLevel: "Serializable" });
+    if (revisions) return revisions.result(results.slice(queries.length));
   } catch (error) {
     if (["22012", "23505", "40001"].includes(String(error?.code))) throw notebookVersionConflict(artifactType);
     throw error;

@@ -4680,6 +4680,68 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         print("PERF08 synthetic fixture: saved=500 mutation_payload_bytes=\(fixtureBytes) full_applied=500 reopen_pull_calls=0 reopen_applied=0 checkpoint_probes=1")
     }
 
+    func testWebPassageAliasesCheckpointRemoveAndUndoIndependently() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("passage-alias-\(UUID()).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let account = SignedInAccount(appUserID: "web", appleUserID: "web", displayName: "QA", signedInAt: Date())
+        let version = UserContentSyncCodeVersion.canonicalNYC2022
+        let repo = try UserDataStore(databaseURL: url)
+        let folderID = try repo.createFolder(name: "QA", address: "", description: "", colorHex: CodeFolder.defaultColorHex,
+                                             codeVersion: UserContentSyncCodeVersion.localNYC2022)
+        let folder = try XCTUnwrap(repo.allFolders().first)
+        for item in try repo.pendingSyncQueueItems(limit: 10) { try repo.markSyncQueueItemSynced(id: item.id) }
+        func passage(_ quote: String, _ second: Int, deleted: Bool = false) -> ServerUserContentMutation {
+            let date = Date(timeIntervalSince1970: Double(1_700_000_000 + second))
+            return .projectSection(.init(id: "web:\(quote)", userID: account.appUserID, codeVersion: version,
+                folderClientID: folder.clientID, folderType: .project, localFolderID: nil, sectionID: 601,
+                scope: nil, updatedAt: date, deletedAt: deleted ? date : nil, selectedExcerpts: [quote]))
+        }
+        func pull(_ rows: [ServerUserContentMutation], cursor: Int64) async throws {
+            let backend = RecordingUserContentSyncBackend(recorder: SyncPullRecorder(), returnedContentMapVersion: 7,
+                                                         returnedLatestEventID: cursor, mutations: rows)
+            let engine = UserContentSyncEngine(repository: repo, backend: backend)
+            _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+            XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, cursor)
+        }
+        func excerpts() throws -> Set<String> {
+            Set(try repo.folderSectionEvidence(sectionID: 601, folderID: folderID,
+                codeVersion: UserContentSyncCodeVersion.localNYC2022)?.excerpts ?? [])
+        }
+        try repo.applyServerUserContentMutation(passage("B", 2))
+        try await pull([passage("A", 1), passage("B", 2)], cursor: 2)
+        XCTAssertEqual(try excerpts(), ["A", "B"])
+        try await pull([passage("B", 3, deleted: true)], cursor: 3)
+        XCTAssertEqual(try excerpts(), ["A"])
+        try await pull([passage("A", 4, deleted: true)], cursor: 4)
+        XCTAssertEqual(try excerpts(), [])
+        try await pull([passage("A", 5)], cursor: 5)
+        XCTAssertEqual(try excerpts(), ["A"])
+        let deletedAt = Date(timeIntervalSince1970: 1_700_000_006)
+        try await pull([.savedItem(.init(id: "global:601", userID: account.appUserID, codeVersion: version,
+                                        sectionID: 601, updatedAt: deletedAt, deletedAt: deletedAt))], cursor: 6)
+        XCTAssertEqual(try excerpts(), ["A"], "A global tombstone must preserve an independently saved project passage.")
+        XCTAssertEqual(try repo.unresolvedSyncQueueCount(), 0)
+    }
+
+    func testTransportFailureRemainsVisibleAndRetriesBeyondFiveAttempts() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("retry-sync-\(UUID()).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let repo = try UserDataStore(databaseURL: url)
+        try repo.toggleBookmark(sectionID: 601, codeVersion: UserContentSyncCodeVersion.localNYC2022)
+        let engine = UserContentSyncEngine(repository: repo)
+        for _ in 0..<6 {
+            let item = try XCTUnwrap(repo.nextSyncQueueItems(limit: 1).first)
+            try repo.markSyncQueueItemsInFlight(ids: [item.id])
+            try engine.markFailed(item, error: URLError(.timedOut))
+            XCTAssertEqual(try engine.unresolvedCount(), 1)
+            XCTAssertTrue(try repo.nextSyncQueueItems(limit: 1).isEmpty)
+            try repo.prepareSyncQueueForProcessing(now: Date().addingTimeInterval(301))
+        }
+        let item = try XCTUnwrap(repo.nextSyncQueueItems(limit: 1).first)
+        try repo.markSyncQueueItemSynced(id: item.id)
+        XCTAssertEqual(try engine.unresolvedCount(), 0)
+    }
+
     func testRegressedServerCursorRetriesFullSnapshotAndPreservesPendingWork() async throws {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("restored-server-\(UUID().uuidString).sqlite")
         defer { try? FileManager.default.removeItem(at: url) }

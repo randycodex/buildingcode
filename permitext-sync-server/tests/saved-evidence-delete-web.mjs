@@ -9,7 +9,7 @@ const context=vm.createContext({
   requirePrivateWorkspaceWritable(){},captureAccountRequest:()=>identity,
   requireCurrentAccountRequest:previous=>{if(previous!==identity)throw Error("Account changed");},
   activeAccount:()=>({userID:"a",sessionToken:"synthetic"}),
-  flushSyncOutbox:async()=>{},state:{syncOutbox:[],syncConflicts:[]},
+  activeWorkspaceID:"p",flushSyncOutbox:async()=>{},state:{syncOutbox:[],syncConflicts:[]},
   syncProjectIdentity:value=>value,syncCodeVersion:value=>value,normalizeAnnotationBlockID:value=>value||"",
   syncedContent:{mutations:[],latestEventID:12},
   postJSON:async(path,body)=>{

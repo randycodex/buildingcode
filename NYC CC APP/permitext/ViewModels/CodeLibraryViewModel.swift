@@ -520,6 +520,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
     private var activeExportTask: Task<Void, Never>?
     private var userContentAutoSyncTask: Task<Void, Never>?
+    private var scheduledUploadTask: Task<Void, Never>?
     private var deferredContinuitySyncTask: Task<Void, Never>?
     private var savedPresentationRefreshTask: Task<Void, Never>?
     private var projectPresentationRefreshTask: Task<Void, Never>?
@@ -678,6 +679,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     deinit {
+        scheduledUploadTask?.cancel()
         userContentAutoSyncTask?.cancel()
         deferredContinuitySyncTask?.cancel()
         savedPresentationRefreshTask?.cancel()
@@ -4082,12 +4084,15 @@ final class CodeLibraryViewModel: ObservableObject {
         // A newly created Project is queued locally before the delayed account
         // sync runs. Cancel that delay and make the Project durable on the
         // server before Research submits a conversation that references it.
+        let identity = privateRequestIdentity
         userContentAutoSyncTask?.cancel()
         userContentAutoSyncTask = nil
+        await scheduledUploadTask?.value
 
         for _ in 0..<80 where isAccountBusy {
             try await Task.sleep(for: .milliseconds(250))
         }
+        guard !Task.isCancelled, identity == privateRequestIdentity else { throw CancellationError() }
         guard !isAccountBusy else { throw ResearchProjectSyncError.projectNotSynced }
 
         _ = await syncPendingUserContentIfPossible()
@@ -5653,11 +5658,10 @@ final class CodeLibraryViewModel: ObservableObject {
         userContentAutoSyncTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 800_000_000)
             guard !Task.isCancelled else { return }
-            for _ in 0..<5 {
-                guard !Task.isCancelled else { return }
+            while !Task.isCancelled {
                 guard let self else { return }
-                if !self.isAccountBusy {
-                    await self.performAutomaticUserContentSync()
+                if !self.isAccountBusy && self.scheduledUploadTask == nil {
+                    await self.runScheduledUserContentSync()
                     return
                 }
                 try? await Task.sleep(nanoseconds: 600_000_000)
@@ -5665,15 +5669,27 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    // A new keystroke can replace the debounce timer while the current upload finishes.
+    private func runScheduledUserContentSync() async {
+        guard scheduledUploadTask == nil else { return }
+        let identity = privateRequestIdentity
+        let task = Task { await performAutomaticUserContentSync() }
+        scheduledUploadTask = task
+        await task.value
+        if identity == privateRequestIdentity { scheduledUploadTask = nil }
+    }
+
     private func performAutomaticUserContentSync() async {
         guard signedInAccount != nil, isNetworkAvailable else { return }
+        let identity = privateRequestIdentity
         // Prefer the cheap server checkpoint before downloading a full pull payload.
         await pullRemoteUserContentIfPossible(skipIfUnchanged: true)
+        guard !Task.isCancelled, privateRequestIdentity == identity else { return }
         let pushedCount = await syncPendingUserContentIfPossible()
         // Trailing pull is only needed after local push work (rejections / concurrent remote
         // events). When the checkpoint already reported no remote changes and nothing was
         // pushed, skip the second pull entirely.
-        if pushedCount > 0 {
+        if pushedCount > 0 && !Task.isCancelled && privateRequestIdentity == identity {
             await pullRemoteUserContentIfPossible(skipIfUnchanged: false)
         }
     }
@@ -5715,8 +5731,8 @@ final class CodeLibraryViewModel: ObservableObject {
                 try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
                 guard !Task.isCancelled, self.signedInAccount != nil else { return }
                 guard !self.isAccountBusy else { continue }
-                await self.performAutomaticUserContentSync()
-                if self.userContentSyncCheckpoint?.lastErrorMessage == nil {
+                await self.runScheduledUserContentSync()
+                if self.pendingUserContentSyncCount == 0 && self.userContentSyncCheckpoint?.lastErrorMessage == nil {
                     return
                 }
             }
@@ -5954,6 +5970,8 @@ final class CodeLibraryViewModel: ObservableObject {
     ) {
         guard let accountUserDataProfiles else { return }
 
+        scheduledUploadTask?.cancel()
+        scheduledUploadTask = nil
         userContentAutoSyncTask?.cancel()
         userContentAutoSyncTask = nil
         savedPresentationRefreshTask?.cancel()
@@ -6000,7 +6018,7 @@ final class CodeLibraryViewModel: ObservableObject {
         // Reconcile once from the complete server state after the project and
         // bulk-clear tombstone repairs. Older event cursors could otherwise
         // remain ahead of those repaired records and preserve stale local data.
-        let key = "permitext.sync.full-state-reconciliation.v7.\(account.appUserID)"
+        let key = "permitext.sync.full-state-reconciliation.v8.\(account.appUserID)"
         guard !preferencesDefaults.bool(forKey: key) else { return }
         guard syncEngine.resetCheckpoint(account: account) else { return }
         preferencesDefaults.set(true, forKey: key)
@@ -6008,7 +6026,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func refreshPendingUserContentSyncCount() {
         do {
-            pendingUserContentSyncCount = try syncEngine.previewPendingWork(limit: 500).pendingCount
+            pendingUserContentSyncCount = try syncEngine.unresolvedCount()
             userContentSyncConflicts = try syncEngine.rejectedConflicts(account: signedInAccount)
         } catch {
             pendingUserContentSyncCount = 0

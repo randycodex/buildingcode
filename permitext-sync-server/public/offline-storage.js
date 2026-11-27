@@ -25,7 +25,7 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v2714";
+const shellCacheName = "permitext-pro-shell-v2715";
 const shellAssetVersion = "20261025-workspace-chrome-v1379";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
@@ -107,7 +107,7 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261126-project-evidence-sync-v2714",
+  "/web/web-client-version.js?v=20261126-sync-recovery-v2715",
   "/web/web-app-update.js?v=20261119-update-notice-v4",
   "/web/research-delete-controls.js?v=14",
   "/web/assistant-composer-hint.js?v=1",
@@ -134,18 +134,18 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261126-project-evidence-sync-v2714",
+  "/web/styles.css?v=20261126-sync-recovery-v2715",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261126-project-evidence-sync-v2714",
+  "/web/app.js?v=20261126-sync-recovery-v2715",
   "/web/settings-copy.js?v=20261109-plan-actions-v8",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261126-project-evidence-sync-v2714",
+  "/web/offline-storage.js?v=20261126-sync-recovery-v2715",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261111-selective-menus-v3",
@@ -1257,11 +1257,10 @@ export async function offlineLibraryStatus() {
   };
 }
 
-export async function saveOfflineSyncSnapshot(userID, content) {
+export async function saveOfflineSyncSnapshot(userID, content, {onlineBaseline = false} = {}) {
   const normalizedUserID = String(userID || "").trim();
   if (!normalizedUserID || !content || typeof indexedDB === "undefined") return false;
-  const library = await offlineLibraryStatus();
-  if (!library?.installID) return false;
+  if (!onlineBaseline && !(await offlineLibraryStatus())?.installID) return false;
   return withOfflineStore(syncSnapshotsStoreName, "readwrite", (store) => {
     store.put({
       userID: normalizedUserID,
@@ -1270,6 +1269,8 @@ export async function saveOfflineSyncSnapshot(userID, content) {
         userID: normalizedUserID,
         pulledAt: content.pulledAt || null,
         latestEventID: content.latestEventID ?? null,
+        syncSchemaVersion: content.syncSchemaVersion,
+        entitlementFingerprint: content.entitlementFingerprint,
         contentMapVersion: Number(content.contentMapVersion || 0),
         entitlement: content.entitlement || null,
         mutations: Array.isArray(content.mutations) ? content.mutations : []
@@ -1279,11 +1280,10 @@ export async function saveOfflineSyncSnapshot(userID, content) {
   }, "Could not save the offline account snapshot.", normalizedUserID);
 }
 
-export async function loadOfflineSyncSnapshot(userID) {
+export async function loadOfflineSyncSnapshot(userID, {onlineBaseline = false} = {}) {
   const normalizedUserID = String(userID || "").trim();
   if (!normalizedUserID || typeof indexedDB === "undefined") return null;
-  const library = await offlineLibraryStatus();
-  if (!library?.installID) return null;
+  if (!onlineBaseline && !(await offlineLibraryStatus())?.installID) return null;
   return withOfflineStore(syncSnapshotsStoreName, "readonly", async (store) => {
     const record = await requestResult(store.get(normalizedUserID), "Could not read the offline account snapshot.");
     return record?.content || null;

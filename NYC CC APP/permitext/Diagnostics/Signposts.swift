@@ -888,6 +888,10 @@ struct UserContentSyncEngine {
         self.continuityStore = continuityStore
     }
 
+    func unresolvedCount() throws -> Int {
+        try repository?.unresolvedSyncQueueCount() ?? 0
+    }
+
     func previewPendingWork(limit: Int = 100) throws -> UserContentSyncPreviewReport {
         guard let repository else {
             return UserContentSyncPreviewReport(
@@ -922,7 +926,10 @@ struct UserContentSyncEngine {
     }
 
     func markFailed(_ item: SyncQueueItem, error: Error) throws {
-        try repository?.markSyncQueueItemFailed(id: item.id, errorMessage: error.localizedDescription)
+        let status = (error as? PermitextBackendHTTPError)?.statusCode
+        let retryable = error is URLError || status == 408 || status == 429 || status.map { (500...599).contains($0) } == true
+        let message = (retryable ? "[transport] " : "") + error.localizedDescription
+        try repository?.markSyncQueueItemFailed(id: item.id, errorMessage: message)
     }
 
     func retryFailedItems() throws {

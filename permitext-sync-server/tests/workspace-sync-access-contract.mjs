@@ -16,6 +16,8 @@ function fixture({ snapshot = null, baseline = null } = {}) {
     activeAccount: () => ({ userID: "a", sessionToken: "token" }),
     captureAccountRequest: () => ({ generation }),
     isCurrentAccountRequest: identity => identity?.generation === generation,
+    requireCurrentAccountRequest: identity => assert.equal(identity.generation, generation),
+    projectURLStartupReady: false,
     postJSON: () => network.promise,
     repairAppleBrowserAccountLink: async () => null,
     summarizeMutations: mutations => ({ mutations }), mergeSyncedMutations: (a,b) => [...a,...b],
@@ -93,3 +95,19 @@ console.log("Workspace sync access passed: full-chain verification, pending sync
   assert.equal(requestCount, 2, "Following supersession must not initiate another pull");
 }
 console.log("Workspace sync supersession passed: render follows replacement pull through completed verification.");
+
+for (const response of [{latestEventID:3}, {latestEventID:10, entitlementFingerprint:"changed"}]) {
+  const snapshot = { userID: "a", mutations: [{ savedItem: { id: "old" } }], latestEventID: 9,
+    syncSchemaVersion: 1, contentMapVersion: 2 };
+  const {c, chain} = fixture({snapshot});
+  const cursors = [];
+  c.postJSON = async (_, body) => {
+    cursors.push(body.sinceEventID);
+    return {...response, mutations: body.sinceEventID === null ? [{savedItem: {id: "restored"}}] : [],
+      contentMapVersion: 2};
+  };
+  chain.resolve();
+  const restored = await c.loadSyncedContent();
+  assert.deepEqual(cursors, [9, null]);
+  assert.deepEqual(restored.mutations, [{savedItem: {id: "restored"}}]);
+}

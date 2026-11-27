@@ -37,7 +37,7 @@ const structs = ['BookmarkIdentity','FolderSectionIdentity','LocalSyncIntent','F
 const harness = await read('./fixtures/native-saved-queue-reopen.swift');
 const dir = await mkdtemp(join(tmpdir(), 'permitext-saved-queue-'));
 try {
- await writeFile(join(dir,'verify.swift'), `${sqlite}\n${declarations}\nfinal class UserDataStore {\n${fields}\n${structs}\n${methods.filter(m => chosen.has(m.name)).map(m => m.source).join('\n')}\n}\n${harness}`);
+ await writeFile(join(dir,'verify.swift'), `${sqlite}\n${block(fullSource, 'struct ReaderEvidenceText')}\n${declarations}\nfinal class UserDataStore {\n${fields}\n${structs}\n${methods.filter(m => chosen.has(m.name)).map(m => m.source).join('\n')}\n}\n${harness}`);
  execFileSync('xcrun', ['swiftc','-parse-as-library',join(dir,'verify.swift'),'-o',join(dir,'verify')], {stdio:'inherit'});
  execFileSync(join(dir,'verify'),[join(dir,'synthetic.sqlite')],{stdio:'inherit'});
  const correct = await readFile(join(dir,'verify.swift'),'utf8');

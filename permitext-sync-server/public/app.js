@@ -18,7 +18,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-project-evidence-sync-v2714";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-sync-recovery-v2715";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -180,7 +180,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261126-project-evidence-sync-v2714";
+} from "./offline-storage.js?v=20261126-sync-recovery-v2715";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -1691,7 +1691,7 @@ async function applyPendingProjectUpdates({automatic = false, checkForUpdates = 
       pending = pendingProjectUpdate(projectID);
       if (!pending) return true;
     }
-    if (pending.domains.project) {
+    if (pending.domains.project || pending.domains.sync) {
       await refreshSyncedWorkspaceInPlace({accountUserID:identity.userID,forceProjectUpdate:true,shouldApply});
     }
     if (!shouldApply()) return false;
@@ -13448,9 +13448,10 @@ function retryRejectedDeletionConflictsOnce(account) {
 }
 
 function summarizeMutations(mutations = []) {
-  const sorted = [...mutations].sort((left, right) => mutationUpdatedAt(right) - mutationUpdatedAt(left));
+  const sorted = mutations.map(mutation => ({mutation, updatedAt: mutationUpdatedAt(mutation)}))
+    .sort((left, right) => right.updatedAt - left.updatedAt);
   const latestByID = new Map();
-  sorted.forEach((mutation) => {
+  sorted.forEach(({mutation}) => {
     const id = syncMutationRecordID(mutation);
     if (id && !latestByID.has(id)) latestByID.set(id, mutation);
   });
@@ -13582,17 +13583,37 @@ async function loadSyncedContent(options = {}) {
   if (syncLoadPromise && isCurrentAccountRequest(syncLoadPromise.accountIdentity) && !options.force) {
     return syncLoadPromise;
   }
-  const baseline = ["connected", "offline"].includes(syncedContent?.status) && syncedContent?.userID === account.userID
-    ? syncedContent
-    : null;
-  const requestedEventID = Number.isSafeInteger(baseline?.latestEventID) ? baseline.latestEventID : null;
-  const request = postJSON("/sync/pull", {
+  const memoryBaseline = ["connected", "offline"].includes(syncedContent?.status) && syncedContent?.userID === account.userID
+    ? syncedContent : null;
+  let baseline = memoryBaseline;
+  let requestedEventID = null;
+  const pull = cursor => postJSON("/sync/pull", {
     auth: { accountUserID: account.userID },
-    sinceEventID: requestedEventID,
+    sinceEventID: cursor,
     contentMapVersion: Number(baseline?.contentMapVersion || 2),
     syncSchemaVersion: permitextSyncSchemaVersion,
     clientCapabilities: permitextClientCapabilities
-  }, { token: account.sessionToken })
+  }, { token: account.sessionToken });
+  const request = Promise.resolve().then(async () => {
+    if (!baseline) {
+      const snapshot = await loadOfflineSyncSnapshot(account.userID, {onlineBaseline:true}).catch(() => null);
+      if (snapshot?.userID === account.userID && snapshot.syncSchemaVersion === permitextSyncSchemaVersion &&
+          Number.isSafeInteger(snapshot.latestEventID) && Array.isArray(snapshot.mutations)) baseline = snapshot;
+    }
+    requireCurrentAccountRequest(identity);
+    requestedEventID = Number.isSafeInteger(baseline?.latestEventID) ? baseline.latestEventID : null;
+    const payload = await pull(requestedEventID);
+    if (requestedEventID !== null && (
+      (payload.latestEventID ?? payload.syncRevision) < requestedEventID ||
+      Number(payload.contentMapVersion || 0) !== Number(baseline.contentMapVersion || 0) ||
+      String(payload.entitlementFingerprint || "") !== String(baseline.entitlementFingerprint || "")
+    )) {
+      requireCurrentAccountRequest(identity);
+      requestedEventID = null;
+      return pull(null);
+    }
+    return payload;
+  })
     .then(async (payload) => {
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       let entitlement = payload.entitlement || null;
@@ -13607,7 +13628,8 @@ async function loadSyncedContent(options = {}) {
       const layoutOnly = Boolean(canMergeIncrementally &&
         String(payload.entitlementFingerprint || "") === String(baseline.entitlementFingerprint || "") &&
         onlyWorkspaceLayoutsChanged(baseline.mutations || [], payload.mutations || []));
-      const mutations = canMergeIncrementally
+      const unchanged = canMergeIncrementally && payload.mutations?.length === 0;
+      const mutations = unchanged ? baseline.mutations : canMergeIncrementally
         ? mergeSyncedMutations(baseline.mutations || [], payload.mutations || [])
         : payload.mutations || [];
       syncedContent = {
@@ -13622,7 +13644,7 @@ async function loadSyncedContent(options = {}) {
         entitlement,
         entitlementFingerprint: payload.entitlementFingerprint || "",
         mutations,
-        summary: summarizeMutations(mutations)
+        summary: unchanged && baseline.summary ? baseline.summary : summarizeMutations(mutations)
       };
       await convergeServerNewerSyncConflicts(account);
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
@@ -13631,7 +13653,7 @@ async function loadSyncedContent(options = {}) {
       await applyRemoteContinuityIfNewer();
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       recoverVerifiedLegacyWorkspace(identity, syncedContent.summary);
-      await saveOfflineSyncSnapshot(account.userID, syncedContent).catch(() => {});
+      await saveOfflineSyncSnapshot(account.userID, syncedContent, {onlineBaseline:true}).catch(() => {});
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       foregroundSyncLastFullPullAt = Date.now();
       broadcastForegroundSyncSignal("sync-complete", {
@@ -13654,10 +13676,10 @@ async function loadSyncedContent(options = {}) {
         clearExpiredAccountSession();
         return syncedContent;
       }
-      const snapshot = baseline || await loadOfflineSyncSnapshot(account.userID).catch(() => null);
+      const snapshot = memoryBaseline || await loadOfflineSyncSnapshot(account.userID).catch(() => null);
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       const snapshotIdentityVerified = snapshot?.userID === account.userID;
-      const snapshotProvenanceVerified = baseline
+      const snapshotProvenanceVerified = memoryBaseline
         ? ["verified", "permitted-offline"].includes(baseline.workspacePresentationAccess)
         : Boolean(snapshot);
       const workspacePresentationAccess = snapshotIdentityVerified && snapshotProvenanceVerified &&
@@ -14855,8 +14877,17 @@ function prepareSyncOutboxForFlush(account) {
     ) changed = true;
     repairedEntries.push(repaired);
   });
-  if (!changed) return;
-  state.syncOutbox = Array.from(new Map(repairedEntries.map((entry) => [entry.id, entry])).values());
+  // Older clients queued every linked passage alongside the project tombstone.
+  const deletedProjects = new Map(repairedEntries.filter(entry => entry.accountUserID === account.userID &&
+    entry.operationGroupID && entry.mutation.project?.deletedAt).map(entry => [entry.operationGroupID, entry.mutation.project]));
+  const retained = repairedEntries.filter(entry => {
+    const link = entry.mutation?.projectSection;
+    const parent = deletedProjects.get(entry.operationGroupID);
+    return !(entry.accountUserID === account.userID && parent && link?.deletedAt &&
+      projectSectionBelongsToProject(link, parent));
+  });
+  if (!changed && retained.length === repairedEntries.length) return;
+  state.syncOutbox = Array.from(new Map(retained.map((entry) => [entry.id, entry])).values());
   state.syncConflicts = [
     ...(state.syncConflicts || []).filter((entry) => !quarantinedEntries.some((invalid) => invalid.id === entry.id)),
     ...quarantinedEntries
@@ -14986,9 +15017,10 @@ async function flushSyncOutbox(options = {}) {
       let entries = queuedEntries.slice(0, 100);
       const boundaryGroupID = entries.at(-1)?.operationGroupID;
       if (boundaryGroupID) {
-        entries = queuedEntries.filter((item, index) =>
-          index < 100 || item.operationGroupID === boundaryGroupID
-        );
+        if (queuedEntries.slice(100).some(item => item.operationGroupID === boundaryGroupID)) {
+          const earlier = entries.filter(item => item.operationGroupID !== boundaryGroupID);
+          if (earlier.length) entries = earlier;
+        }
       }
       if (!entries.length) break;
       layoutOnly &&= entries.every(entry => isWorkspaceLayoutOnlyMutation(entry.mutation));
@@ -36623,9 +36655,8 @@ async function deleteArchivedProjectData(project) {
   saveWorkspaceState();
   if (account) {
     try {
-      const operationGroupID = crypto.randomUUID();
-      membershipTombstones.forEach((record) => enqueueSyncMutation({ projectSection: record }, account, {operationGroupID}));
-      enqueueSyncMutation(deletedProjectMutationForRecord(project), account, {operationGroupID});
+      // The server retires all links in the same transaction as the project.
+      enqueueSyncMutation(deletedProjectMutationForRecord(project), account);
       await flushSyncOutbox({ refresh: true });
       requireCurrentAccountRequest(requestIdentity);
     } catch (error) {

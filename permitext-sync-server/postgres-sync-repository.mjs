@@ -112,6 +112,12 @@ export function postgresMutationRejectionReason({ userID, mutation, context = {}
   };
 }
 
+// Sequence numbers are allocated before commit. Hold this per-account lock until
+// commit so a pull cannot advance past a lower-numbered, uncommitted event.
+export function syncEventLock(sql, userID) {
+  return sql`SELECT pg_advisory_xact_lock(hashtextextended(${userID}::text, 1729))`;
+}
+
 export function createPostgresSyncRepository(sql) {
   function activeProPredicate(ownerUserID) {
     return sql`
@@ -265,6 +271,10 @@ export function createPostgresSyncRepository(sql) {
             AND coalesce(mutation->'annotation'->>'noteBody', '') <> ''
             AND NOT (mutation->'annotation' ? 'tags')
         )::int AS note_count
+      WHERE NOT EXISTS (
+        SELECT 1 FROM permitext_user_content_records
+        WHERE record_id = ${recordID} AND user_id = ${userID} AND mutation = ${JSON.stringify(mutation)}::jsonb
+      )
     `;
   }
 
@@ -525,11 +535,10 @@ export function createPostgresSyncRepository(sql) {
 
       let acceptedRows;
       try {
-        acceptedRows = await continuityCompatibilityQuery(
-          userID,
-          mergedMutation,
-          Number(existingRow?.server_version || 0)
-        );
+        [, acceptedRows] = await sql.transaction([
+          syncEventLock(sql, userID),
+          continuityCompatibilityQuery(userID, mergedMutation, Number(existingRow?.server_version || 0))
+        ]);
       } catch (error) {
         if (error?.code === "40001") continue;
         throw error;
@@ -594,12 +603,24 @@ export function createPostgresSyncRepository(sql) {
     const needsRecovery = nativeEvidenceRemoval || deleteInput || recoveryBatch || mutations.some(m => m.codeVersionClear || Object.values(m).some(r => r?.deletedAt || (m.annotation && !String(r?.noteBody || "").trim())));
     let original = [], expectedEvent = 0, captured = null, skipped = 0;
     if (needsRecovery) {
+      // Native Remove and Undo affect only membership links for the specified sections.
+      // Projects and collection clears are also needed to resolve legacy IDs and visibility.
+      const onlyEvidenceActions = nativeEvidenceRemoval && mutations.every(m => m.projectSection?.evidenceRemovalID);
+      const sectionIDs = mutations.flatMap(m => m.projectSection ? [String(m.projectSection.sectionID)] : []);
       const snapshots = [
-        sql`SELECT mutation FROM permitext_user_content_records WHERE user_id = ${userID}`,
+        onlyEvidenceActions
+          ? sql`SELECT mutation FROM permitext_user_content_records WHERE user_id = ${userID}
+                AND (entity_kind IN ('project', 'codeVersionClear') OR (entity_kind = 'projectSection'
+                  AND mutation->'projectSection'->>'sectionID' IN (SELECT jsonb_array_elements_text(${JSON.stringify(sectionIDs)}::jsonb))))`
+          : sql`SELECT mutation FROM permitext_user_content_records WHERE user_id = ${userID}`,
         sql`SELECT COALESCE(MAX(event_id),0)::bigint AS latest_event_id FROM permitext_sync_events WHERE user_id = ${userID}`
       ];
       if (mutations.some(({projectSection}) => projectSection?.evidenceRemovalID && !projectSection.deletedAt)) {
-        snapshots.push(sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} AND expires_at > CURRENT_TIMESTAMP`);
+        const removalIDs = mutations.flatMap(({projectSection}) =>
+          projectSection?.evidenceRemovalID && !projectSection.deletedAt ? [projectSection.evidenceRemovalID] : []);
+        snapshots.push(sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} AND expires_at > CURRENT_TIMESTAMP
+          AND EXISTS (SELECT 1 FROM jsonb_array_elements(batch->'records') item
+            WHERE item->>'evidenceRemovalID' IN (SELECT jsonb_array_elements_text(${JSON.stringify(removalIDs)}::jsonb)))`);
       }
       const [rows, events, trashRows = []] = await sql.transaction(snapshots, {isolationLevel:"RepeatableRead",readOnly:true});
       original = rows.map(row => safeJSON(row.mutation,{}));
@@ -633,7 +654,8 @@ export function createPostgresSyncRepository(sql) {
     }
     const continuityMutations = mutations.filter(({ continuity }) => Boolean(continuity));
     const standardMutations = mutations.filter(({ continuity }) => !continuity);
-    const queries = selectionGuard ? [selectionGuard] : [];
+    const queries = [syncEventLock(sql, userID)];
+    if (selectionGuard) queries.push(selectionGuard);
     if (needsRecovery) {
       queries.push(sql`SELECT 1 / CASE WHEN (SELECT COALESCE(MAX(event_id),0) FROM permitext_sync_events WHERE user_id = ${userID}) = ${expectedEvent} THEN 1 ELSE 0 END AS recovery_guard`);
     }

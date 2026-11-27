@@ -240,7 +240,7 @@
     "test:construction-figures": "node tests/construction-figure-binding.mjs",
     "test:fc-figures": "node tests/fire-code-figure-pilot.mjs",
     "extract:fc-figures": "python3 scripts/extract-fc-503-figures.py",
-    "verify:postgres": "node tests/postgres-integration.mjs",
+    "verify:postgres": "node tests/postgres-integration.mjs && node tests/postgres-event-order.mjs",
     "verify:production": "node tests/production-health.mjs",
     "verify:production:aasa": "node tests/production-aasa.mjs",
     "verify:production:identity": "node tests/production-identity-restore.mjs",

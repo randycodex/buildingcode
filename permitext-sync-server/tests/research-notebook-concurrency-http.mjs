@@ -117,6 +117,16 @@ try {
   assert.equal((await request("/notebook/cards/save", { ...createDraft, title: "Changed content under old identity" })).status, 409);
   assert.equal((await request("/notebook/cards/save", { ...createDraft, cardID: recoveredID, expectedVersion: 1 })).status, 409, "Mutation identity cannot be reused for another version.");
   assert.equal((await request("/notebook/cards/save", { projectID: "project-b", cardID: recoveredID, title: "Missing expected version", cardType: "finding", document })).status, 409);
+  // An older client may replay a save committed before revision notification was atomic.
+  const revision = async () => (await request("/projects/artifacts/checkpoint", {projectIDs: ["project-b"]})).json.projects[0].revision;
+  const beforeRepair = await revision();
+  await adapter.withMutation(store => {
+    const saved = store.foundationArtifactsByUserID[userID].find(item => item.envelope.id === recoveredID);
+    delete saved.payload._saveReceipt.revisionCommitted;
+  });
+  const legacyRetries = await Promise.all([request("/notebook/cards/save", createDraft), request("/notebook/cards/save", createDraft)]);
+  assert(legacyRetries.every(result => result.status === 200 && result.json.replayed));
+  assert.equal(await revision(), beforeRepair + 1, "Concurrent replays must publish the legacy revision once");
   const editDraft = { ...createDraft, cardID: recoveredID, expectedVersion: 1, clientMutationID: "durable-edit-revision", title: "Recovered edit" };
   const lostEditResponse = await request("/notebook/cards/save", editDraft);
   assert.equal(lostEditResponse.status, 200);

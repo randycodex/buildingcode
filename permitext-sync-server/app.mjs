@@ -155,7 +155,7 @@ import {
 } from "./file-store-coordinator.mjs";
 import { createPostgresOrganizationRepository } from "./postgres-organization-repository.mjs";
 import { createPostgresRateLimitRepository } from "./postgres-rate-limit-repository.mjs";
-import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
+import { syncEventLock, createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
 import { ensurePostgresNormalizedSchema } from "./postgres-schema-readiness.mjs";
 import {
   intersectCandidateIDsWithPosting,
@@ -1683,8 +1683,20 @@ export function createFileStoreAdapter() {
         return next;
       });
     },
+    async repairNotebookSaveRevision(userID, artifact, changes) {
+      return this.withMutation(store => {
+        const current = store.foundationArtifactsByUserID?.[userID]?.find(item => item.envelope.id === artifact.envelope.id);
+        if (current?.envelope.version !== artifact.envelope.version ||
+            canonicalJSONString(current.payload._saveReceipt) !== canonicalJSONString(artifact.payload._saveReceipt)) return;
+        current.payload._saveReceipt.revisionCommitted = true;
+        applyArtifactRevisions(store, userID, changes);
+      });
+    },
     async commitNotebookCardMutation(userID, mutation) {
-      return this.withMutation((store) => applyNotebookCardMutation(store, userID, mutation));
+      return this.withMutation(store => {
+        const artifact = applyNotebookCardMutation(store, userID, mutation);
+        return mutation.revisionChanges ? applyArtifactRevisions(store, userID, mutation.revisionChanges) : artifact;
+      });
     },
     async allocateCodeQuestionCounter(userID, scope, scopeKey) {
       return this.withMutation((store) => {
@@ -1895,39 +1907,8 @@ export function createFileStoreAdapter() {
         })
       };
     },
-    async bumpArtifactRevisions(userID, { accountDomains = [], projects = [] } = {}) {
-      return this.withMutation((store) => {
-        store.artifactRevisionsByUserID ||= {};
-        const state = store.artifactRevisionsByUserID[userID] || { account: null, projects: {} };
-        state.projects ||= {};
-        const updatedAt = new Date().toISOString();
-        const updateRecord = (existing, domains, extra = {}) => ({
-          ...extra,
-          revision: Number(existing?.revision || 0) + 1,
-          domains: Array.from(new Set([...(existing?.domains || []), ...domains])).sort(),
-          updatedAt
-        });
-        let account = null;
-        const normalizedAccountDomains = normalizedArtifactDomains(accountDomains);
-        if (normalizedAccountDomains.length) {
-          state.account = updateRecord(state.account, normalizedAccountDomains);
-          account = { ...state.account, changedDomains: normalizedAccountDomains };
-        }
-        const changedProjects = [];
-        for (const input of normalizedArtifactProjectChanges(projects)) {
-          state.projects[input.projectID] = updateRecord(
-            state.projects[input.projectID],
-            input.domains,
-            { projectID: input.projectID }
-          );
-          changedProjects.push({
-            ...state.projects[input.projectID],
-            changedDomains: input.domains
-          });
-        }
-        store.artifactRevisionsByUserID[userID] = state;
-        return { storageOwnerUserID: userID, account, projects: changedProjects };
-      });
+    async bumpArtifactRevisions(userID, changes = {}) {
+      return this.withMutation(store => applyArtifactRevisions(store, userID, changes));
     },
     async commitCodeQuestionIssuance(userID, { artifacts, links, events, pending }) {
       return this.withMutation((store) => {
@@ -3568,7 +3549,7 @@ async function createPostgresStoreAdapter() {
     if (!recordID || !kind || !record) {
       return;
     }
-    await sql`
+    await sql.transaction([syncEventLock(sql, record.userID || userID), sql`
       INSERT INTO permitext_sync_events (
         record_id,
         user_id,
@@ -3586,7 +3567,7 @@ async function createPostgresStoreAdapter() {
         ${JSON.stringify(mutation)}::jsonb
       )
       ON CONFLICT (record_id, mutation_updated_at) DO NOTHING
-    `;
+    `]);
   }
 
   async function latestEventID(userID) {
@@ -4980,9 +4961,29 @@ async function createPostgresStoreAdapter() {
       }
       return next;
     },
+    async repairNotebookSaveRevision(userID, artifact, changes) {
+      await ensureSchema();
+      const write = postgresRevisionWrite(sql, userID, changes);
+      // Claim this exact legacy receipt and notify in the same transaction. A
+      // newer save or a concurrent replay consumes the claim and needs no repair.
+      const claim = sql`WITH claimed AS (
+        UPDATE permitext_foundation_artifacts
+        SET payload = jsonb_set(payload, '{_saveReceipt,revisionCommitted}', 'true'::jsonb)
+        WHERE user_id = ${userID} AND id = ${artifact.envelope.id}
+          AND envelope->>'version' = ${String(artifact.envelope.version)}
+          AND payload->'_saveReceipt' = ${JSON.stringify(artifact.payload._saveReceipt)}::jsonb
+        RETURNING id
+      ) SELECT 1 / COUNT(*)::int FROM claimed`;
+      try {
+        await sql.transaction([claim, ...write.queries]);
+      } catch (error) {
+        if (error?.code !== "22012") throw error;
+      }
+    },
     async commitNotebookCardMutation(userID, mutation) {
       await ensureSchema();
-      return commitPostgresNotebookCardMutation(sql, userID, mutation);
+      const revisions = mutation.revisionChanges && postgresRevisionWrite(sql, userID, mutation.revisionChanges);
+      return commitPostgresNotebookCardMutation(sql, userID, mutation, revisions);
     },
     async allocateCodeQuestionCounter(userID, scope, scopeKey) {
       await ensureSchema();
@@ -5690,60 +5691,10 @@ async function createPostgresStoreAdapter() {
       }
       throw new Error("Research credit reconciliation was not applied.");
     },
-    async bumpArtifactRevisions(userID, { accountDomains = [], projects = [] } = {}) {
+    async bumpArtifactRevisions(userID, changes = {}) {
       await ensureSchema();
-      const changes = [
-        ...(normalizedArtifactDomains(accountDomains).length ? [{
-          kind: "account",
-          id: "account",
-          domains: normalizedArtifactDomains(accountDomains)
-        }] : []),
-        ...normalizedArtifactProjectChanges(projects).map((project) => ({
-          kind: "project",
-          id: project.projectID,
-          domains: project.domains
-        }))
-      ];
-      if (!changes.length) {
-        return { storageOwnerUserID: userID, account: null, projects: [] };
-      }
-      const results = await sql.transaction(changes.map((change) => sql`
-        INSERT INTO permitext_artifact_revisions (
-          user_id, scope_kind, scope_id, revision, domains, updated_at
-        )
-        VALUES (
-          ${userID}, ${change.kind}, ${change.id}, 1,
-          ${JSON.stringify(change.domains)}::jsonb, now()
-        )
-        ON CONFLICT (user_id, scope_kind, scope_id) DO UPDATE SET
-          revision = permitext_artifact_revisions.revision + 1,
-          domains = (
-            SELECT COALESCE(jsonb_agg(domain ORDER BY domain), '[]'::jsonb)
-            FROM (
-              SELECT DISTINCT value AS domain
-              FROM jsonb_array_elements_text(
-                permitext_artifact_revisions.domains || EXCLUDED.domains
-              )
-            ) AS merged_domains
-          ),
-          updated_at = now()
-        RETURNING revision, domains, updated_at
-      `));
-      const records = changes.map((change, index) => {
-        const row = results[index][0];
-        return {
-          ...(change.kind === "project" ? { projectID: change.id } : {}),
-          revision: Number(row.revision),
-          domains: safeJSON(row.domains, []),
-          changedDomains: change.domains,
-          updatedAt: new Date(row.updated_at).toISOString()
-        };
-      });
-      return {
-        storageOwnerUserID: userID,
-        account: records.find((record, index) => changes[index].kind === "account") || null,
-        projects: records.filter((record, index) => changes[index].kind === "project")
-      };
+      const write = postgresRevisionWrite(sql, userID, changes);
+      return write.result(write.queries.length ? await sql.transaction(write.queries) : []);
     },
     async migrationCheckpoint(userID, checkpointName) {
       await ensureSchema();
@@ -6555,6 +6506,96 @@ const artifactRevisionDomains = new Set([
   "report",
   "research"
 ]);
+
+function applyArtifactRevisions(store, userID, {accountDomains = [], projects = []}) {
+  store.artifactRevisionsByUserID ||= {};
+  const state = store.artifactRevisionsByUserID[userID] || { account: null, projects: {} };
+  state.projects ||= {};
+  const updatedAt = new Date().toISOString();
+  const updateRecord = (existing, domains, extra = {}) => ({
+    ...extra,
+    revision: Number(existing?.revision || 0) + 1,
+    domains: Array.from(new Set([...(existing?.domains || []), ...domains])).sort(),
+    updatedAt
+  });
+  let account = null;
+  const normalizedAccountDomains = normalizedArtifactDomains(accountDomains);
+  if (normalizedAccountDomains.length) {
+    state.account = updateRecord(state.account, normalizedAccountDomains);
+    account = { ...state.account, changedDomains: normalizedAccountDomains };
+  }
+  const changedProjects = [];
+  for (const input of normalizedArtifactProjectChanges(projects)) {
+    state.projects[input.projectID] = updateRecord(
+      state.projects[input.projectID],
+      input.domains,
+      { projectID: input.projectID }
+    );
+    changedProjects.push({
+      ...state.projects[input.projectID],
+      changedDomains: input.domains
+    });
+  }
+  store.artifactRevisionsByUserID[userID] = state;
+  return { storageOwnerUserID: userID, account, projects: changedProjects };
+}
+
+function postgresRevisionWrite(sql, userID, {accountDomains = [], projects = []}) {
+  const changes = [
+    ...(normalizedArtifactDomains(accountDomains).length ? [{
+      kind: "account",
+      id: "account",
+      domains: normalizedArtifactDomains(accountDomains)
+    }] : []),
+    ...normalizedArtifactProjectChanges(projects).map((project) => ({
+      kind: "project",
+      id: project.projectID,
+      domains: project.domains
+    }))
+  ];
+  const queries = changes.map((change) => sql`
+        INSERT INTO permitext_artifact_revisions (
+          user_id, scope_kind, scope_id, revision, domains, updated_at
+        )
+        VALUES (
+          ${userID}, ${change.kind}, ${change.id}, 1,
+          ${JSON.stringify(change.domains)}::jsonb, now()
+        )
+        ON CONFLICT (user_id, scope_kind, scope_id) DO UPDATE SET
+          revision = permitext_artifact_revisions.revision + 1,
+          domains = (
+            SELECT COALESCE(jsonb_agg(domain ORDER BY domain), '[]'::jsonb)
+            FROM (
+              SELECT DISTINCT value AS domain
+              FROM jsonb_array_elements_text(
+                permitext_artifact_revisions.domains || EXCLUDED.domains
+              )
+            ) AS merged_domains
+          ),
+          updated_at = now()
+        RETURNING revision, domains, updated_at
+      `);
+  return {
+    queries,
+    result(results) {
+      const records = changes.map((change, index) => {
+        const row = results[index][0];
+        return {
+          ...(change.kind === "project" ? { projectID: change.id } : {}),
+          revision: Number(row.revision),
+          domains: safeJSON(row.domains, []),
+          changedDomains: change.domains,
+          updatedAt: new Date(row.updated_at).toISOString()
+        };
+      });
+      return {
+        storageOwnerUserID: userID,
+        account: records.find((record, index) => changes[index].kind === "account") || null,
+        projects: records.filter((record, index) => changes[index].kind === "project")
+      };
+    }
+  };
+}
 
 function normalizedArtifactDomains(domains = []) {
   return Array.from(new Set((Array.isArray(domains) ? domains : [])
@@ -15679,7 +15720,8 @@ async function handleProjectCollaborationNoteSave(request, response) {
     const activeProjectLink = existing ? (await listStoredProjectLinks(access.storageOwnerUserID)).find((item) =>
       !item.deletedAt && item.projectID === projectID && item.targetKind === "projectNote" && item.targetID === noteID) : null;
     if (existing && !activeProjectLink) throw Object.assign(new Error("The Project note link changed. Reload before saving."), { code: "PROJECT_NOTE_VERSION_CONFLICT" });
-    await commitStoredNotebookCardMutation(access.storageOwnerUserID, {
+    const artifactRevisions = await commitStoredNotebookCardMutation(access.storageOwnerUserID, {
+      revisionChanges: projectArtifactRevisionChange(projectID, ["foundation", "activity"]),
       artifact, expectedVersion, links: link ? [link] : [], expectedLinks: activeProjectLink ? [activeProjectLink] : [], events: [event],
       requireEmptyProjectNoteProjectID: existing ? null : projectID
     });
@@ -15690,8 +15732,6 @@ async function handleProjectCollaborationNoteSave(request, response) {
       projectID,
       removedImageAssets
     );
-    const artifactRevisions = await bumpCommittedNotebookArtifactRevisions(access.storageOwnerUserID,
-      projectArtifactRevisionChange(projectID, ["foundation", "activity"]));
     sendJSON(response, existing ? 200 : 201, {
       note: collaborationArtifactForClient(artifact),
       link,
@@ -16645,15 +16685,6 @@ async function cleanupCommittedNotebookImageAssets(userID, projectID, assetIDs) 
   }
 }
 
-async function bumpCommittedNotebookArtifactRevisions(userID, changes) {
-  try {
-    return await bumpStoredArtifactRevisions(userID, changes);
-  } catch (error) {
-    console.warn(JSON.stringify({ event: "notebook_artifact_revision_deferred", code: error?.code || "REVISION_FAILED" }));
-    return { account: null, projects: [], deferred: true };
-  }
-}
-
 async function handleNotebookCardSave(request, response) {
   const context = await authenticatedNotebookBody(request, response);
   if (!context) return;
@@ -16676,6 +16707,7 @@ async function handleNotebookCardSave(request, response) {
   const expectedVersion = Number(context.body.expectedVersion ?? 0);
   const cardID = requestedCardID || (clientMutationID
     ? notebookCreationID(storageOwnerUserID, projectID, clientMutationID) : randomUUID());
+  const revisionChanges = projectArtifactRevisionChange(projectID, ["notebook", "foundation", "activity"]);
   const receipt = clientMutationID ? {
     clientMutationID, projectID, expectedVersion,
     fingerprint: createHash("sha256").update(canonicalJSONString({
@@ -16690,6 +16722,10 @@ async function handleNotebookCardSave(request, response) {
     if (!receipt) return false;
     const replay = notebookMutationReplay(current, await listStoredProjectLinks(storageOwnerUserID, { projectID, targetKind: "notebookCard", targetIDs: [cardID] }), receipt);
     if (!replay) return false;
+    if (!current.payload._saveReceipt.revisionCommitted) {
+      const adapter = await storeAdapter();
+      await adapter.repairNotebookSaveRevision(storageOwnerUserID, current, revisionChanges);
+    }
     sendJSON(response, 200, { card: notebookCardForClient(replay.artifact, [projectID]), link: replay.link, replayed: true });
     return true;
   };
@@ -16739,7 +16775,7 @@ async function handleNotebookCardSave(request, response) {
       createdBy: existing?.payload?.createdBy || context.userID,
       updatedBy: context.userID
     });
-    if (receipt) payload._saveReceipt = receipt;
+    if (receipt) payload._saveReceipt = {...receipt, revisionCommitted: true};
     await validateNotebookReferences(storageOwnerUserID, payload.references, payload.evidenceLinks);
     await validateNotebookImageAssets(storageOwnerUserID, projectID, payload.imageAssets);
     validatingCard = false;
@@ -16789,7 +16825,8 @@ async function handleNotebookCardSave(request, response) {
         referenceCount: payload.references.length
       }
     });
-    await commitStoredNotebookCardMutation(storageOwnerUserID, {
+    const artifactRevisions = await commitStoredNotebookCardMutation(storageOwnerUserID, {
+      revisionChanges,
       artifact, expectedVersion,
       links: activeProjectLink ? [] : [link],
       expectedLinks: activeProjectLink ? [activeProjectLink] : [],
@@ -16798,10 +16835,6 @@ async function handleNotebookCardSave(request, response) {
     const removedImageAssets = (existing?.payload?.imageAssets || [])
       .filter((assetID) => !payload.imageAssets.includes(assetID));
     await cleanupCommittedNotebookImageAssets(storageOwnerUserID, projectID, removedImageAssets);
-    const artifactRevisions = await bumpCommittedNotebookArtifactRevisions(
-      storageOwnerUserID,
-      projectArtifactRevisionChange(projectID, ["notebook", "foundation", "activity"])
-    );
     sendJSON(response, existing ? 200 : 201, {
       card: notebookCardForClient(artifact, [projectID]),
       link,
@@ -16818,11 +16851,12 @@ async function handleNotebookCardSave(request, response) {
         ...(currentIsLinked ? { card: notebookCardForClient(current, [projectID]) } : {}) });
       return;
     }
-    sendJSON(response, 400, {
-      error: error instanceof Error ? error.message : "Invalid Notebook card.",
-      code: "INVALID_NOTEBOOK_CARD",
-      ...(validatingCard ? {rejectedBeforeSave:true} : {})
-    });
+    if (!validatingCard) {
+      sendJSON(response, 503, {error: "The Note could not be saved. Retry the same save.", code: "NOTEBOOK_SAVE_UNAVAILABLE"});
+      return;
+    }
+    sendJSON(response, 400, {error: error instanceof Error ? error.message : "Invalid Notebook card.",
+      code: "INVALID_NOTEBOOK_CARD", rejectedBeforeSave: true});
   }
 }
 
@@ -16915,19 +16949,14 @@ async function handleNotebookCardDelete(request, response) {
       createdAt: now
     }));
   }
-  await commitStoredNotebookCardMutation(access.storageOwnerUserID, {
+  const artifactRevisions = await commitStoredNotebookCardMutation(access.storageOwnerUserID, {
+    revisionChanges: {projects: activeLinks.map(link => ({projectID: link.projectID, domains: ["notebook", "foundation", "activity"]}))},
     artifact: deletedArtifact, expectedVersion, links: deletedLinks,
     expectedLinks: activeLinks, events: deleteEvents
   });
   if (context.body.recoverable !== true) await cleanupCommittedNotebookImageAssets(
     access.storageOwnerUserID, access.projectID, artifact.payload?.imageAssets || []
   );
-  const artifactRevisions = await bumpCommittedNotebookArtifactRevisions(access.storageOwnerUserID, {
-    projects: activeLinks.map((link) => ({
-      projectID: link.projectID,
-      domains: ["notebook", "foundation", "activity"]
-    }))
-  });
   sendJSON(response, 200, {
     cardID: artifact.envelope.id,
     deletedAt: now,
@@ -16996,13 +17025,10 @@ async function handleNotebookCardArchive(request, response) {
     newStatus: archived ? "archived" : "active",
     createdAt: now
   });
-  await commitStoredNotebookCardMutation(access.storageOwnerUserID, {
+  const artifactRevisions = await commitStoredNotebookCardMutation(access.storageOwnerUserID, {
+    revisionChanges: projectArtifactRevisionChange(access.projectID, ["notebook", "foundation", "activity"]),
     artifact: updatedArtifact, expectedVersion, expectedLinks: links, events: [activity]
   });
-  const artifactRevisions = await bumpCommittedNotebookArtifactRevisions(
-    access.storageOwnerUserID,
-    projectArtifactRevisionChange(access.projectID, ["notebook", "foundation", "activity"])
-  );
   sendJSON(response, 200, {
     card: notebookCardForClient(updatedArtifact, [access.projectID]),
     activity,
@@ -28005,22 +28031,6 @@ function filterMutationsByExcludedKinds(mutations, excludedKinds) {
   });
 }
 
-function projectRecordMatchesSection(projectRecord, sectionRecord) {
-  if (!projectRecord || !sectionRecord) {
-    return false;
-  }
-  if (projectRecord.userID !== sectionRecord.userID || projectRecord.codeVersion !== sectionRecord.codeVersion) {
-    return false;
-  }
-  const sectionFolderClientID = sectionRecord.folderClientID || null;
-  if (sectionFolderClientID && (projectRecord.clientID === sectionFolderClientID || projectRecord.id === sectionFolderClientID)) {
-    return true;
-  }
-  return sectionRecord.localFolderID !== undefined &&
-    sectionRecord.localFolderID !== null &&
-    projectRecord.localFolderID === sectionRecord.localFolderID;
-}
-
 function expandPullMutationsWithDependencies(filteredMutations, allMutations) {
   const expandedByID = new Map();
   for (const mutation of filteredMutations) {
@@ -28030,15 +28040,22 @@ function expandPullMutationsWithDependencies(filteredMutations, allMutations) {
     }
   }
 
-  for (const mutation of filteredMutations) {
-    const { kind, record } = mutationKindAndRecord(mutation);
-    if (kind !== "projectSection" || !record) {
-      continue;
+  const parents = new Map();
+  const key = (record, kind, id) => JSON.stringify([record.userID, record.codeVersion, kind, id]);
+  for (const [index, mutation] of allMutations.entries()) {
+    const project = mutation.project;
+    if (!project) continue;
+    const aliases = [key(project, "client", project.id), key(project, "client", project.clientID),
+      key(project, "local", project.localFolderID)];
+    for (const alias of aliases) {
+      if (!parents.has(alias)) parents.set(alias, index);
     }
-    const parentProject = allMutations.find((candidate) => {
-      const { kind: candidateKind, record: candidateRecord } = mutationKindAndRecord(candidate);
-      return candidateKind === "project" && projectRecordMatchesSection(candidateRecord, record);
-    });
+  }
+  for (const {projectSection: record} of filteredMutations) {
+    if (!record) continue;
+    const client = record.folderClientID ? parents.get(key(record, "client", record.folderClientID)) : undefined;
+    const local = record.localFolderID != null ? parents.get(key(record, "local", record.localFolderID)) : undefined;
+    const parentProject = allMutations[Math.min(client ?? Infinity, local ?? Infinity)];
     const parentID = parentProject ? mutationRecordID(parentProject) : null;
     if (parentProject && parentID && !expandedByID.has(parentID)) {
       expandedByID.set(parentID, parentProject);
@@ -29604,9 +29621,9 @@ async function handleContentTrash(request, response) {
       if (restoring) mutation.events = projectIDs.map(projectID => activityEvent({owner: target.envelope.owner,
         projectID, actorUserID: userID, action: 'notebook-card.restored', objectKind: 'notebookCard',
         objectID: target.envelope.id, previousStatus: 'deleted', newStatus: 'active'}));
+      mutation.revisionChanges = {projects: projectIDs.map(projectID => ({projectID, domains: ["notebook", "foundation", "activity"]}))};
       await commitStoredNotebookCardMutation(userID, mutation);
       if (!restoring) await cleanupCommittedNotebookImageAssets(userID, projectIDs[0], target.payload.imageAssets || []);
-      await bumpCommittedNotebookArtifactRevisions(userID, {projects: projectIDs.map(projectID => ({projectID, domains: ['notebook','foundation','activity']}))});
       if (restoring) result.restoredCount = 1;
     }
     if (action === 'inspect') await enrichTrashContents(result.entry);
@@ -29678,7 +29695,7 @@ async function handlePull(request, response) {
     );
     const responseContract = await syncResponseContract(userID, result.entitlement, body, contentMapVersion);
     logSyncTelemetry({
-      mode: "full-pull",
+      mode: sinceEventID === null ? "full-pull" : "cursor-pull",
       userID,
       changed: mutations.length > 0,
       mutationCount: mutations.length,
@@ -29706,16 +29723,19 @@ async function handlePull(request, response) {
   const allMutations = store.mutationsByUserID[userID] || [];
   // Return the current canonical state until clients send a content-map version.
   // Otherwise old event checkpoints can hide server-side section ID repairs.
-  const filteredMutations = Number.isFinite(since) ? allMutations.filter((mutation) => mutationUpdatedAt(mutation) > since) : allMutations;
+  const latestEventID = Number(store.syncRevisionsByUserID?.[userID] || 0);
+  const unchanged = sinceEventID !== null && sinceEventID === latestEventID;
+  const filteredMutations = unchanged ? [] : Number.isFinite(since)
+    ? allMutations.filter(mutation => mutationUpdatedAt(mutation) > since)
+    : allMutations;
   const mutations = filterMutationsByExcludedKinds(
     await canonicalizeMutations(expandPullMutationsWithDependencies(filteredMutations, allMutations)),
     excludedMutationKinds
   );
-  const latestEventID = await latestSyncEventID(userID);
   const entitlement = store.entitlements[userID] || null;
   const responseContract = await syncResponseContract(userID, entitlement, body, contentMapVersion);
   logSyncTelemetry({
-    mode: "full-pull",
+    mode: sinceEventID === null ? "full-pull" : "cursor-pull",
     userID,
     changed: mutations.length > 0,
     mutationCount: mutations.length,

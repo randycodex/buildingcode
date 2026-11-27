@@ -1,3 +1,4 @@
+import { syncEventLock } from "./postgres-sync-repository.mjs";
 import { createHash, randomUUID } from "node:crypto";
 import { accountMergeHasEntitlementConflict } from "./entitlement-contract.mjs";
 import { mergedPolicyAcceptances } from "./policy-acceptance.mjs";
@@ -791,9 +792,10 @@ export function createPostgresAccountRepository(sql, options = {}) {
       queries.splice(queries.length - 1, 0, ...additionalMergeQueries);
     }
 
+    const eventLocks = [sourceUserID, targetUserID].sort().map(id => syncEventLock(sql, id));
     let results;
     try {
-      results = await sql.transaction(queries, { isolationLevel: "Serializable" });
+      results = (await sql.transaction([...eventLocks, ...queries], { isolationLevel: "Serializable" })).slice(eventLocks.length);
     } catch (error) {
       if (error?.code === "40001") throw accountLinkBusyError();
       if (error?.code === "22012") {

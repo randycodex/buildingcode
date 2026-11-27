@@ -69,6 +69,7 @@ protocol UserContentRepository {
     func removeSectionFromAllFolders(sectionID: Int64, codeVersion: String) throws
     func clearAllFolders(codeVersion: String) throws
     func clearAllFolders() throws
+    func unresolvedSyncQueueCount() throws -> Int
     func pendingSyncQueueItems(limit: Int) throws -> [SyncQueueItem]
     func nextSyncQueueItems(limit: Int) throws -> [SyncQueueItem]
     func failedSyncQueueItems(limit: Int) throws -> [SyncQueueItem]
@@ -88,6 +89,10 @@ protocol UserContentRepository {
 }
 
 extension UserContentRepository {
+    func unresolvedSyncQueueCount() throws -> Int {
+        try pendingSyncQueueItems(limit: Int.max).count + failedSyncQueueItems(limit: Int.max).count
+    }
+
     func nextSyncQueueItems(limit: Int) throws -> [SyncQueueItem] {
         try pendingSyncQueueItems(limit: limit)
     }
@@ -1004,6 +1009,18 @@ final class UserDataStore: UserContentRepository {
             CREATE INDEX IF NOT EXISTS idx_folder_sections_folder_version_added
                 ON folder_sections(folder_id, code_version, added_at);
 
+            CREATE TABLE IF NOT EXISTS remote_evidence (
+                record_id TEXT PRIMARY KEY, code_version TEXT NOT NULL, folder_id INTEGER NOT NULL,
+                section_id INTEGER NOT NULL, payload TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_remote_evidence_section
+                ON remote_evidence(code_version, folder_id, section_id);
+
+            CREATE TRIGGER IF NOT EXISTS folder_remote_evidence_cleanup AFTER DELETE ON folders
+            BEGIN
+                DELETE FROM remote_evidence WHERE folder_id = OLD.id;
+            END;
+
             CREATE TABLE IF NOT EXISTS sync_checkpoints (
                 account_user_id TEXT NOT NULL,
                 backend_name TEXT NOT NULL,
@@ -1439,13 +1456,21 @@ final class UserDataStore: UserContentRepository {
             """
             SELECT id, attempt_count, updated_at
             FROM sync_queue
-            WHERE state = ? AND attempt_count < ?
+            WHERE state = ? AND (attempt_count < ? OR last_error LIKE '[transport] %'
+              OR last_error IN (?, ?, ?, ?))
+              AND COALESCE(last_error, '') NOT LIKE '[SERVER_NEWER] %'
+              AND COALESCE(last_error, '') NOT LIKE '[EQUAL_TIMESTAMP_CONFLICT] %'
             ORDER BY updated_at ASC, id ASC;
             """
         )
         defer { connection.finalize(failedStatement) }
         try connection.bind(text: failedQueueState, index: 1, to: failedStatement)
         sqlite3_bind_int64(failedStatement, 2, Int64(maximumAutomaticSyncAttempts))
+        // Older clients persisted only the localized transport description.
+        let legacyErrors: [URLError.Code] = [.timedOut, .notConnectedToInternet, .networkConnectionLost, .cannotConnectToHost]
+        for (index, code) in legacyErrors.enumerated() {
+            try connection.bind(text: URLError(code).localizedDescription, index: Int32(index + 3), to: failedStatement)
+        }
 
         var retryItemIDs: [Int64] = []
         while try connection.step(failedStatement) == SQLITE_ROW {
@@ -1476,6 +1501,10 @@ final class UserDataStore: UserContentRepository {
             try connection.bind(text: failedQueueState, index: 4, to: retryStatement)
             _ = try connection.step(retryStatement)
         }
+    }
+
+    func unresolvedSyncQueueCount() throws -> Int {
+        try countRows(sql: "SELECT COUNT(*) FROM sync_queue WHERE state != 'synced';")
     }
 
     private func automaticRetryDelay(attemptCount: Int) -> TimeInterval {
@@ -1669,6 +1698,7 @@ final class UserDataStore: UserContentRepository {
                 "bookmarks",
                 "folders",
                 "sync_queue",
+                "remote_evidence",
                 "sync_checkpoints"
             ] {
                 let statement = try connection.prepare("DELETE FROM \(table);")
@@ -2077,6 +2107,7 @@ final class UserDataStore: UserContentRepository {
     func clearBookmarks(codeVersion: String) throws {
         try performTransaction {
             for equivalentVersion in UserContentSyncCodeVersion.equivalentLocalVersions(codeVersion) {
+                try deleteRows(sql: "DELETE FROM remote_evidence WHERE code_version = ?;", codeVersion: equivalentVersion)
                 try deleteRows(sql: "DELETE FROM bookmarks WHERE code_version = ?;", codeVersion: equivalentVersion)
                 // Folder membership references bookmarks. Wipe the junction so
                 // folders don't keep ghost section IDs after Clear Bookmarks.
@@ -3087,14 +3118,16 @@ final class UserDataStore: UserContentRepository {
         for mutations: [ServerUserContentMutation],
         account: SignedInAccount
     ) throws -> [String: UserContentMergeCandidate] {
+        let queued = try unresolvedMutationsByID(account: account)
         var candidates: [String: UserContentMergeCandidate] = [:]
         for mutation in mutations {
             let localizedMutation = localizedServerMutation(mutation)
             let rowCandidate = try localMergeCandidate(for: localizedMutation)
-            let queuedCandidate = try queuedRecordMergeCandidate(
-                for: localizedMutation,
-                account: account
-            )
+            let queuedCandidate = queued[mutation.recordID].map { local in
+                UserContentMergeCandidate(recordID: mutation.recordID, entityKind: mutation.entityKind,
+                    localUpdatedAt: local.updatedAt, serverUpdatedAt: mutation.updatedAt,
+                    localDeletedAt: local.deletedAt, serverDeletedAt: mutation.deletedAt, localSyncState: .pendingUpload)
+            }
             let localCandidate = [rowCandidate, queuedCandidate]
                 .compactMap { $0 }
                 .max {
@@ -3124,10 +3157,8 @@ final class UserDataStore: UserContentRepository {
         return candidates
     }
 
-    private func queuedRecordMergeCandidate(
-        for mutation: ServerUserContentMutation,
-        account: SignedInAccount
-    ) throws -> UserContentMergeCandidate? {
+    private func unresolvedMutationsByID(account: SignedInAccount) throws -> [String: ServerUserContentMutation] {
+        var mutations: [String: ServerUserContentMutation] = [:]
         let statement = try connection.prepare(
             """
             SELECT id, client_id, entity_type, operation_type, payload_json, state,
@@ -3145,22 +3176,10 @@ final class UserDataStore: UserContentRepository {
                   let queuedMutation = try? ServerUserContentMutation(
                     syncQueueItem: item,
                     account: account
-                  ),
-                  queuedMutation.recordID == mutation.recordID
-            else {
-                continue
-            }
-            return UserContentMergeCandidate(
-                recordID: mutation.recordID,
-                entityKind: mutation.entityKind,
-                localUpdatedAt: queuedMutation.updatedAt,
-                serverUpdatedAt: mutation.updatedAt,
-                localDeletedAt: queuedMutation.deletedAt,
-                serverDeletedAt: mutation.deletedAt,
-                localSyncState: .pendingUpload
-            )
+                  ), mutations[queuedMutation.recordID] == nil else { continue }
+            mutations[queuedMutation.recordID] = queuedMutation
         }
-        return nil
+        return mutations
     }
 
     private func pendingBulkClearUpdatedAt(for mutation: ServerUserContentMutation) throws -> Date? {
@@ -3232,13 +3251,20 @@ final class UserDataStore: UserContentRepository {
 
     private func localMergeCandidate(for mutation: ServerUserContentMutation) throws -> UserContentMergeCandidate? {
         switch mutation {
-        case .savedItem(let record):
-            return try localMergeCandidate(
-                mutation: mutation,
-                sql: "SELECT sync_state, updated_at, deleted_at FROM bookmarks WHERE code_version = ? AND section_id = ? LIMIT 1;",
-                codeVersion: record.codeVersion,
-                firstID: record.sectionID
-            )
+        case .savedItem, .projectSection:
+            // Display rows combine several server IDs. Only compare the incoming
+            // revision with its own last applied record or its own queued edit.
+            let statement = try connection.prepare("SELECT payload FROM remote_evidence WHERE record_id = ?;")
+            defer { connection.finalize(statement) }
+            try connection.bind(text: mutation.recordID, index: 1, to: statement)
+            guard try connection.step(statement) == SQLITE_ROW else { return nil }
+            let prior = try JSONDecoder().decode(ServerUserContentMutation.self, from: Data(connection.string(at: 0, in: statement).utf8))
+            // A new server revision (including Undo after a tombstone) is authoritative.
+            // Unsent edits are compared separately from the acknowledged server snapshot.
+            guard prior == mutation else { return nil }
+            return UserContentMergeCandidate(recordID: mutation.recordID, entityKind: mutation.entityKind,
+                localUpdatedAt: prior.updatedAt, serverUpdatedAt: mutation.updatedAt,
+                localDeletedAt: prior.deletedAt, serverDeletedAt: mutation.deletedAt, localSyncState: .synced)
         case .annotation(let record):
             if record.tags != nil {
                 let statement = try connection.prepare(
@@ -3286,24 +3312,6 @@ final class UserDataStore: UserContentRepository {
                 sql: "SELECT sync_state, updated_at, deleted_at FROM folders WHERE code_version = ? AND id = ? LIMIT 1;",
                 codeVersion: record.codeVersion,
                 firstID: record.localFolderID
-            )
-        case .projectSection(let record):
-            let legacyClientID = record.localFolderID.map {
-                "\(record.userID):project:\(record.codeVersion):\($0)"
-            }
-            guard let folderID = try localFolderID(
-                clientID: record.folderClientID ?? legacyClientID,
-                codeVersion: record.codeVersion
-            ) else {
-                return nil
-            }
-            if try isSeparateManualLink(record, folderID: folderID) { return nil }
-            return try localMergeCandidate(
-                mutation: mutation,
-                sql: "SELECT sync_state, updated_at, deleted_at FROM folder_sections WHERE code_version = ? AND folder_id = ? AND section_id = ? LIMIT 1;",
-                codeVersion: record.codeVersion,
-                firstID: folderID,
-                secondID: record.sectionID
             )
         case .workboard:
             return nil
@@ -3426,12 +3434,16 @@ final class UserDataStore: UserContentRepository {
     }
 
     func applyServerUserContentMutation(_ mutation: ServerUserContentMutation) throws {
-        switch localizedServerMutation(mutation) {
+        let localized = localizedServerMutation(mutation)
+        switch localized {
         case .savedItem(let record):
-            if record.deletedAt != nil {
-                try deleteServerBookmark(sectionID: record.sectionID, codeVersion: record.codeVersion)
-            } else {
-                try upsertServerBookmark(record)
+            try performTransaction {
+                let siblings = try recordRemoteEvidence(localized, codeVersion: record.codeVersion, folderID: 0, sectionID: record.sectionID)
+                if record.deletedAt == nil {
+                    try upsertServerBookmark(record)
+                } else if siblings.isEmpty {
+                    try deleteServerBookmark(sectionID: record.sectionID, codeVersion: record.codeVersion)
+                }
             }
         case .annotation(let record):
             if record.deletedAt != nil {
@@ -3446,10 +3458,29 @@ final class UserDataStore: UserContentRepository {
                 try upsertServerProject(record)
             }
         case .projectSection(let record):
-            if record.deletedAt != nil {
-                try deleteServerProjectSection(record)
-            } else {
-                try upsertServerProjectSection(record)
+            let legacyID = record.localFolderID.map { "\(record.userID):project:\(record.codeVersion):\($0)" }
+            guard let folderID = try localFolderID(clientID: record.folderClientID ?? legacyID, codeVersion: record.codeVersion)
+                    ?? (record.folderClientID == nil ? record.localFolderID : nil) else {
+                if record.deletedAt != nil { try deleteServerProjectSection(record) }
+                return
+            }
+            try performTransaction {
+                let siblings = try recordRemoteEvidence(localized, codeVersion: record.codeVersion, folderID: folderID, sectionID: record.sectionID)
+                if record.deletedAt != nil || record.selectionResetAt != nil {
+                    if siblings.isEmpty && record.deletedAt != nil {
+                        try deleteServerProjectSection(record)
+                        return
+                    }
+                    // Rebuild the display row from the surviving passage identities.
+                    if !siblings.isEmpty {
+                        try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND folder_id = ? AND section_id = ?;",
+                                       codeVersion: record.codeVersion, firstID: folderID, secondID: record.sectionID)
+                    }
+                }
+                if record.deletedAt == nil { try upsertServerProjectSection(record) }
+                for case .projectSection(let sibling) in siblings {
+                    try upsertServerProjectSection(sibling, rebuildingSibling: true)
+                }
             }
         case .workboard:
             // Workboards remain web-only. Recognize their sync records so they
@@ -3460,6 +3491,41 @@ final class UserDataStore: UserContentRepository {
         case .codeVersionClear(let record):
             try applyServerCodeVersionClear(record)
         }
+    }
+
+    private func recordRemoteEvidence(_ mutation: ServerUserContentMutation, codeVersion: String, folderID: Int64,
+                                      sectionID: Int64) throws -> [ServerUserContentMutation] {
+        let statement = try connection.prepare("""
+            INSERT OR REPLACE INTO remote_evidence(record_id, code_version, folder_id, section_id, payload)
+            VALUES (?, ?, ?, ?, ?);
+            """)
+        defer { connection.finalize(statement) }
+        try connection.bind(text: mutation.recordID, index: 1, to: statement)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+        sqlite3_bind_int64(statement, 3, folderID)
+        sqlite3_bind_int64(statement, 4, sectionID)
+        let payload = String(decoding: try JSONEncoder().encode(mutation), as: UTF8.self)
+        try connection.bind(text: payload, index: 5, to: statement)
+        _ = try connection.step(statement)
+        if mutation.deletedAt == nil {
+            guard case .projectSection(let record) = mutation, record.selectionResetAt != nil else { return [] }
+        }
+        let siblings = try connection.prepare("""
+            SELECT payload FROM remote_evidence WHERE code_version = ? AND folder_id = ? AND section_id = ? AND record_id <> ?
+            ORDER BY record_id;
+            """)
+        defer { connection.finalize(siblings) }
+        try connection.bind(text: codeVersion, index: 1, to: siblings)
+        sqlite3_bind_int64(siblings, 2, folderID)
+        sqlite3_bind_int64(siblings, 3, sectionID)
+        try connection.bind(text: mutation.recordID, index: 4, to: siblings)
+        var active: [ServerUserContentMutation] = []
+        while try connection.step(siblings) == SQLITE_ROW {
+            let data = Data(connection.string(at: 0, in: siblings).utf8)
+            let sibling = try JSONDecoder().decode(ServerUserContentMutation.self, from: data)
+            if sibling.deletedAt == nil { active.append(sibling) }
+        }
+        return active
     }
 
     private func localizedServerMutation(_ mutation: ServerUserContentMutation) -> ServerUserContentMutation {
@@ -3571,10 +3637,19 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func deleteServerBookmark(sectionID: Int64, codeVersion: String) throws {
-        try performTransaction {
-            try deleteRows(sql: "DELETE FROM bookmarks WHERE code_version = ? AND section_id = ?;", codeVersion: codeVersion, sectionID: sectionID)
-            try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND section_id = ?;", codeVersion: codeVersion, sectionID: sectionID)
-        }
+        try deleteRows(sql: "DELETE FROM bookmarks WHERE code_version = ? AND section_id = ?;", codeVersion: codeVersion, sectionID: sectionID)
+        // Project memberships have independent server identities. A legacy
+        // project can retain a passage even after its global bookmark is gone.
+        try deleteRows(sql: """
+            DELETE FROM folder_sections WHERE code_version = ? AND section_id = ?
+              AND NOT EXISTS (
+                SELECT 1 FROM remote_evidence AS evidence
+                WHERE evidence.code_version = folder_sections.code_version
+                  AND evidence.folder_id = folder_sections.folder_id
+                  AND evidence.section_id = folder_sections.section_id
+                  AND json_extract(evidence.payload, '$.projectSection.deletedAt') IS NULL
+              );
+            """, codeVersion: codeVersion, sectionID: sectionID)
     }
 
     private func upsertServerAnnotation(_ record: ServerAnnotationRecord) throws {
@@ -3889,7 +3964,7 @@ final class UserDataStore: UserContentRepository {
         return try connection.step(statement) == SQLITE_ROW
     }
 
-    private func upsertServerProjectSection(_ record: ServerProjectSectionRecord) throws {
+    private func upsertServerProjectSection(_ record: ServerProjectSectionRecord, rebuildingSibling: Bool = false) throws {
         let legacyClientID = record.localFolderID.map {
             "\(record.userID):project:\(record.codeVersion):\($0)"
         }
@@ -3901,7 +3976,7 @@ final class UserDataStore: UserContentRepository {
         }
         if try isSeparateManualLink(record, folderID: folderID) { return }
         var saved: ReaderEvidenceText
-        if let reset = record.selectionResetAt {
+        if let reset = record.selectionResetAt, !rebuildingSibling {
             saved = ReaderEvidenceText(excerpts: record.selectedExcerpts ?? [])
             // The server sends a complete post-deletion snapshot. Only newer,
             // unacknowledged local actions belong to this lifetime.
@@ -3929,7 +4004,7 @@ final class UserDataStore: UserContentRepository {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)
             ON CONFLICT(folder_id, code_version, section_id) DO UPDATE SET
                 client_id = excluded.client_id, owner_id = excluded.owner_id, visibility = excluded.visibility,
-                sync_state = excluded.sync_state, updated_at = excluded.updated_at, deleted_at = NULL,
+                sync_state = excluded.sync_state, updated_at = MAX(folder_sections.updated_at, excluded.updated_at), deleted_at = NULL,
                 selected_excerpts_json = excluded.selected_excerpts_json,
                 selected_excerpt_occurrences = excluded.selected_excerpt_occurrences,
                 reader_excerpt_offsets = CASE WHEN ? THEN NULL ELSE folder_sections.reader_excerpt_offsets END;
@@ -3979,6 +4054,7 @@ final class UserDataStore: UserContentRepository {
         switch record.values["scope"] {
         case "bookmarks":
             for codeVersion in equivalentVersions {
+                try deleteRows(sql: "DELETE FROM remote_evidence WHERE code_version = ?;", codeVersion: codeVersion)
                 try deleteRows(sql: "DELETE FROM bookmarks WHERE code_version = ?;", codeVersion: codeVersion)
                 try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ?;", codeVersion: codeVersion)
             }
@@ -3993,6 +4069,7 @@ final class UserDataStore: UserContentRepository {
         case "folders":
             try performTransaction {
                 for codeVersion in equivalentVersions {
+                    try deleteRows(sql: "DELETE FROM remote_evidence WHERE code_version = ? AND folder_id <> 0;", codeVersion: codeVersion)
                     try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ?;", codeVersion: codeVersion)
                     try deleteRows(sql: "DELETE FROM folders WHERE code_version = ?;", codeVersion: codeVersion)
                 }
