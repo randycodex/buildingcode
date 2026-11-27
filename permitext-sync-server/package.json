@@ -309,7 +309,7 @@
     "@blocknote/react": "^0.57.0",
     "@clerk/backend": "^3.17.0",
     "@clerk/react": "6.15.1",
-    "@clerk/shared": "4.31.0",
+    "@clerk/shared": "4.48.2",
     "@mantine/core": "^9.8.0",
     "@mantine/hooks": "^9.8.0",
     "@neondatabase/serverless": "^1.2.0",
