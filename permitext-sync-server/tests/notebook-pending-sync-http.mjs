@@ -129,12 +129,30 @@ try {
   assert.deepEqual(bodyRead.json.card.document, savedWebDocument,
     "Reading the Note after the iPhone upload still returns the web body and its existing reference.");
 
+  const sharedBase = { ...bodyDraft, cardID: bodyNote.json.card.id, expectedVersion: bodyRead.json.card.version };
+  const olderOfflineWeb = { ...sharedBase, clientMutationID: "offline-web-body",
+    document: bodyDocument("Older offline web text"), editedAtMS: editedAtMS + 300 };
+  const newerOfflinePhone = { ...sharedBase, clientMutationID: "newer-offline-phone-body",
+    document: bodyDocument("Newer offline iPhone text"), editedAtMS: editedAtMS + 400 };
+  const savedPhone = await request("/notebook/cards/save", newerOfflinePhone);
+  assert.equal(savedPhone.status, 200);
+  const webReconnect = await request("/notebook/cards/save", olderOfflineWeb);
+  assert.equal(webReconnect.status, 200);
+  assert.equal(webReconnect.json.superseded, true);
+  assert.equal(webReconnect.json.card.version, savedPhone.json.card.version);
+  assert.deepEqual(webReconnect.json.card.document, savedPhone.json.card.document);
+  const afterWebReconnect = await request("/notebook/cards/get", { projectID, cardID: sharedBase.cardID });
+  assert.equal(afterWebReconnect.status, 200);
+  assert.equal(afterWebReconnect.json.card.version, savedPhone.json.card.version);
+  assert.equal(afterWebReconnect.json.card.document.document[0].content[0].text, "Newer offline iPhone text");
+  assert.deepEqual(afterWebReconnect.json.card.document.document.slice(1), bodyNote.json.card.document.document.slice(1));
+
   const foreign = structuredClone(document);
   foreign.document[0].content[0].props.referenceID = "foreign-answer";
   const rejected = await request("/notebook/cards/save", { ...draft, clientMutationID: "foreign-reference", document: foreign });
   assert.equal(rejected.status, 400);
   assert.match(rejected.json.error, /reference is unavailable/);
-  console.log("Pending Note HTTP passed: full Research question, default title, immutable retry identity, owner isolation, and a first delayed iPhone body upload after a newer web edit; no provider calls.");
+  console.log("Pending Note HTTP passed: full Research question, default title, immutable retry identity, owner isolation, and first delayed body uploads in both reconnect orders; no provider calls.");
 } finally {
   globalThis.fetch = originalFetch;
   server.closeAllConnections();

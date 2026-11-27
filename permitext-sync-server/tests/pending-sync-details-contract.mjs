@@ -193,3 +193,25 @@ console.log("Pending sync details passed: exact Project/item/reason, owner isola
   assert.equal(attempts,2);
   assert.equal(timers.size,0);
 }
+
+// A browser reconnect starts the durable Note queue even if foreground sync is delayed.
+{
+  const window = new EventTarget();
+  const attempts = [];
+  const start = app.indexOf('  window.addEventListener("online", () => {');
+  const end = app.indexOf('\n  });', start);
+  assert.ok(start >= 0 && end > start, "Workspace online handler is registered.");
+  vm.runInNewContext(app.slice(start, end + '\n  });'.length), {
+    window, serverReachable: false,
+    updateConnectionStatus() {},
+    async flushPendingNotebookDrafts(options) { attempts.push(options.automatic); },
+    startForegroundSyncLoop() {},
+    scheduleVisibleEvidenceSync() {},
+    flushCodeQuestionOutbox() {},
+    flushPendingNotebookImages() {},
+    refreshOpenProjectCalculations() {},
+    refreshOpenSettingsTrash() {}
+  });
+  window.dispatchEvent(new Event("online"));
+  assert.deepEqual(attempts, [true], "Reconnect retries eligible Notes immediately without waiting for foreground sync or backoff.");
+}
