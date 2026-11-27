@@ -1,3 +1,4 @@
+import Combine
 import ImageIO
 import PhotosUI
 import SwiftUI
@@ -1646,15 +1647,28 @@ private struct NotebookCardEditorView: View {
 
     @MainActor
     private func resolveEditorAsset(_ url: String) async throws -> Data {
-        guard isCurrentOwner else { throw CancellationError() }
-        let data: Data
+        let read: () async throws -> Data
         if url.hasPrefix("permitext-notebook-asset:") {
-            data = try await library.notebookAsset(projectID: projectID, assetID: String(url.dropFirst("permitext-notebook-asset:".count)))
+            let assetID = String(url.dropFirst("permitext-notebook-asset:".count))
+            read = { [library, projectID] in try await library.notebookAsset(projectID: projectID, assetID: assetID) }
         } else if let remote = URL(string: url), remote.scheme == "https" {
-            (data, _) = try await URLSession.shared.data(from: remote)
+            read = { try await URLSession.shared.data(from: remote).0 }
         } else { throw NotebookDocumentEditorError.assetUnavailable }
-        guard isCurrentOwner, !Task.isCancelled else { throw CancellationError() }
-        return data
+
+        while isCurrentOwner, !Task.isCancelled {
+            let generation = library.networkConnectionGeneration
+            if library.isNetworkAvailable {
+                do {
+                    let data = try await read()
+                    guard isCurrentOwner, !Task.isCancelled else { throw CancellationError() }
+                    return data
+                } catch let error as URLError where error.code == .notConnectedToInternet || error.code == .networkConnectionLost {
+                    // Keep the image's pending request alive until the next connection.
+                }
+            }
+            guard await library.$networkConnectionGeneration.values.first(where: { $0 != generation }) != nil else { break }
+        }
+        throw CancellationError()
     }
 
     private func loadCard(forceNetwork: Bool = false) async {

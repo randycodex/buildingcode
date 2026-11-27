@@ -218,7 +218,8 @@ addColumnButton?.addEventListener("click", () => {
 function requestNative(type, payload) {
   const requestID = String(++nextRequest);
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
+    // A read can wait for iOS to reconnect. Swift cancels it when the editor closes.
+    const timeout = type === "asset" ? undefined : setTimeout(() => {
       pendingRequests.delete(requestID);
       reject(new Error("The image could not be loaded. Try again when connected."));
     }, 60000);
@@ -306,7 +307,7 @@ window.PermitextNativeNotebook = {
     if (command.type === "assetReply") {
       const pending = pendingRequests.get(command.requestID);
       if (!pending) return null;
-      clearTimeout(pending.timeout);
+      if (pending.timeout !== undefined) clearTimeout(pending.timeout);
       pendingRequests.delete(command.requestID);
       command.error ? pending.reject(new Error(command.error)) : pending.resolve(command.value);
       return null;

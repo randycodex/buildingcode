@@ -241,11 +241,21 @@ await assert.rejects(dispatch({ type: "reference", reference: {} }), /read-only/
 await assert.rejects(dispatch({ type: "snapshot", session: "another-account" }), /another note/);
 await dispatch({ type: "readOnly", readOnly: false });
 
+const scheduledAssetTimeouts = [];
+context.setTimeout = (callback, delay) => {
+  scheduledAssetTimeouts.push(delay);
+  return setTimeout(callback, delay);
+};
+const beforeAsset = await dispatch({ type: "snapshot" });
 const asset = options.resolveFileUrl("permitext-notebook-asset:asset1");
 const assetRequest = messages.at(-1);
 assert.equal(assetRequest.type, "asset");
+assert.deepEqual(scheduledAssetTimeouts, [], "an offline image read must stay pending until iOS reconnects");
+assert.equal((await dispatch({ type: "snapshot" })).revision, beforeAsset.revision, "pending assets do not block editing");
 await dispatch({ type: "assetReply", requestID: assetRequest.requestID, value: "data:image/png;base64,eA==" });
 assert.equal(await asset, "data:image/png;base64,eA==");
+assert.deepEqual(structuredClone(await dispatch({ type: "snapshot" })), structuredClone(beforeAsset), "loading an image must not change the saved note or selection");
+context.setTimeout = setTimeout;
 const beforeReplace = messages.filter(message => message.type === "change").length;
 const revisionBeforeRefresh = (await dispatch({ type: "snapshot" })).revision;
 const queuedRefresh = dispatch({ type: "replace", document, expectedRevision: revisionBeforeRefresh });
