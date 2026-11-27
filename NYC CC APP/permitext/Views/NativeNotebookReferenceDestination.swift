@@ -259,7 +259,6 @@ struct LinkedChapterReaderDestination: View {
     @State private var fallbackLibrary: CodeLibraryViewModel?
     @State private var accountPresentationID = UUID()
     @State private var showsSavedText = false
-    @State private var showsComments = false
     @State private var rememberedSectionID: Int64?
     @State private var rememberedBlockID: String?
     @State private var rememberedViewport: NativeReaderViewportPosition?
@@ -319,6 +318,7 @@ struct LinkedChapterReaderDestination: View {
         let library = prepared.library
         let occurrences = evidenceFolderID.flatMap { library.readerEvidence[sectionID]?[$0]?.occurrences } ?? [:]
         let linkedPassage = isWholeSection || passages.isEmpty ? nil : LinkedReaderPassage(passages: passages, occurrences: occurrences)
+        let savedTextTitle = isWholeSection ? "Saved section" : "Saved passage"
         return readerSession(library) {
             ChapterHTMLReaderView(chapter: prepared.chapter, initialSection: prepared.section,
                 rememberedNativeSectionID: $rememberedSectionID, rememberedNativeBlockID: $rememberedBlockID,
@@ -326,53 +326,33 @@ struct LinkedChapterReaderDestination: View {
                 rememberedScrollOffset: $rememberedScrollOffset, preparedNativeOpening: prepared.nativeOpening,
                 linkedPassage: linkedPassage)
                 .toolbar {
-                    if !passages.isEmpty || library.hasCapability(.notes) {
+                    if !passages.isEmpty {
                         ToolbarItem(placement: .topBarTrailing) {
-                            Menu {
-                                if !passages.isEmpty {
-                                    Button(isWholeSection ? "Saved section" : "Saved passage", systemImage: "quote.bubble") {
-                                        showsSavedText = true
-                                    }
-                                }
-                                if library.hasCapability(.notes) {
-                                    Button("Comments", systemImage: "text.bubble") { showsComments = true }
-                                }
-                            } label: {
-                                Image(systemName: "ellipsis")
-                            }
-                            .accessibilityLabel("Passage options")
+                            Button(savedTextTitle, systemImage: "quote.opening") { showsSavedText = true }
+                                .labelStyle(.iconOnly)
                         }
                     }
                 }
                 .sheet(isPresented: $showsSavedText) {
-                    passageSheet(isWholeSection ? "Saved section" : "Saved passage", isPresented: $showsSavedText) {
-                        ForEach(Array(passages.enumerated()), id: \.offset) { _, passage in
-                            Text(passage.exact).textSelection(.enabled)
+                    NavigationStack {
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 12) {
+                                ForEach(Array(passages.enumerated()), id: \.offset) { _, passage in
+                                    Text(passage.exact).textSelection(.enabled)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                        }
+                        .navigationTitle(savedTextTitle)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) { Button("Done") { showsSavedText = false } }
                         }
                     }
-                }
-                .sheet(isPresented: $showsComments) {
-                    passageSheet("Comments", isPresented: $showsComments) {
-                        ReaderPassageCommentFields(sectionID: sectionID)
-                    }
+                    .presentationDetents([.medium, .large])
                 }
         }
-    }
-
-    private func passageSheet<Content: View>(_ title: String, isPresented: Binding<Bool>, @ViewBuilder content: () -> Content) -> some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12, content: content)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-            }
-            .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) { Button("Done") { isPresented.wrappedValue = false } }
-            }
-        }
-        .presentationDetents([.medium, .large])
     }
 
     private func readerSession<Content: View>(_ library: CodeLibraryViewModel, @ViewBuilder content: () -> Content) -> some View {

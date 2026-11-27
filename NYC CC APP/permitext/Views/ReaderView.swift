@@ -180,13 +180,6 @@ struct ReaderView: View {
                             FigureListSection(title: "Practice Diagrams", figures: detail.customDiagrams)
                         }
 
-                        if library.hasCapability(.notes) {
-                            VStack(alignment: .leading, spacing: 12) {
-                                CodeHairline().padding(.bottom, 4)
-                                Text("Comments").font(.headline)
-                                ReaderPassageCommentFields(sectionID: sectionID)
-                            }
-                        }
                         if isBookmarked && library.hasCapability(.projects) {
                             CodeHairline().padding(.top, 2)
                             projectsEditor
@@ -879,93 +872,3 @@ private struct FigureImageView: View {
     .preferredColorScheme(.light)
 }
 #endif
-
-struct ReaderPassageCommentFields: View {
-    let sectionID: Int64
-    @EnvironmentObject private var library: CodeLibraryViewModel
-
-    var body: some View {
-        PassageCommentEditor(sectionID: sectionID, blockID: "", label: "")
-        ForEach(library.noteBlockIDs(sectionID: sectionID).filter { !$0.isEmpty }, id: \.self) { blockID in
-            PassageCommentEditor(sectionID: sectionID, blockID: blockID, label: "Passage note")
-        }
-    }
-}
-
-/// Uses the same section/block annotation identity as web Detail and the Reader.
-private struct PassageCommentEditor: View {
-    let sectionID: Int64
-    let blockID: String
-    let label: String
-    @EnvironmentObject private var library: CodeLibraryViewModel
-    @State private var bodyText = ""
-    @State private var failure: String?
-    @State private var addedProject: CodeFolder?
-    @State private var addedSession: UUID?
-    @State private var previousComment = ""
-    @State private var fieldGeneration = 0
-    @FocusState private var focused: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if !label.isEmpty { Text(label).font(.caption).foregroundStyle(.secondary) }
-            TextField("Add a comment", text: $bodyText, axis: .vertical)
-                .lineLimit(1...)
-                .focused($focused)
-                .id(fieldGeneration)
-                .padding(14)
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-                .background(Color(uiColor: .systemBackground), in: RoundedRectangle(cornerRadius: 16))
-                .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color.primary.opacity(0.08)))
-                .accessibilityLabel(label.isEmpty ? "Comments" : label)
-                .accessibilityIdentifier("passage-comment-" + blockID)
-                .onChange(of: bodyText) { oldValue, value in
-                    guard focused else { return }
-                    let destination = library.readerSaveDestinationProject
-                    let wasSaved = library.isSavedToReaderDestination(sectionID: sectionID)
-                    switch library.saveNote(sectionID: sectionID, blockID: blockID, body: value) {
-                    case .saved:
-                        failure = nil
-                        if !wasSaved, library.isSavedToReaderDestination(sectionID: sectionID) {
-                            addedProject = destination
-                            addedSession = library.privateSessionID
-                            previousComment = oldValue
-                        }
-                    case .failed(_, let message): failure = message
-                    }
-                }
-            if let project = addedProject, addedSession == library.privateSessionID,
-               library.readerSaveDestinationProject?.clientID == project.clientID,
-               library.isSavedToReaderDestination(sectionID: sectionID) {
-                Text("Passage added to Evidence in \(project.name).")
-                    .font(.footnote)
-                Button("Undo") {
-                    focused = false
-                    switch library.saveNote(sectionID: sectionID, blockID: blockID, body: previousComment) {
-                    case .failed(_, let message):
-                        failure = message
-                    case .saved:
-                        // Replace the native editing buffer, including any marked text.
-                        bodyText = previousComment
-                        fieldGeneration += 1
-                        failure = nil
-                        library.removeSection(sectionID, fromFolder: project.id)
-                        if !library.isSavedToReaderDestination(sectionID: sectionID) { addedProject = nil }
-                        else { failure = library.statusMessage }
-                    }
-                }
-                .accessibilityLabel("Undo comment and remove passage from project evidence")
-            }
-            if let failure { Text(failure).font(.caption).foregroundStyle(.red) }
-        }
-        .onAppear { refresh() }
-        .onChange(of: sectionID) { _, _ in addedProject = nil; refresh() }
-        .onChange(of: blockID) { _, _ in addedProject = nil; refresh() }
-        .onChange(of: library.bookmarkRevision) { _, _ in refresh() }
-    }
-
-    private func refresh() {
-        guard !focused, failure == nil else { return }
-        bodyText = library.noteBody(sectionID: sectionID, blockID: blockID)
-    }
-}

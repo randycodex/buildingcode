@@ -1937,6 +1937,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let edition = app.staticTexts.matching(NSPredicate(format:
             "label CONTAINS[c] %@ AND label CONTAINS %@", "Building Code", "2022")).firstMatch
         XCTAssertTrue(edition.waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["Comments"].exists)
+        XCTAssertFalse(app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH %@", "passage-comment-")).firstMatch.exists)
         close.tap()
         let returned = NSPredicate { _, _ in
             !close.exists && field.exists && field.isHittable && field.value as? String == section
@@ -2343,6 +2345,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let quotation = app.textViews.matching(NSPredicate(format: "label CONTAINS %@ AND value CONTAINS %@",
             "alteration, movement, addition, replacement, repair", "Saved text")).firstMatch
         XCTAssertTrue(quotation.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
+        XCTAssertFalse(app.buttons["Comments"].exists)
         app.navigationBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(editor.waitForExistence(timeout: 10), app.debugDescription)
         XCTAssertEqual(nativeNotebookBodyValue(editor), original)
@@ -3516,20 +3519,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 20), app.debugDescription)
         let scope = app.textViews.matching(NSPredicate(format: "label CONTAINS %@", "The provisions of this code shall apply")).firstMatch
         XCTAssertTrue(scope.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
-        XCTAssertFalse(app.textFields["Add a comment"].exists)
-        let options = app.buttons["Passage options"]
-        XCTAssertTrue(options.isHittable, app.debugDescription)
-        options.tap()
-        XCTAssertTrue(app.buttons["Comments"].waitForExistence(timeout: 5))
-        app.buttons["Comments"].tap()
-        XCTAssertTrue(app.navigationBars["Comments"].waitForExistence(timeout: 5))
-        app.buttons["Done"].tap()
+        XCTAssertFalse(app.buttons["Comments"].exists)
+        XCTAssertFalse(app.buttons["Passage options"].exists)
         app.buttons["main-tab-reader"].tap()
         XCTAssertTrue(passage.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
         XCTAssertEqual(passage.frame.minY, originalY, accuracy: 5)
 
         app.buttons["main-tab-saved"].tap()
-        XCTAssertTrue(options.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
+        XCTAssertTrue(scope.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
         app.navigationBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(app.navigationBars["Evidence"].waitForExistence(timeout: 10))
     }
@@ -5783,7 +5780,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let savedParagraph = app.textViews.matching(NSPredicate(format: "label CONTAINS %@ AND value CONTAINS %@",
                                                               "designation \"BC\".", "Saved text")).firstMatch
         XCTAssertTrue(savedParagraph.wait(for: \.isHittable, toEqual: true, timeout: 10), app.debugDescription)
-        app.buttons["Passage options"].tap()
+        XCTAssertFalse(app.buttons["Passage options"].exists)
         app.buttons["Saved passage"].tap()
         XCTAssertTrue(app.navigationBars["Saved passage"].waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "designation \"BC\".")).firstMatch.exists)

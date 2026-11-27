@@ -186,10 +186,6 @@ struct BookmarksView: View {
         .accessibilityLabel("Open Account")
     }
 
-    private func bookmarkAccentColor(for codeSectionID: Int64?) -> Color {
-        Color(uiColor: library.accentColor(for: codeSectionID))
-    }
-
     private var showsSavedInlineFilters: Bool {
         !availableFilterSections.isEmpty
     }
@@ -924,24 +920,11 @@ private var filteredSavedEmptyState: some View {
     }
 
     private func bookmarkRow(_ bookmark: BookmarkedSection) -> some View {
-        let bookmarkAccent = bookmarkAccentColor(for: bookmark.codeSectionID)
-
-        return HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
-                    Text(bookmark.sectionNumber)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
-
-                    if bookmark.hasNote {
-                        Image(systemName: "note.text")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 16, height: 16)
-                            .accessibilityLabel("Has note")
-                    }
-
-                }
+                Text(bookmark.sectionNumber)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
 
                 Text(bookmark.evidenceDisplayTitle)
                     .font(.body.weight(.semibold))
@@ -954,14 +937,6 @@ private var filteredSavedEmptyState: some View {
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
                         .lineLimit(3)
-                }
-
-                if bookmark.hasNote {
-                    Text(bookmark.noteBody)
-                        .font(.body)
-                        .foregroundStyle(bookmarkAccent.opacity(0.88))
-                        .multilineTextAlignment(.leading)
-                        .padding(.top, 4)
                 }
 
             }
@@ -1606,7 +1581,6 @@ struct ProjectView: View {
                 bookmark.sectionNumber,
                 bookmark.displayTitle,
                 bookmark.previewText,
-                bookmark.noteBody,
                 bookmark.chapterTitle,
                 bookmark.codeSectionName
             ].contains { $0.lowercased().contains(query) }
@@ -2590,16 +2564,9 @@ struct ProjectView: View {
             : Color(uiColor: CodeSectionThemeProfile(codeSectionName: bookmark.codeSectionName).accentColor)
 
         return VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 8) {
-                Text(bookmark.sectionNumber)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                if bookmark.hasNote {
-                    Image(systemName: "note.text")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                }
-            }
+            Text(bookmark.sectionNumber)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
             Text(bookmark.evidenceDisplayTitle)
                 .font(.body.weight(.semibold))
                 .foregroundStyle(.primary)
@@ -2619,12 +2586,6 @@ struct ProjectView: View {
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .lineLimit(3)
-            }
-            if bookmark.hasNote {
-                Text(bookmark.noteBody)
-                    .font(.body)
-                    .foregroundStyle(bookmarkAccent.opacity(0.88))
-                    .padding(.top, 4)
             }
         }
         .multilineTextAlignment(.leading)
