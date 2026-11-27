@@ -98,12 +98,43 @@ try {
     else assert.equal(response.status, 200);
   }
   assert.equal((await request("/notebook/cards/get", {projectID, cardID: clockedID})).json.card.title, simultaneous[0].title);
+
+  const bodyDocument = text => ({ ...document, document: [
+    { type: "paragraph", content: [{ type: "text", text, styles: {} }] },
+    ...document.document
+  ] });
+  const bodyDraft = { ...draft, title: "Cross-device body edit", document: bodyDocument("Initial text"),
+    clientMutationID: "body-create", editedAtMS };
+  const bodyNote = await request("/notebook/cards/save", bodyDraft);
+  assert.equal(bodyNote.status, 201);
+  const bodyEdit = (clientMutationID, text, editOffset) => ({ ...bodyDraft, cardID: bodyNote.json.card.id,
+    expectedVersion: bodyNote.json.card.version, clientMutationID, document: bodyDocument(text),
+    editedAtMS: editedAtMS + editOffset });
+  const offlinePhone = bodyEdit("offline-phone-body", "Older iPhone body text", 100);
+  const onlineWeb = bodyEdit("online-web-body", "Newer web body text", 200);
+  const webSave = await request("/notebook/cards/save", onlineWeb);
+  assert.equal(webSave.status, 200);
+  const savedWebDocument = webSave.json.card.document;
+  assert.equal(savedWebDocument.document[0].content[0].text, "Newer web body text");
+  assert.deepEqual(savedWebDocument.document.slice(1), bodyNote.json.card.document.document.slice(1));
+  const phoneReconnect = await request("/notebook/cards/save", offlinePhone);
+  assert.equal(phoneReconnect.status, 200);
+  assert.equal(phoneReconnect.json.superseded, true);
+  assert.equal(phoneReconnect.json.card.version, webSave.json.card.version);
+  assert.deepEqual(phoneReconnect.json.card.document, savedWebDocument,
+    "The reconnecting iPhone receives the newer web body on its first upload of the older edit.");
+  const bodyRead = await request("/notebook/cards/get", { projectID, cardID: bodyNote.json.card.id });
+  assert.equal(bodyRead.status, 200);
+  assert.equal(bodyRead.json.card.version, webSave.json.card.version);
+  assert.deepEqual(bodyRead.json.card.document, savedWebDocument,
+    "Reading the Note after the iPhone upload still returns the web body and its existing reference.");
+
   const foreign = structuredClone(document);
   foreign.document[0].content[0].props.referenceID = "foreign-answer";
   const rejected = await request("/notebook/cards/save", { ...draft, clientMutationID: "foreign-reference", document: foreign });
   assert.equal(rejected.status, 400);
   assert.match(rejected.json.error, /reference is unavailable/);
-  console.log("Pending Note HTTP passed: full Research question, default title, save/read round-trip, immutable retry identity and owner isolation; no provider calls.");
+  console.log("Pending Note HTTP passed: full Research question, default title, immutable retry identity, owner isolation, and a first delayed iPhone body upload after a newer web edit; no provider calls.");
 } finally {
   globalThis.fetch = originalFetch;
   server.closeAllConnections();
