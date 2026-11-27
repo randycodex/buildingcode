@@ -18,7 +18,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261127-note-open-sync-v2717";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261127-evidence-sync-v2718";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -180,7 +180,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261127-note-open-sync-v2717";
+} from "./offline-storage.js?v=20261127-evidence-sync-v2718";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -673,6 +673,8 @@ let syncRetryTimer = null;
 let foregroundSyncTimer = null;
 let foregroundSyncLeaderTimer = null;
 let foregroundSyncPromise = null;
+let visibleEvidenceSyncTimer = null;
+let visibleEvidenceSyncScope = null;
 let serverReachable = navigator.onLine !== false;
 let foregroundSyncLastActivityAt = Date.now();
 let foregroundSyncLastFullPullAt = 0;
@@ -15516,6 +15518,98 @@ function canRunForegroundSync() {
     navigator.onLine &&
     document.visibilityState === "visible"
   );
+}
+
+function visibleEvidenceSyncPanels() {
+  return Array.from(track.querySelectorAll(":scope > .saved-panel, :scope > .reader-panel"))
+    .filter(panel => !panel.hidden && !panel.classList.contains("is-collapsed") &&
+      !panel.classList.contains("is-workflow-hidden") && readerPrivateContentAllowed(panel));
+}
+
+function projectEvidenceSyncSnapshot(project) {
+  const summary = currentContentSummary();
+  const links = summary.projectSections.filter(link => projectSectionBelongsToProject(link, project));
+  const keys = new Set(links.map(link => visibleSyncedTargetKey({...link, blockID: ""})));
+  const belongs = item => keys.has(visibleSyncedTargetKey({...item, blockID: ""}));
+  return JSON.stringify([links, summary.savedItems.filter(belongs), summary.annotations.filter(belongs)]);
+}
+
+async function checkVisibleEvidenceSync(scope, shouldApply) {
+  const account = activeAccount();
+  const content = syncedContent;
+  const baseline = content?.status === "connected" && content.userID === account.userID && Number.isSafeInteger(content.latestEventID);
+  const checkpoint = baseline ? await postJSON("/sync/checkpoint", {
+    auth: {accountUserID: account.userID},
+    sinceEventID: content.latestEventID,
+    contentMapVersion: content.contentMapVersion,
+    entitlementFingerprint: content.entitlementFingerprint
+  }, {token: account.sessionToken}) : null;
+  if (!shouldApply()) return;
+  if (syncCheckpointRequiresFullPull({checkpoint,
+    latestEventID: content?.latestEventID, contentMapVersion: content?.contentMapVersion,
+    entitlementFingerprint: content?.entitlementFingerprint, maximumStalenessMs: Infinity})) {
+    await loadSyncedContent();
+  }
+  if (!shouldApply() || syncedContent?.status !== "connected" || syncedContent.userID !== account.userID) return;
+  const verifiedContent = syncedContent;
+  if (scope.content === verifiedContent) return;
+  const project = workspaceProject();
+  if (!project || projectDetailKey(project) !== scope.projectID) return;
+  const snapshot = projectEvidenceSyncSnapshot(project);
+  if (scope.snapshot === snapshot) {
+    scope.content = verifiedContent;
+    return;
+  }
+
+  const savedPanels = visibleEvidenceSyncPanels().filter(panel => panel.classList.contains("saved-panel"));
+  const canRefresh = () => shouldApply() && !document.querySelector(".saved-evidence-menu:not([hidden])") &&
+    savedPanels.every(panel => !workspacePaneHasFocusedEditor(panel.dataset.paneId));
+  if (!canRefresh()) return;
+  const refreshed = await Promise.all(savedPanels.map(panel => refreshSavedPanelInPlace(panel.dataset.paneId, {
+    reconcileProjectStudio: false, preserveProjectChrome: true, reuseVerifiedSync: true, shouldApply: canRefresh
+  })));
+  if (!canRefresh() || refreshed.some(result => !result)) return;
+  refreshVisibleSyncedDerivedState();
+  scope.snapshot = snapshot;
+  scope.content = verifiedContent;
+}
+
+function scheduleVisibleEvidenceSync(immediate = false) {
+  const project = canRunForegroundSync() && workspacePrivatePresentationAllowed() && hasCapability("saved-work") &&
+    visibleEvidenceSyncPanels().length ? workspaceProject() : null;
+  if (!project) {
+    window.clearTimeout(visibleEvidenceSyncTimer);
+    visibleEvidenceSyncTimer = null;
+    if (visibleEvidenceSyncScope) visibleEvidenceSyncScope.paused = true;
+    return;
+  }
+  const projectID = projectDetailKey(project);
+  const previous = visibleEvidenceSyncScope;
+  const newScope = !previous || previous.workspaceID !== activeWorkspaceID || previous.projectID !== projectID ||
+    !isCurrentAccountRequest(previous.identity);
+  if (newScope) {
+    visibleEvidenceSyncScope = {identity: captureAccountRequest(), workspaceID: activeWorkspaceID, projectID,
+      content: syncedContent, snapshot: projectEvidenceSyncSnapshot(project), checking: false};
+  }
+  const scope = visibleEvidenceSyncScope;
+  const checkNow = newScope || scope.paused || immediate;
+  scope.paused = false;
+  if (scope.checking || (visibleEvidenceSyncTimer !== null && !checkNow)) return;
+  window.clearTimeout(visibleEvidenceSyncTimer);
+  visibleEvidenceSyncTimer = window.setTimeout(async () => {
+    visibleEvidenceSyncTimer = null;
+    const shouldApply = () => visibleEvidenceSyncScope === scope && activeWorkspaceID === scope.workspaceID &&
+      isCurrentAccountRequest(scope.identity) && canRunForegroundSync() && workspacePrivatePresentationAllowed() && hasCapability("saved-work") &&
+      visibleEvidenceSyncPanels().length > 0;
+    if (!shouldApply()) return;
+    scope.checking = true;
+    try { await checkVisibleEvidenceSync(scope, shouldApply); }
+    catch { /* Keep the last rendered Evidence and retry on the next check. */ }
+    finally {
+      scope.checking = false;
+      if (visibleEvidenceSyncScope === scope) scheduleVisibleEvidenceSync();
+    }
+  }, checkNow ? 0 : 6000);
 }
 
 function markForegroundSyncActivity() {
@@ -53650,6 +53744,7 @@ async function start() {
     serverReachable = true;
     updateConnectionStatus();
     startForegroundSyncLoop({ immediate: true });
+    scheduleVisibleEvidenceSync(true);
     void flushCodeQuestionOutbox();
     void flushPendingNotebookImages();
     refreshOpenProjectCalculations();
@@ -53661,8 +53756,10 @@ async function start() {
     serverReachable = false;
     updateConnectionStatus();
     stopForegroundSyncLoop();
+    scheduleVisibleEvidenceSync();
   });
   document.addEventListener("visibilitychange", () => {
+    scheduleVisibleEvidenceSync(document.visibilityState === "visible");
     if (document.visibilityState !== "visible") {
       flushSearchQueryPersistence();
       flushResearchDraftPersistence();
@@ -53683,6 +53780,7 @@ async function start() {
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
   track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   track.addEventListener("permitext:workspace-layout-change", () => syncResearchColumnLayout());
+  track.addEventListener("permitext:workspace-layout-change", () => scheduleVisibleEvidenceSync());
   bindHorizontalWheelScroll(track);
   if (detachedProjectWindow) {
     if (!detachedProject) throw new Error("This detached Workboard no longer has a project session.");

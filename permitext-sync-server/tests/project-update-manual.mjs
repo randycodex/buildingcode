@@ -78,6 +78,69 @@ for(const changed of [false,true]) {
  assert.equal(result.refreshes.length,1);assert.equal(projectUpdateNotice(stored,'p').domains.artifacts.version,3);
 }
 
+// The visible Evidence/Reader check uses the ordinary cursor pull and refreshes
+// only Evidence consumers. Other Project views retain their manual update policy.
+{
+ const content = {status:'connected',userID:'u',latestEventID:7,contentMapVersion:9,entitlementFingerprint:'pro'};
+ const project = {id:'p'};
+ const saved = {hidden:false, dataset:{paneId:'saved'}, classList:{contains:name=>name==='saved-panel'}};
+ const reader = {hidden:false, dataset:{paneId:'reader'}, classList:{contains:name=>name==='reader-panel'}};
+ const evidence = {id:'link',projectID:'p',sectionID:101,selectedExcerpts:['Exact passage']};
+ let checkpoint, focused = false, nextSummary, allowResponse;
+ let summary = {projectSections:[evidence],savedItems:[],annotations:[]};
+ const calls = [], timers = new Map();
+ const c = vm.createContext({visibleEvidenceSyncScope:null,visibleEvidenceSyncTimer:null,
+  activeWorkspaceID:'w',accountGeneration:1,syncedContent:content,
+  workspaceProject:()=>project,projectDetailKey:item=>item.id,
+  track:{querySelectorAll:()=>[saved,reader]}, readerPrivateContentAllowed:()=>true,
+  workspacePrivatePresentationAllowed:()=>true,canRunForegroundSync:()=>true,hasCapability:()=>true,
+  activeAccount:()=>({userID:'u',sessionToken:'token'}),
+  captureAccountRequest:()=>c.accountGeneration,isCurrentAccountRequest:identity=>identity===c.accountGeneration,
+  document:{querySelector:()=>null}, workspacePaneHasFocusedEditor:()=>focused,
+  window:{clearTimeout:id=>timers.delete(id),setTimeout(fn,delay){const id=Symbol();timers.set(id,{fn,delay});return id;}},
+  currentContentSummary:()=>summary, projectSectionBelongsToProject:(item,target)=>item.projectID===target.id,
+  visibleSyncedTargetKey:item=>String(item.sectionID),syncCheckpointRequiresFullPull,
+  async postJSON(path,body){
+   assert.equal(path,'/sync/checkpoint'); assert.equal(body.sinceEventID,c.syncedContent.latestEventID);
+   calls.push('checkpoint'); if (allowResponse) await allowResponse; return checkpoint;
+  },
+  async loadSyncedContent(){calls.push('pull');summary=nextSummary;c.syncedContent={...content,latestEventID:checkpoint.latestEventID};},
+  async refreshSavedPanelInPlace(id,options){
+   assert.equal(id,'saved'); assert.equal(options.reuseVerifiedSync,true); assert.equal(options.shouldApply(),true);
+   calls.push('evidence'); return true;
+  },
+  refreshVisibleSyncedDerivedState(){calls.push('reader');}
+ });
+ vm.runInContext(['visibleEvidenceSyncPanels','projectEvidenceSyncSnapshot','checkVisibleEvidenceSync','scheduleVisibleEvidenceSync'].map(actual).join('\n'),c);
+ const fire = async delay => {
+  assert.equal(timers.size,1);
+  const [id,timer]=timers.entries().next().value; assert.equal(timer.delay,delay);timers.delete(id);
+  await timer.fn();
+ };
+ checkpoint={...content,changed:false}; c.scheduleVisibleEvidenceSync();
+ await fire(0); assert.deepEqual(calls.splice(0),['checkpoint']);
+
+ checkpoint={...content,latestEventID:8,changed:true};
+ nextSummary={...summary,projectSections:[evidence,{...evidence,id:'other',projectID:'other'}]};
+ await fire(6000); assert.deepEqual(calls.splice(0),['checkpoint','pull'],'Unrelated changes do not repaint the visible list');
+
+ checkpoint={...content,latestEventID:9,changed:true};
+ nextSummary={...summary,projectSections:[]}; focused=true;
+ await fire(6000); assert.deepEqual(calls.splice(0),['checkpoint','pull'],'A focused Evidence filter keeps its editor');
+ focused=false; checkpoint={...checkpoint,changed:false};
+ await fire(6000); assert.deepEqual(calls.splice(0),['checkpoint','evidence','reader'],'Removal updates both mounted consumers');
+
+ saved.hidden=true;reader.hidden=true;c.scheduleVisibleEvidenceSync();assert.equal(timers.size,0);
+ saved.hidden=false;c.scheduleVisibleEvidenceSync();
+ checkpoint={...content,latestEventID:10,changed:true}; nextSummary={...summary,projectSections:[evidence]};
+ await fire(0); assert.deepEqual(calls.splice(0),['checkpoint','pull','evidence','reader'],'Reopening checks immediately and publishes Undo');
+
+ let release; allowResponse=new Promise(resolve=>{release=resolve;});
+ const checking=fire(6000); await Promise.resolve(); c.accountGeneration++;
+ release();await checking;
+ assert.deepEqual(calls.splice(0),['checkpoint'],'An old account response cannot pull or paint');
+}
+
 // Repeated lifecycle/mount notifications and cross-tab announcements must never
 // schedule a timer or query remote content. Reconnect can still upload our edits.
 {
