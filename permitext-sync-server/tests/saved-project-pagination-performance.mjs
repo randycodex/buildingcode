@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
+import { mergeReaderExcerptFields } from "../public/reader-evidence-selection.js";
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 function actual(name) {
   const start = source.search(new RegExp(`(?:async )?function ${name}\\(`));
@@ -25,6 +26,8 @@ class Element {
 const project = { id: "project", folderType: "project" };
 const records = Array.from({ length: 1000 }, (_, index) => ({ id: `saved-${index}`, sectionID: index + 1, codeVersion: "2022", chapterNumber: "1", sectionNumber: String(index + 1), title: `Section ${index + 1}` }));
 const summary = { projects: [project], annotations: [], savedItems: records, projectSections: records.map(item => ({ ...item, folderClientID: project.id })) };
+summary.projectSections[0].selectedExcerpts = ['Earlier selection', 'Exact phone selection'];
+summary.projectSections.push({...summary.projectSections[0],folderClientID:'other-project',selectedExcerpts:['Unrelated selection']});
 const elements = new Map();
 const panel = { isConnected: true, querySelector(selector) { if (!elements.has(selector)) elements.set(selector, new Element()); return elements.get(selector); } };
 let hydrated = [], rendered = [], selectionRecords = [], changed;
@@ -38,6 +41,7 @@ const context = vm.createContext({
   renderUnassignedEvidenceNotice: () => new Set(), savedEvidenceKey: item => `${item.codeVersion}:${item.sectionID}:${item.blockID || ""}`,
   projectSectionBelongsToProject: (item, project) => item.folderClientID === project.id,
   syncCodeVersion: value => value,
+  mergeReaderExcerptFields,
   normalizeAnnotationBlockID: value => String(value || "").trim(),
   hydrateSavedColumnItems: async items => {
     hydrated.push(...items.map(item => item.sectionID));
@@ -66,6 +70,8 @@ await context.performSavedPanelHydration(panel, instance, "saved:project");
 assert.equal(rendered.length, 48);
 assert.equal(hydrated.length, 49, "Initial Project page loads only 48 rows plus a has-more sentinel");
 assert.equal(selectionRecords.length, 1000, "Pagination cannot truncate the complete eligible selection collection");
+assert.deepEqual(rendered[0].selectedExcerpts, ['Earlier selection', 'Exact phone selection']);
+assert.equal(rendered[0].projectSavedScope, undefined, 'A project excerpt must not be forced to whole-section scope');
 assert.equal(panel.querySelector(".saved-column-scroll").scrollTop, 123);
 const footer = panel.querySelector(".saved-content").children.at(-1);
 assert.equal(footer.children[1].textContent, "Show more");
@@ -138,8 +144,22 @@ assert.equal(completePage.items.length, 50); assert.equal(completePage.hasMore, 
 // collapsed, keyboard focus still lands on the visible code-group toggle.
 includeCodeToggle = true; collapsedIDs.clear(); instance.folderQuery = "";
 summary.savedItems = records.slice(0, 60);
+summary.projectSections = summary.projectSections.filter(link => link.sectionID <= 60);
 await context.performSavedPanelHydration(panel, instance, "saved:project");
 for (let id = 49; id <= 60; id++) collapsedIDs.add(id);
 expand(); await new Promise(resolve => setImmediate(resolve));
 assert.equal(rendered.length, 60); assert.equal(activeElement.className, "saved-code-toggle");
 console.log("Saved page boundary normalization and final collapsed-page focus fallback passed.");
+
+{
+  const content = vm.createContext({syncCodeVersion: value => value, normalizeAnnotationBlockID: value => value || '',
+    resolveSavedSectionDetail: async () => ({chapter:{}, section:{}}), annotatedBlocksForSection: () => [],
+    sectionPlainText: () => 'Whole provision', savedSectionIsNestedListParagraph: () => false});
+  vm.runInContext(actual('hydrateSavedColumnItems'), content);
+  const item = {sectionID: 1, codeVersion:'2022', selectedExcerpts:['Earlier selection','Exact phone selection']};
+  const [selection, whole] = await content.hydrateSavedColumnItems([item, {...item, selectedExcerpts:[]}]);
+  assert.equal(selection.evidenceScope, 'Passage');
+  assert.equal(selection.previewText, 'Exact phone selection');
+  assert.equal(whole.evidenceScope, 'Whole section');
+  assert.equal(whole.previewText, 'Whole provision');
+}

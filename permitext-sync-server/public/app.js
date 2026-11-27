@@ -18,7 +18,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261127-evidence-sync-v2718";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261127-evidence-excerpts-v2719";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -180,7 +180,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261127-evidence-sync-v2718";
+} from "./offline-storage.js?v=20261127-evidence-excerpts-v2719";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41053,6 +41053,13 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
   const { savedItems } = summary;
   const selectedFolderLinks = (summary.projectSections || []).filter((link) =>
     selectedFolder && projectSectionBelongsToProject(link, selectedFolder));
+  const selectionsByKey = new Map();
+  selectedFolderLinks.forEach(link => {
+    if (!link.selectedExcerpts) return;
+    const key = savedEvidenceKey(link);
+    const selection = mergeReaderExcerptFields(selectionsByKey.get(key), link);
+    if (selection.selectedExcerpts.length) selectionsByKey.set(key, selection);
+  });
   // A project link can be restored independently of the global Saved item.
   // Render the membership even if an older client deleted that global item.
   const projectOnlyItems = new Map();
@@ -41102,13 +41109,15 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
   const folderHydrationItems = selectedFolder && !savedInstance.showAllSaved
     ? combinedItems
         .filter((item) => selectedFolderEvidenceKeys.has(savedEvidenceKey(item)))
-        .map((item) =>
-          item.savedColumnKind === "bookmark" &&
-          !normalizeAnnotationBlockID(item.blockID) &&
-          selectedFolderSectionEvidenceKeys.has(savedEvidenceKey(item))
-          ? { ...item, projectSavedScope: "section" }
-          : item
-        )
+        .map((item) => {
+          const key = savedEvidenceKey(item);
+          const selection = selectionsByKey.get(key);
+          if (selection) return { ...item, ...selection };
+          return item.savedColumnKind === "bookmark" &&
+            !normalizeAnnotationBlockID(item.blockID) && selectedFolderSectionEvidenceKeys.has(key)
+            ? { ...item, projectSavedScope: "section" }
+            : item;
+        })
     : combinedItems;
   // Keep the complete collection for filtering and selection, but load source
   // bodies only for the visible page. A Project may contain thousands of saves.
@@ -42223,6 +42232,7 @@ async function hydrateSavedColumnItems(items = []) {
   };
 
   return Promise.all(items.map(async (item) => {
+    const selectedText = Array.isArray(item.selectedExcerpts) ? item.selectedExcerpts.at(-1) : "";
     try {
       const { chapter, section, detail } = await resolveItemSection(item);
       const blockID = item.projectSavedScope === "section"
@@ -42234,12 +42244,12 @@ async function hydrateSavedColumnItems(items = []) {
             normalizeAnnotationBlockID(candidate?.id || candidate?.tableID || candidate?.imageID) === blockID
           )
         : null;
-      const rawPreview = block?.plainText || block?.text || sectionPlainText(section) || item.previewText || "";
+      const rawPreview = selectedText || block?.plainText || block?.text || sectionPlainText(section) || item.previewText || "";
       const codePrefix = detail.codePrefix || chapter?.codePrefix || item.codePrefix || "BC";
       const chapterID = detail.chapterID || chapter?.id || item.chapterID || "";
       const chapterNumber = chapter?.chapterNumber || detail.chapterNumber || item.chapterNumber || "";
       const savedContentComparisonText = String(rawPreview).replace(/\s+/g, " ").trim();
-      const evidenceScope = !blockID ? "Whole section" : block?.kind === "table" || /<table\b/i.test(block?.html || "")
+      const evidenceScope = selectedText ? "Passage" : !blockID ? "Whole section" : block?.kind === "table" || /<table\b/i.test(block?.html || "")
         ? "Table" : block?.kind === "image" || /<img\b/i.test(block?.html || "") ? "Figure" : "Passage";
       return {
         ...item,
@@ -42256,6 +42266,8 @@ async function hydrateSavedColumnItems(items = []) {
         previewText: savedContentComparisonText.slice(0, 240)
       };
     } catch {
+      if (selectedText) return { ...item, evidenceScope: "Passage", savedContentComparisonText: selectedText,
+        previewText: selectedText.replace(/\s+/g, " ").trim().slice(0, 240) };
       return { ...item, previewText: String(item.previewText || "").replace(/\s+/g, " ").trim().slice(0, 240) };
     }
   }));
@@ -42546,19 +42558,21 @@ async function addSavedEvidenceToNotebook(anchor, item, projectID = "") {
   const { chapter, section } = await resolveSavedSectionDetail(detail);
   if (!current()) return;
   if (!section || !sectionRecordMatchesRequestedEdition(detail, section)) throw new Error("This saved passage's exact code edition is unavailable.");
+  const source = {
+    codeVersion: detail.codeVersion, codePrefix: detail.codePrefix || section.codePrefix || "BC",
+    sectionID: section.sectionID || section.id, sectionNumber: section.sectionNumber || detail.sectionNumber,
+    title: section.title || detail.title, chapterID: chapter?.id || detail.chapterID || "",
+    chapterNumber: chapter?.chapterNumber || detail.chapterNumber || "", blockID
+  };
+  const selectedText = Array.isArray(item.selectedExcerpts) ? item.selectedExcerpts.at(-1) : "";
+  if (selectedText) return addPassageToNotebook(anchor, source, selectedText);
   const blocks = blockID
     ? annotatedBlocksForSection(section).filter(block => normalizeAnnotationBlockID(block.id || block.tableID || block.imageID) === blockID)
     : section.blocks || [];
   if (!blocks.length) throw new Error("This saved passage is unavailable. Open its source and try again.");
   const { exact, blocks: sourceBlocks } = captureCodeBlocksForNotebook(blocks);
   if (!String(exact || "").trim()) throw new Error("This saved passage has no text to add to a Note.");
-  await addPassageToNotebook(anchor, {
-    codeVersion: detail.codeVersion, codePrefix: detail.codePrefix || section.codePrefix || "BC",
-    sectionID: section.sectionID || section.id, sectionNumber: section.sectionNumber || detail.sectionNumber,
-    title: section.title || detail.title, chapterID: chapter?.id || detail.chapterID || "",
-    chapterNumber: chapter?.chapterNumber || detail.chapterNumber || "", blockID,
-    ...(!blockID ? { scope: "section" } : {})
-  }, exact, sourceBlocks);
+  await addPassageToNotebook(anchor, blockID ? source : {...source, scope: "section"}, exact, sourceBlocks);
 }
 
 function openSavedEvidenceMenu(row, anchor, menu) {
@@ -43490,7 +43504,9 @@ async function openSavedItemInReader(item, savedPaneID, { forceNewReader = false
 
 async function startFocusedResearchFromSavedItem(item, projectID = "") {
   const sectionID = String(item?.sectionID || item?.id || "").trim();
-  const selectedText = String(item?.selectedText || item?.savedContentComparisonText || item?.previewText || item?.title || "").trim();
+  const selectedExcerpt = Array.isArray(item?.selectedExcerpts) ? item.selectedExcerpts.at(-1) : "";
+  const selectedText = String(item?.selectedText || selectedExcerpt ||
+    item?.savedContentComparisonText || item?.previewText || item?.title || "").trim();
   if (!sectionID || !selectedText) throw new Error("This saved passage does not have enough source text for Research.");
   // Project evidence rows are projectSection records, not savedItem records.
   // Reader rebinds their exact passage; only real bookmarks carry a savedItem ID.

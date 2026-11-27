@@ -6,7 +6,7 @@ const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const captureHelper=source.slice(source.indexOf('function captureCodeBlocksForNotebook('),source.indexOf('\nasync function addPassageToNotebook('));
 const helper=source.slice(source.indexOf('async function addSavedEvidenceToNotebook('),source.indexOf('\nfunction appendSavedEvidenceRow('));
 const exact='The full saved paragraph, including every condition. '+ 'Preserve the complete historical source. '.repeat(12);
-for(const mode of ['paragraph','section','no-note','missing','edition','workspace','project','account','view','closed','note','mount','acknowledged']) {
+for(const mode of ['paragraph','section','excerpt','no-note','missing','edition','workspace','project','account','view','closed','note','mount','acknowledged']) {
  const calls=[],identity={},nextIdentity={};let finish;
  let project={id:'project'},account=true,target=mode==='no-note'?null:{id:'note',identity};
  const mount={insertionTarget:()=>target};
@@ -25,7 +25,7 @@ for(const mode of ['paragraph','section','no-note','missing','edition','workspac
   notebookBlocksFromSourceElement:()=>[],addPassageToNotebook:async(...args)=>calls.push(args)});
  vm.runInContext(captureHelper+helper,c);
  const pending=c.addSavedEvidenceToNotebook(anchor,{sectionID:'source',codeVersion:'2014',codePrefix:'BC',blockID:mode==='missing'?'missing':'selected',
-  ...(mode==='section'?{scope:'section'}:{})},'project');
+  ...(mode==='section'?{scope:'section'}:mode==='excerpt'?{blockID:'',selectedExcerpts:['Earlier quote','Precise saved excerpt']}:{})},'project');
  if(mode==='workspace')c.activeWorkspaceID='other';
  if(mode==='project')project={id:'other'};
  if(mode==='account')account=false;
@@ -36,8 +36,8 @@ for(const mode of ['paragraph','section','no-note','missing','edition','workspac
  if(mode==='acknowledged')target={id:'new-server-id',identity};
  finish();
  if(['missing','edition'].includes(mode)){await assert.rejects(pending,/unavailable/);assert.equal(calls.length,0);}
- else {await pending;const expected=['paragraph','section','no-note','acknowledged'].includes(mode);assert.equal(calls.length,expected?1:0,mode);
-  if(expected){assert.equal(calls[0][1].codeVersion,'2014');assert.equal(calls[0][1].sectionID,'source');assert.equal(calls[0][1].scope,mode==='section'?'section':undefined);assert.equal(calls[0][2],mode==='section'?`${exact}\nAnother paragraph, not the selection.`:exact);}}
+ else {await pending;const expected=['paragraph','section','excerpt','no-note','acknowledged'].includes(mode);assert.equal(calls.length,expected?1:0,mode);
+  if(expected){assert.equal(calls[0][1].codeVersion,'2014');assert.equal(calls[0][1].sectionID,'source');assert.equal(calls[0][1].scope,mode==='section'?'section':undefined);assert.equal(calls[0][2],mode==='section'?`${exact}\nAnother paragraph, not the selection.`:mode==='excerpt'?'Precise saved excerpt':exact);}}
 }
 
 const nodes=[],calls=[];
