@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { mkdtemp, rm, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { verifyProjectEvidenceRemoval } from "./project-evidence-removal-scenario.mjs";
 const deploymentConfig = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8"));
 assert(deploymentConfig.rewrites.some(route => route.source === "/saved/evidence/delete-batch" && route.destination === "/api/index"), "Production must route batch deletion to the backend");
 const directory = await mkdtemp(join(tmpdir(), "permitext-trash-test-"));
@@ -139,5 +140,10 @@ try {
   await send(link("queued-resave", 8, selected(0)), queuedRemoval);
   assert.deepEqual((await active()).selectedExcerptOccurrences, {[quote]: [0]});
   assert((await send(web)).rejectedMutationIDs.includes("web-link"));
+  await verifyProjectEvidenceRemoval({
+    userID,
+    push: mutations => send(...mutations),
+    pull: async () => (await post("/sync/pull", {auth}, token)).body
+  });
   console.log("Batch delete HTTP passed: 101 items, authenticated isolation, bounds, shared destination, notes, concurrent retries, cascaded workspace deletion, scoped inspect/restore/purge, and repeat-selection sync across aliases and deletion.");
 } finally { await new Promise(resolve=>server.close(resolve)); await rm(directory,{recursive:true,force:true}); }

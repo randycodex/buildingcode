@@ -3216,6 +3216,52 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(try store.bookmarkCount(codeVersion: version), 1)
     }
 
+    func testProjectEvidenceUndoQueuesAfterTheRemovalForTheSameSection() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("project-evidence-queue-\(UUID().uuidString).sqlite")
+        defer { for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: url.path + suffix) } }
+        let store = try UserDataStore(databaseURL: url)
+        let version = UserContentSyncCodeVersion.localNYC2022
+        let folder = try store.createFolder(name: "Project", address: "", description: "", colorHex: CodeFolder.defaultColorHex,
+                                            folderType: .project, codeVersion: version)
+        try store.saveSection(10747, toFolderIDs: [folder], codeVersion: version)
+        try store.saveSection(10452, toFolderIDs: [folder], codeVersion: version)
+        let firstID = UUID().uuidString
+        let lastID = UUID().uuidString
+        try store.removeSection(10747, fromFolder: folder, codeVersion: version, evidenceRemovalID: firstID)
+        let last = try XCTUnwrap(store.removeSection(10452, fromFolder: folder, codeVersion: version, evidenceRemovalID: lastID))
+        try store.restoreSection(10452, toFolder: folder, codeVersion: version, evidence: last, evidenceRemovalID: lastID)
+
+        let engine = UserContentSyncEngine(repository: store)
+        let saves = try engine.claimNextBatch()
+        XCTAssertFalse(saves.isEmpty)
+        XCTAssertTrue(saves.items.allSatisfy { $0.payload.values["evidenceRemovalID"] == nil })
+        for item in saves.items { try engine.markCompleted(item) }
+        let removals = try engine.claimNextBatch()
+        XCTAssertEqual(removals.items.map(\.operationType), [.delete, .delete])
+        XCTAssertEqual(removals.items.compactMap { $0.payload.values["evidenceRemovalID"] }, [firstID, lastID])
+        let firstRemoval = try XCTUnwrap(removals.items.first)
+        let lastRemoval = try XCTUnwrap(removals.items.last)
+        try engine.markCompleted(firstRemoval)
+        try engine.markFailed(lastRemoval, error: URLError(.notConnectedToInternet))
+        XCTAssertTrue(try engine.claimNextBatch().isEmpty, "Undo waits for the failed removal to retry.")
+        try engine.retryFailedItems()
+        let retry = try engine.claimNextBatch()
+        XCTAssertEqual(retry.items.map(\.id), [lastRemoval.id])
+        for item in retry.items { try engine.markCompleted(item) }
+
+        let undo = try XCTUnwrap(try engine.claimNextBatch().items.first)
+        let account = SignedInAccount(appUserID: "apple:evidence-test", appleUserID: "evidence-test",
+                                      displayName: "Evidence", signedInAt: Date())
+        guard case .projectSection(let wire) = try ServerUserContentMutation(syncQueueItem: undo, account: account) else {
+            return XCTFail("Undo must sync a project membership.")
+        }
+        XCTAssertEqual(wire.evidenceRemovalID, lastID)
+        XCTAssertNotNil(wire.evidenceActionAt)
+        XCTAssertNil(wire.deletedAt)
+        XCTAssertEqual(wire.sectionID, 10452)
+        XCTAssertEqual(try store.evidenceReferences(inFolder: folder).map(\.sectionID), [10452])
+    }
+
     func testReplacingFolderMembershipPreservesBookmarkAndRejectsFinalUnlink() throws {
         let databaseURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-folder-replace-\(UUID().uuidString).sqlite")

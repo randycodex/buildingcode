@@ -6741,7 +6741,7 @@ final class CodeLibraryViewModel: ObservableObject {
             var section = removal.section
             do {
                 try userContentRepository.restoreSection(section.id, toFolder: folderID, codeVersion: section.codeVersion,
-                                                         evidence: removal.evidence)
+                                                         evidence: removal.evidence, evidenceRemovalID: removal.id)
             } catch {
                 failed.append(removal)
                 statusMessage = error.localizedDescription
@@ -6769,14 +6769,16 @@ final class CodeLibraryViewModel: ObservableObject {
         var firstError: Error?
 
         for section in sections {
+            let removalID = UUID().uuidString
             do {
                 let evidence = try userContentRepository.removeSection(
                     section.id,
                     fromFolder: folderID,
-                    codeVersion: section.codeVersion
+                    codeVersion: section.codeVersion,
+                    evidenceRemovalID: removalID
                 )
                 removedKeys.insert(ProjectEvidenceSectionKey(section))
-                if let evidence { removed.append(ProjectEvidenceRemoval(section: section, evidence: evidence)) }
+                if let evidence { removed.append(ProjectEvidenceRemoval(id: removalID, section: section, evidence: evidence)) }
             } catch {
                 if firstError == nil {
                     firstError = error
@@ -8259,6 +8261,7 @@ final class CodeLibraryViewModel: ObservableObject {
 }
 
 struct ProjectEvidenceRemoval {
+    let id: String
     let section: BookmarkedSection
     let evidence: ReaderEvidenceText
 }

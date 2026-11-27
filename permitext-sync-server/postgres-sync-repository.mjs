@@ -4,6 +4,7 @@ import { captureTrash, restoreTrash, trashSummary, trashContents, trashBatchForW
 import { freePlanMutationDecision } from "./entitlement-contract.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
 import { mergeProjectSectionSelection } from "./project-section-selections.mjs";
+import { planProjectEvidenceRemovals } from "./project-evidence-removal.mjs";
 
 function safeJSON(value, fallback) {
   if (value === null || value === undefined) return fallback;
@@ -548,6 +549,15 @@ export function createPostgresSyncRepository(sql) {
   }
 
   async function push(userID, mutations, recoveryBatch = null, deleteInput = null, recoveryRemainder = null, recoveryExpected = null) {
+    if (mutations.some(({projectSection}) => projectSection?.evidenceRemovalID)) {
+      for (let attempt = 1; ; attempt++) {
+        try {
+          return await writeBatch(userID, mutations, null, null, null, null);
+        } catch (error) {
+          if (!["22012", "40001"].includes(error?.code) || attempt >= 3) throw error;
+        }
+      }
+    }
     const ids = mutations.flatMap(({ projectSection }) => projectSection && !projectSection.deletedAt ? [projectSection.id] : []);
     if (!ids.length || recoveryBatch || deleteInput) {
       return writeBatch(userID, mutations, recoveryBatch, deleteInput, recoveryRemainder, recoveryExpected);
@@ -577,15 +587,31 @@ export function createPostgresSyncRepository(sql) {
   async function writeBatch(userID, mutations, recoveryBatch, deleteInput, recoveryRemainder, recoveryExpected, selectionGuard = null) {
     let deletePlan = null;
     let cascade = [];
-    const needsRecovery = deleteInput || recoveryBatch || mutations.some(m => m.codeVersionClear || Object.values(m).some(r => r?.deletedAt || (m.annotation && !String(r?.noteBody || "").trim())));
+    const nativeEvidenceRemoval = mutations.some(({projectSection}) => projectSection?.evidenceRemovalID);
+    let acknowledgedEvidenceActions = [];
+    let evidenceActionWrites = [];
+    let evidenceUndoSources = [];
+    const needsRecovery = nativeEvidenceRemoval || deleteInput || recoveryBatch || mutations.some(m => m.codeVersionClear || Object.values(m).some(r => r?.deletedAt || (m.annotation && !String(r?.noteBody || "").trim())));
     let original = [], expectedEvent = 0, captured = null, skipped = 0;
     if (needsRecovery) {
-      const [rows, events] = await sql.transaction([
+      const snapshots = [
         sql`SELECT mutation FROM permitext_user_content_records WHERE user_id = ${userID}`,
         sql`SELECT COALESCE(MAX(event_id),0)::bigint AS latest_event_id FROM permitext_sync_events WHERE user_id = ${userID}`
-      ], {isolationLevel:"RepeatableRead",readOnly:true});
+      ];
+      if (mutations.some(({projectSection}) => projectSection?.evidenceRemovalID && !projectSection.deletedAt)) {
+        snapshots.push(sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} AND expires_at > CURRENT_TIMESTAMP`);
+      }
+      const [rows, events, trashRows = []] = await sql.transaction(snapshots, {isolationLevel:"RepeatableRead",readOnly:true});
       original = rows.map(row => safeJSON(row.mutation,{}));
       expectedEvent = Number(events[0]?.latest_event_id || 0);
+      if (nativeEvidenceRemoval) {
+        const originalMutations = new Set(mutations);
+        const plan = planProjectEvidenceRemovals(userID, original, mutations, trashRows.map(row => safeJSON(row.batch, {})));
+        acknowledgedEvidenceActions = plan.additionalAcceptedIDs;
+        evidenceActionWrites = plan.mutations.filter(mutation => !originalMutations.has(mutation));
+        evidenceUndoSources = plan.usedTrashEntries;
+        mutations = plan.mutations;
+      }
       if (deleteInput) {
         deletePlan = planSavedEvidenceDelete(userID, original, deleteInput);
         mutations = deletePlan.mutations;
@@ -613,6 +639,12 @@ export function createPostgresSyncRepository(sql) {
     }
     if (recoveryBatch) {
       queries.push(sql`SELECT 1 / CASE WHEN EXISTS(SELECT 1 FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${recoveryBatch.id} AND expires_at > CURRENT_TIMESTAMP AND batch = ${JSON.stringify(recoveryExpected || recoveryBatch)}::jsonb) THEN 1 ELSE 0 END AS trash_guard`);
+    }
+    for (const source of evidenceUndoSources) {
+      queries.push(sql`SELECT 1 / CASE WHEN EXISTS(
+        SELECT 1 FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${source.id}
+          AND expires_at > CURRENT_TIMESTAMP AND batch = ${JSON.stringify(source)}::jsonb
+      ) THEN 1 ELSE 0 END AS evidence_undo_guard`);
     }
     const acceptanceIndexes = [];
     const rejectionContextIndexes = [];
@@ -646,9 +678,10 @@ export function createPostgresSyncRepository(sql) {
           JOIN permitext_user_content_records accepted ON accepted.user_id = ${userID} AND accepted.mutation = trigger_mutation
         ) HAVING count(*) > 0 ON CONFLICT(id) DO NOTHING`);
     }
-    if (recoveryBatch || deleteInput || cascade.length) {
+    if (recoveryBatch || deleteInput || cascade.length || evidenceActionWrites.length) {
       // A rejected restore or batch deletion must roll back every write.
-      for (const mutation of standardMutations) queries.push(sql`SELECT 1 / CASE WHEN EXISTS(
+      const guardedWrites = recoveryBatch || deleteInput || cascade.length ? standardMutations : evidenceActionWrites;
+      for (const mutation of guardedWrites) queries.push(sql`SELECT 1 / CASE WHEN EXISTS(
         SELECT 1 FROM permitext_user_content_records WHERE user_id = ${userID}
         AND record_id = ${mutationRecordID(mutation)} AND mutation = ${JSON.stringify(mutation)}::jsonb
       ) THEN 1 ELSE 0 END AS restore_guard`);
@@ -667,7 +700,7 @@ export function createPostgresSyncRepository(sql) {
         if (error?.code !== "40001" || attempt === 3) throw error;
       }
     }
-    const acceptedMutationIDs = [];
+    const acceptedMutationIDs = [...acknowledgedEvidenceActions];
     const rejectedMutationIDs = [];
     const rejectionReasons = {};
     standardMutations.forEach((mutation, index) => {

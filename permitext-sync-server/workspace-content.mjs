@@ -24,6 +24,9 @@ export function workspaceContentState(userID, mutations) {
 // Only retire content whose last real workspace disappears in this operation.
 // Existing unassigned records are preserved; this is not a cleanup migration.
 export function workspaceContentRetirements(userID, existing, incoming) {
+  // "Remove from this project" on iPhone unlinks evidence only. The saved
+  // passage and its notes remain usable, including when Undo restores the link.
+  incoming = incoming.filter(mutation => !mutation.projectSection?.evidenceRemovedBy);
   if (!incoming.some(m => m.project?.deletedAt || m.projectSection?.deletedAt ||
       ['folders', 'bookmarks'].includes(m.codeVersionClear?.values?.scope))) return [];
   const merged = new Map(owned(existing, userID).map(m => {

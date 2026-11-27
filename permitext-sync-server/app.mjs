@@ -136,6 +136,7 @@ import {
 } from "./operational-readiness.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
 import { mergeProjectSectionSelection } from "./project-section-selections.mjs";
+import { planProjectEvidenceRemovals } from "./project-evidence-removal.mjs";
 import { applyNotebookCardMutation, commitPostgresNotebookCardMutation, notebookCreationID, notebookMutationReplay } from "./notebook-persistence.mjs";
 import { normalizedResearchProjectStructuredFacts, researchProjectFactLine, projectFactProjection } from "./project-fact-projection.mjs";
 import {
@@ -1149,7 +1150,9 @@ export function createFileStoreAdapter() {
       return withFileStoreLock(dataPath, async () => {
         const store = await readUnlocked();
         const existing = await canonicalizeMutations(store.mutationsByUserID[userID] || []);
-        const plan = enforceFreePlanMutationBatch(existing, incoming, store.entitlements[userID] || null);
+        const entries = (store.trashByUserID?.[userID] || []).filter(b => Date.parse(b.expiresAt) > Date.now());
+        const removalPlan = planProjectEvidenceRemovals(userID, existing, incoming, entries);
+        const plan = enforceFreePlanMutationBatch(existing, removalPlan.mutations, store.entitlements[userID] || null);
         const initial = mergeMutations(existing, plan.acceptedMutations);
         const submitted = plan.acceptedMutations.filter(m => initial.acceptedMutationIDs.includes(mutationRecordID(m)));
         const cascade = workspaceContentRetirements(userID, existing, submitted);
@@ -1158,14 +1161,14 @@ export function createFileStoreAdapter() {
         const accepted = [...submitted, ...cascade].filter(m => merge.acceptedMutationIDs.includes(mutationRecordID(m)));
         const batch = captureTrash(userID, existing, accepted);
         store.trashByUserID ||= {};
-        const entries = (store.trashByUserID[userID] || []).filter(b => Date.parse(b.expiresAt) > Date.now());
         if (batch && !entries.some(b => b.id === batch.id)) entries.push(batch);
         store.trashByUserID[userID] = entries;
         rememberFileProjectURLNames(store,userID,existing,accepted);
         store.mutationsByUserID[userID] = merge.mutations;
         if (merge.acceptedMutationIDs.length) store.syncRevisionsByUserID[userID] = Number(store.syncRevisionsByUserID[userID] || 0) + 1;
         await writeUnlocked(store);
-        return {...merge,rejectedMutationIDs:[...merge.rejectedMutationIDs,...plan.rejectedMutationIDs],rejectionReasons:plan.rejectionReasons,
+        return {...merge,acceptedMutationIDs:[...merge.acceptedMutationIDs,...removalPlan.additionalAcceptedIDs],
+          rejectedMutationIDs:[...merge.rejectedMutationIDs,...plan.rejectedMutationIDs],rejectionReasons:plan.rejectionReasons,
           latestEventID:Number(store.syncRevisionsByUserID[userID] || 0),entitlement:store.entitlements[userID] || null};
       });
     },
@@ -27556,6 +27559,17 @@ function validateMutation(mutation, userID) {
   }
   if (kind === "codeVersionClear" && !allowedCodeVersionClearScopes.has(String(record.values?.scope || ""))) {
     return validationError("Code-version clear mutations require a supported scope.");
+  }
+  if (kind === "projectSection" && record.evidenceRemovedBy !== undefined) {
+    return validationError("Project evidence recovery fields are managed by the server.");
+  }
+  if (kind === "projectSection" && (record.evidenceRemovalID !== undefined || record.evidenceActionAt !== undefined) &&
+      (typeof record.evidenceRemovalID !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(record.evidenceRemovalID) ||
+       typeof record.evidenceActionAt !== "string" || !Number.isFinite(Date.parse(record.evidenceActionAt)) ||
+       Date.parse(record.evidenceActionAt) > Date.now() + maxSyncFutureClockSkewMilliseconds ||
+       !syncProjectIdentity(record.folderClientID, userID) || record.folderType !== "project" ||
+       record.scope || normalizedBlockID(record.blockID))) {
+    return validationError("Project evidence removal requires an unscoped Project section and a valid removal ID.");
   }
   const updatedAt = mutationUpdatedAt(mutation);
   if (!Number.isFinite(updatedAt)) {

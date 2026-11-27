@@ -906,7 +906,13 @@ struct UserContentSyncEngine {
             return UserContentSyncBatch(items: [])
         }
         try repository.prepareSyncQueueForProcessing(now: Date())
-        let items = try repository.pendingSyncQueueItems(limit: limit)
+        let pending = try repository.nextSyncQueueItems(limit: limit)
+        let startsWithEvidenceAction = pending.first?.payload.values["evidenceRemovalID"] != nil
+        // The server needs to read and update the saved evidence snapshot
+        // atomically. Send these actions apart from ordinary sync mutations.
+        let items = Array(pending.prefix { item in
+            (item.payload.values["evidenceRemovalID"] != nil) == startsWithEvidenceAction
+        })
         try repository.markSyncQueueItemsInFlight(ids: items.map(\.id))
         return UserContentSyncBatch(items: items)
     }

@@ -63,13 +63,14 @@ protocol UserContentRepository {
     func deleteFolder(id: Int64, codeVersion: String) throws
     func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, selectedExcerpts: [String]) throws
     func folderSectionEvidence(sectionID: Int64, folderID: Int64, codeVersion: String) throws -> ReaderEvidenceText?
-    func restoreSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, evidence: ReaderEvidenceText) throws
+    func restoreSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, evidence: ReaderEvidenceText, evidenceRemovalID: String?) throws
     @discardableResult
-    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws -> ReaderEvidenceText?
+    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String, evidenceRemovalID: String?) throws -> ReaderEvidenceText?
     func removeSectionFromAllFolders(sectionID: Int64, codeVersion: String) throws
     func clearAllFolders(codeVersion: String) throws
     func clearAllFolders() throws
     func pendingSyncQueueItems(limit: Int) throws -> [SyncQueueItem]
+    func nextSyncQueueItems(limit: Int) throws -> [SyncQueueItem]
     func failedSyncQueueItems(limit: Int) throws -> [SyncQueueItem]
     func prepareSyncQueueForProcessing(now: Date) throws
     func markSyncQueueItemsInFlight(ids: [Int64]) throws
@@ -84,6 +85,21 @@ protocol UserContentRepository {
     ) throws -> [String: UserContentMergeCandidate]
     func discardQueuedMutation(recordID: String, account: SignedInAccount) throws
     func applyServerUserContentMutation(_ mutation: ServerUserContentMutation) throws
+}
+
+extension UserContentRepository {
+    func nextSyncQueueItems(limit: Int) throws -> [SyncQueueItem] {
+        try pendingSyncQueueItems(limit: limit)
+    }
+
+    func restoreSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, evidence: ReaderEvidenceText) throws {
+        try restoreSection(sectionID, toFolder: folderID, codeVersion: codeVersion, evidence: evidence, evidenceRemovalID: nil)
+    }
+
+    @discardableResult
+    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws -> ReaderEvidenceText? {
+        try removeSection(sectionID, fromFolder: folderID, codeVersion: codeVersion, evidenceRemovalID: nil)
+    }
 }
 
 /// Recovery keeps source identity and memberships, without overwriting newer notes or links.
@@ -1343,12 +1359,27 @@ final class UserDataStore: UserContentRepository {
         try syncQueueItems(state: failedQueueState, limit: limit)
     }
 
-    private func syncQueueItems(state: String, limit: Int) throws -> [SyncQueueItem] {
+    func nextSyncQueueItems(limit: Int) throws -> [SyncQueueItem] {
+        try syncQueueItems(state: pendingQueueState, limit: limit, readyToSend: true)
+    }
+
+    private func syncQueueItems(state: String, limit: Int, readyToSend: Bool = false) throws -> [SyncQueueItem] {
+        // Keep the removal and its Undo in order across failed or interrupted
+        // uploads without blocking unrelated evidence from synchronizing.
+        let evidenceOrder = readyToSend ? """
+          AND (json_extract(candidate.payload_json, '$.values.evidenceRemovalID') IS NULL OR NOT EXISTS (
+            SELECT 1 FROM sync_queue prior
+            WHERE prior.id < candidate.id AND prior.entity_type = 'folderSection' AND prior.state <> '\(syncedQueueState)'
+              AND json_extract(prior.payload_json, '$.folderID') = json_extract(candidate.payload_json, '$.folderID')
+              AND json_extract(prior.payload_json, '$.sectionID') = json_extract(candidate.payload_json, '$.sectionID')
+              AND json_extract(prior.payload_json, '$.codeVersion') = json_extract(candidate.payload_json, '$.codeVersion')
+          ))
+        """ : ""
         let statement = try connection.prepare(
             """
             SELECT id, client_id, entity_type, operation_type, payload_json, state, attempt_count, created_at, updated_at, last_error, mutation_updated_at
-            FROM sync_queue
-            WHERE state = ?
+            FROM sync_queue candidate
+            WHERE state = ? \(evidenceOrder)
             ORDER BY created_at ASC, id ASC
             LIMIT ?;
             """
@@ -2768,7 +2799,7 @@ final class UserDataStore: UserContentRepository {
         try restoreSection(sectionID, toFolder: folderID, codeVersion: codeVersion, evidence: .init(excerpts: selectedExcerpts))
     }
 
-    func restoreSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, evidence: ReaderEvidenceText) throws {
+    func restoreSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, evidence: ReaderEvidenceText, evidenceRemovalID: String?) throws {
         try performTransaction {
             let target = FolderSectionSyncTarget(
                 folderID: folderID,
@@ -2781,7 +2812,8 @@ final class UserDataStore: UserContentRepository {
             saved.excerpts = mergeFolderSectionExcerpts(saved.excerpts, evidence.excerpts)
             saved.offsets.merge(evidence.offsets, uniquingKeysWith: { current, _ in current })
             saved.addOccurrences(evidence.occurrences)
-            try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion, saved: saved, added: evidence)
+            try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion, saved: saved, added: evidence,
+                                    evidenceRemovalID: evidenceRemovalID)
         }
     }
 
@@ -2819,7 +2851,8 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func upsertFolderSection(
-        _ sectionID: Int64, target: FolderSectionSyncTarget, codeVersion: String, saved: ReaderEvidenceText, added: ReaderEvidenceText
+        _ sectionID: Int64, target: FolderSectionSyncTarget, codeVersion: String, saved: ReaderEvidenceText,
+        added: ReaderEvidenceText, evidenceRemovalID: String? = nil
     ) throws {
         let statement = try connection.prepare(
             """
@@ -2864,6 +2897,10 @@ final class UserDataStore: UserContentRepository {
         // Send only this action: a concurrent remote delete/re-save may have
         // invalidated earlier selections still present in our local snapshot.
         var values = ["folderClientID": target.folderClientID, "folderType": target.folderType.rawValue]
+        if let evidenceRemovalID {
+            values["evidenceRemovalID"] = evidenceRemovalID
+            values["evidenceActionAt"] = Date().formatted(Date.ISO8601FormatStyle(includingFractionalSeconds: true))
+        }
         if !added.excerpts.isEmpty {
             values["selectedExcerpts"] = String(decoding: try JSONEncoder().encode(added.excerpts), as: UTF8.self)
         }
@@ -2879,9 +2916,14 @@ final class UserDataStore: UserContentRepository {
     }
 
     @discardableResult
-    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws -> ReaderEvidenceText? {
+    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String, evidenceRemovalID: String?) throws -> ReaderEvidenceText? {
         let folderClientID = try folderClientID(id: folderID, codeVersion: codeVersion)
         let folderType = try folderType(id: folderID, codeVersion: codeVersion)
+        var values = ["folderClientID": folderClientID, "folderType": folderType.rawValue]
+        if let evidenceRemovalID {
+            values["evidenceRemovalID"] = evidenceRemovalID
+            values["evidenceActionAt"] = Date().formatted(Date.ISO8601FormatStyle(includingFractionalSeconds: true))
+        }
         var removed: ReaderEvidenceText?
         try performTransaction {
             removed = try folderSectionEvidence(sectionID: sectionID, folderID: folderID, codeVersion: codeVersion)
@@ -2903,10 +2945,7 @@ final class UserDataStore: UserContentRepository {
                     codeVersion: codeVersion,
                     sectionID: sectionID,
                     folderID: folderID,
-                    values: [
-                        "folderClientID": folderClientID,
-                        "folderType": folderType.rawValue
-                    ]
+                    values: values
                 )
             )
         }

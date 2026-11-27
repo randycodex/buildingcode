@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {createPostgresSyncRepository} from '../postgres-sync-repository.mjs';
+import {verifyProjectEvidenceRemoval} from './project-evidence-removal-scenario.mjs';
 const {PGlite} = await import(process.env.PERMITEXT_TEST_PGLITE_PATH || '@electric-sql/pglite');
 const db = new PGlite();
 const source=await readFile(new URL('../app.mjs',import.meta.url),'utf8');
@@ -115,5 +116,10 @@ assert.deepEqual((await pushLink(competing)).rejectedMutationIDs, [membershipID]
 const fresh = (await repo.pull(user, {})).mutations.find(m => m.projectSection?.id === membershipID).projectSection;
 assert.deepEqual(fresh.selectedExcerptOccurrences, {[quote]: [2]});
 assert.deepEqual(fresh.selectedExcerpts, [quote]);
+await verifyProjectEvidenceRemoval({
+  userID: user,
+  push: mutations => repo.push(user, mutations),
+  pull: () => repo.pull(user, {})
+});
 await db.close();
 console.log('Batch delete PostgreSQL passed: actual SQL 101 items, atomic recovery failure rollback, shared destination preservation, notes, idempotency, typed tables, Trash restore, and cross-device selection merges with concurrent and delayed writes.');

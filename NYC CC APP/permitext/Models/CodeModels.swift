@@ -907,6 +907,8 @@ struct ServerProjectSectionRecord: Codable, Hashable, Sendable {
     var selectedExcerpts: [String]? = nil
     var selectedExcerptOccurrences: [String: [Int]]? = nil
     var selectionResetAt: Date? = nil
+    var evidenceRemovalID: String? = nil
+    var evidenceActionAt: String? = nil
 
     var resolvedFolderType: CodeFolderType {
         folderType ?? .project
@@ -1150,7 +1152,9 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt,
                     selectedExcerpts: ServerProjectSectionRecord.decodeExcerpts(payload.values["selectedExcerpts"]),
-                    selectedExcerptOccurrences: ServerProjectSectionRecord.decodeOccurrences(payload.values["selectedExcerptOccurrences"])
+                    selectedExcerptOccurrences: ServerProjectSectionRecord.decodeOccurrences(payload.values["selectedExcerptOccurrences"]),
+                    evidenceRemovalID: payload.values["evidenceRemovalID"],
+                    evidenceActionAt: payload.values["evidenceActionAt"]
                 )
             )
         case .continuity:

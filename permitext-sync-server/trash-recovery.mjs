@@ -39,7 +39,9 @@ export function captureTrash(userID, existing, accepted, now = new Date()) {
     const projectIDs = kind === 'project' ? [workspaceProjectKey(record, userID)]
       : kind === 'projectSection' ? [workspaceLinkKey(record, userID)]
       : workspaceState.links.filter(link => workspaceEvidenceKey(link) === workspaceEvidenceKey(record)).map(link => workspaceLinkKey(link, userID));
-    records.push({kind, record:original, mode:kind === 'annotation' ? 'note' : 'record', projectIDs: [...new Set(projectIDs.filter(Boolean))]});
+    const evidenceRemovalID = kind === 'projectSection' && changes.find(next => next.evidenceRemovedBy)?.evidenceRemovedBy;
+    records.push({kind, record:original, mode:kind === 'annotation' ? 'note' : 'record',
+      projectIDs: [...new Set(projectIDs.filter(Boolean))], ...(evidenceRemovalID ? { evidenceRemovalID } : {})});
   }
   if (!records.length) return null;
   const id = createHash('sha256').update(JSON.stringify([userID, accepted])).digest('hex');

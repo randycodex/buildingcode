@@ -18,7 +18,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-note-table-resize-v2713";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-project-evidence-sync-v2714";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -180,7 +180,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261126-note-table-resize-v2713";
+} from "./offline-storage.js?v=20261126-project-evidence-sync-v2714";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -40820,7 +40820,16 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
   }
 
   const { savedItems } = summary;
-  const combinedItems = mergeSavedColumnItems(savedItems, annotatedItems);
+  const selectedFolderLinks = (summary.projectSections || []).filter((link) =>
+    selectedFolder && projectSectionBelongsToProject(link, selectedFolder));
+  // A project link can be restored independently of the global Saved item.
+  // Render the membership even if an older client deleted that global item.
+  const projectOnlyItems = new Map();
+  if (selectedFolder && !savedInstance.showAllSaved) {
+    selectedFolderLinks.forEach(link => projectOnlyItems.set(savedEvidenceKey(link), link));
+    savedItems.forEach(item => projectOnlyItems.delete(savedEvidenceKey(item)));
+  }
+  const combinedItems = mergeSavedColumnItems([...savedItems, ...projectOnlyItems.values()], annotatedItems);
   const unassignedSectionIDs = renderUnassignedEvidenceNotice(
     panel,
     savedInstance,
@@ -40843,16 +40852,11 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     return Promise.all(items.map((item) => hydratedItemPromises.get(item)));
   };
   const selectedFolderEvidenceKeys = selectedFolder
-    ? new Set((summary.projectSections || [])
-        .filter((link) => projectSectionBelongsToProject(link, selectedFolder))
-        .map((link) => savedEvidenceKey(link)))
+    ? new Set(selectedFolderLinks.map((link) => savedEvidenceKey(link)))
     : null;
   const selectedFolderSectionEvidenceKeys = selectedFolder
-    ? new Set((summary.projectSections || [])
-        .filter((link) =>
-          projectSectionBelongsToProject(link, selectedFolder) &&
-          !normalizeAnnotationBlockID(link.blockID || link.anchorID || link.contentBlockID)
-        )
+    ? new Set(selectedFolderLinks
+        .filter((link) => !normalizeAnnotationBlockID(link.blockID || link.anchorID || link.contentBlockID))
         .map((link) => savedEvidenceKey(link)))
     : null;
   const projectNamesForItem = (item) => {
