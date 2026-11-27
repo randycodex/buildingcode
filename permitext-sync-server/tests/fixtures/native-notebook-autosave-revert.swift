@@ -47,9 +47,9 @@ final class DraftCache {
  func invalidateProjectDashboardPreview(projectID: String) {}
  func notebookCards(projectID: String) async throws -> ListResponse { ListResponse() }
  func saveNotebookCard(projectID: String, cardID: String?, expectedVersion: Int, title: String,
-  document: NotebookDocument, evidenceLinks: [NotebookEvidenceLink], clientMutationID: String, openQuestions: [NotebookQuestion]? = nil) async throws -> NotebookCard {
+  document: NotebookDocument, evidenceLinks: [NotebookEvidenceLink], clientMutationID: String, openQuestions: [NotebookQuestion]? = nil, editedAtMS: Int64? = nil) async throws -> NotebookCard {
   let attempt = NativeNotebookSaveAttempt(clientMutationID: clientMutationID, cardID: cardID,
-   expectedVersion: expectedVersion, content: .init(title: title, document: document, evidenceLinks: evidenceLinks, openQuestions: openQuestions))
+   expectedVersion: expectedVersion, content: .init(title: title, document: document, evidenceLinks: evidenceLinks, openQuestions: openQuestions), editedAtMS: editedAtMS)
   attempts.append(attempt)
   if !isNetworkAvailable { throw URLError(.notConnectedToInternet) }
   if let rejectionStatus { throw PermitextBackendHTTPError.serverStatus(rejectionStatus, "Temporary failure") }
@@ -93,9 +93,9 @@ final class DraftCache {
   throw URLError(.fileDoesNotExist)
  }
  func saveNotebookCard(projectID: String, cardID: String?, expectedVersion: Int, title: String,
-  document: NotebookDocument, evidenceLinks: [NotebookEvidenceLink], clientMutationID: String, openQuestions: [NotebookQuestion]?) async throws -> NotebookCard {
+  document: NotebookDocument, evidenceLinks: [NotebookEvidenceLink], clientMutationID: String, openQuestions: [NotebookQuestion]?, editedAtMS: Int64? = nil) async throws -> NotebookCard {
   try await library.saveNotebookCard(projectID: projectID, cardID: cardID, expectedVersion: expectedVersion, title: title,
-   document: document, evidenceLinks: evidenceLinks, clientMutationID: clientMutationID, openQuestions: openQuestions)
+   document: document, evidenceLinks: evidenceLinks, clientMutationID: clientMutationID, openQuestions: openQuestions, editedAtMS: editedAtMS)
  }
  // CLOSED_REPLAY_METHOD
 }

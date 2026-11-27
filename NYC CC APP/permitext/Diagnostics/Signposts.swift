@@ -639,6 +639,11 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         )
     }
 
+    func notebookCardVersion(account: SignedInAccount, projectID: String, cardID: String) async throws -> Int {
+        try await transport.notebookCardVersion(NotebookCardGetRequest(
+            auth: authContext(for: account), projectID: projectID, cardID: cardID, versionOnly: true))
+    }
+
     func notebookCard(account: SignedInAccount, projectID: String, cardID: String) async throws -> NotebookCard {
         try await transport.notebookCardGet(
             NotebookCardGetRequest(
@@ -658,7 +663,8 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         document: NotebookDocument,
         evidenceLinks: [NotebookEvidenceLink],
         clientMutationID: String? = nil,
-        openQuestions: [NotebookQuestion]? = nil
+        openQuestions: [NotebookQuestion]? = nil,
+        editedAtMS: Int64? = nil
     ) async throws -> NotebookCard {
         try await transport.notebookCardSave(
             NotebookCardSaveRequest(
@@ -671,7 +677,8 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
                 document: document,
                 evidenceLinks: evidenceLinks,
                 clientMutationID: clientMutationID,
-                openQuestions: openQuestions
+                openQuestions: openQuestions,
+                editedAtMS: editedAtMS
             )
         ).card
     }

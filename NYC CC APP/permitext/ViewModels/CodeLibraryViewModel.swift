@@ -4233,6 +4233,12 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func notebookCardVersion(projectID: String, cardID: String) async throws -> Int {
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.notebookCardVersion(account: account, projectID: projectID, cardID: cardID)
+        }
+    }
+
     func notebookCard(projectID: String, cardID: String) async throws -> NotebookCard {
         try await performPrivateAccountRequest { account in
             try await accountBackendClient.notebookCard(
@@ -4251,7 +4257,8 @@ final class CodeLibraryViewModel: ObservableObject {
         document: NotebookDocument,
         evidenceLinks: [NotebookEvidenceLink],
         clientMutationID: String? = nil,
-        openQuestions: [NotebookQuestion]? = nil
+        openQuestions: [NotebookQuestion]? = nil,
+        editedAtMS: Int64? = nil
     ) async throws -> NotebookCard {
         try await performPrivateAccountRequest { account in
             try await accountBackendClient.saveNotebookCard(
@@ -4263,7 +4270,8 @@ final class CodeLibraryViewModel: ObservableObject {
                 document: document,
                 evidenceLinks: evidenceLinks,
                 clientMutationID: clientMutationID,
-                openQuestions: openQuestions
+                openQuestions: openQuestions,
+                editedAtMS: editedAtMS
             )
         }
     }
@@ -8813,7 +8821,8 @@ extension CodeLibraryViewModel {
                 let content = draft.editableContent
                 let attempt = draft.pendingSave ?? NativeNotebookSaveAttempt(
                     clientMutationID: draft.clientMutationID ?? UUID().uuidString.lowercased(),
-                    cardID: draft.cardID, expectedVersion: draft.version, content: content, preservesServerQuestions: true)
+                    cardID: draft.cardID, expectedVersion: draft.version, content: content, preservesServerQuestions: true,
+                    editedAtMS: draft.editedAt.map { Int64($0.timeIntervalSince1970 * 1000) })
                 draft.pendingSave = attempt
                 try cache.store(draft, accountID: accountID, projectID: projectID, scope: scope)
                 let title = attempt.content.title.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -8821,7 +8830,8 @@ extension CodeLibraryViewModel {
                     projectID: projectID, cardID: attempt.cardID, expectedVersion: attempt.expectedVersion,
                     title: title.isEmpty ? "Untitled Note" : title, document: attempt.content.document,
                     evidenceLinks: attempt.content.evidenceLinks, clientMutationID: attempt.clientMutationID,
-                    openQuestions: attempt.preservesServerQuestions == true ? nil : attempt.content.openQuestions)
+                    openQuestions: attempt.preservesServerQuestions == true ? nil : attempt.content.openQuestions,
+                    editedAtMS: attempt.editedAtMS)
                 guard address.owner == privateRequestIdentity, !Task.isCancelled,
                       try cache.load(NativeNotebookDraft.self, accountID: accountID, projectID: projectID, scope: scope)?.value == draft
                 else { return }

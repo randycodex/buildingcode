@@ -25,7 +25,7 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v2715";
+const shellCacheName = "permitext-pro-shell-v2716";
 const shellAssetVersion = "20261025-workspace-chrome-v1379";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
@@ -107,7 +107,7 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261126-sync-recovery-v2715",
+  "/web/web-client-version.js?v=20261127-note-sync-v2716",
   "/web/web-app-update.js?v=20261119-update-notice-v4",
   "/web/research-delete-controls.js?v=14",
   "/web/assistant-composer-hint.js?v=1",
@@ -134,18 +134,18 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261126-sync-recovery-v2715",
+  "/web/styles.css?v=20261127-note-sync-v2716",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261126-sync-recovery-v2715",
+  "/web/app.js?v=20261127-note-sync-v2716",
   "/web/settings-copy.js?v=20261109-plan-actions-v8",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261126-sync-recovery-v2715",
+  "/web/offline-storage.js?v=20261127-note-sync-v2716",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261111-selective-menus-v3",
@@ -177,7 +177,7 @@ const shellURLs = [
   "/web/profile-preference-menu.js?v=4",
   "/web/report-library.js?v=20261118-report-resize-v17",
   "/web/notebook-note-menu.js?v=20261109-notebook-desk-v1299",
-  "/web/notebook-columns.js?v=4",
+  "/web/notebook-columns.js?v=5",
   "/web/reader-block-window.js?v=11",
   "/web/reader-section-visibility.js?v=4",
   "/web/reader-render-batches.js?v=20261012-reader-batches-v1",
@@ -424,7 +424,7 @@ function draftMatches(record, accountUserID, projectID, cardID) {
   return record?.accountUserID === accountUserID && record.projectID === projectID && record.cardID === (cardID || "");
 }
 
-export async function saveNotebookDraft({ accountUserID, projectID, cardID, title, document, evidenceLinks = [], openQuestions, questionsEditable, baseVersion, cardType, scope, expectedRevision }) {
+export async function saveNotebookDraft({ accountUserID, projectID, cardID, title, document, evidenceLinks = [], openQuestions, questionsEditable, baseVersion, cardType, scope, expectedRevision, updatedAt }) {
   if (!String(accountUserID || "").trim() || !String(projectID || "").trim()) {
     throw new Error("A Notebook draft must belong to an account and Project.");
   }
@@ -458,7 +458,7 @@ export async function saveNotebookDraft({ accountUserID, projectID, cardID, titl
       ...(previous?.recoveryConflict || localConflict ? { recoveryConflict: true,
         acceptedCardID: previous.acceptedCardID, acceptedBaseVersion: previous.acceptedBaseVersion } : {}),
       ...(recoveryCopies.length ? { recoveryCopies } : {}),
-      revision: crypto.randomUUID(), updatedAt: new Date().toISOString()
+      revision: crypto.randomUUID(), updatedAt: updatedAt || new Date().toISOString()
     };
     store.put(record);
     return record;
@@ -559,19 +559,19 @@ export async function retireRejectedNotebookQuestionSave(accountUserID, projectI
   }, "Could not retain the rejected Notebook metadata.", accountUserID);
 }
 
-export async function recordNotebookDraftSaveError(accountUserID, projectID, cardID, revision, message, {rejected = false} = {}) {
+export async function recordNotebookDraftSaveError(accountUserID, projectID, cardID, revision, message, {rejected = false, retryNeedsReview = false} = {}) {
   return withOfflineStore(notebookDraftsStoreName, "readwrite", async store => {
     const key = notebookDraftKey(accountUserID, projectID, cardID);
     const current = await requestResult(store.get(key), "Could not read the pending Notebook save.");
     if (!draftMatches(current, accountUserID, projectID, cardID) || current.pendingSave?.revision !== revision) return current;
     if (!rejected) {
-      const next = {...current,lastError:message}; store.put(next); return next;
+      const next = {...current,lastError:message,retryNeedsReview}; store.put(next); return next;
     }
     // Only a server-confirmed validation rejection can retire a receipt. Keep
     // its exact content in recovery; a timeout must replay the original bytes.
     store.put({...current,key:`${key}:save-recovery:${revision}`,scope:"notebook-save-recovery",rejectedAt:new Date().toISOString()});
     const {pendingSave: _rejected, ...content} = current;
-    const next = {...content,lastError:message,revision:current.revision === revision ? crypto.randomUUID() : current.revision};
+    const next = {...content,lastError:message,retryNeedsReview,revision:current.revision === revision ? crypto.randomUUID() : current.revision};
     store.put(next); return next;
   }, "Could not retain the Notebook save error.", accountUserID);
 }
@@ -651,7 +651,7 @@ export async function rebaseNotebookDraftAfterReview(accountUserID, projectID, c
     const { pendingSave: _pending, recoveryConflict: _conflict,
       acceptedCardID: _acceptedID, acceptedBaseVersion: _acceptedVersion, ...content } = current;
     const next = { ...content, key: nextKey, cardID: currentServerCard.id,
-      baseVersion: currentServerCard.version, revision: crypto.randomUUID(), updatedAt: new Date().toISOString() };
+      lastError: "", retryNeedsReview: false, baseVersion: currentServerCard.version, revision: crypto.randomUUID(), updatedAt: new Date().toISOString() };
     if (key !== nextKey) store.delete(key);
     store.put(next);
     return next;

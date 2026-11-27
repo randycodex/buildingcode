@@ -31,7 +31,8 @@ function element(tag) {
   };
 }
 const context = vm.createContext({
-  state, Number, String, notebookDraftSaveTitle,
+  state, Number, String, notebookDraftSaveTitle, Event, window: new EventTarget(), notebookPendingDraftCount: 1,
+  schedulePendingNotebookRetry() {},
   captureAccountRequest: () => identity,
   requireCurrentAccountRequest: value => {
     if (value.generation !== generation) throw new Error("Account context changed");
@@ -77,7 +78,7 @@ let now = Date.parse("2026-10-14T18:00:00Z"), scheduledAttention = null;
 Object.assign(context, { projectUpdateAutoApplyReady:false, detachedProjectWindow:false, renderProjectUpdateBadge() {}, connectionStatus: badge, activeAccount: () => ({ userID: "owner" }),
   notebookPendingDraftCount: 0, notebookPendingDraftAttentionAt: Infinity, connectionStatusAttentionTimer: null,
   Date: { now: () => now, parse: Date.parse },
-  window: { setTimeout(callback, delay) { scheduledAttention = { callback, delay }; return 1; } },
+  window: Object.assign(context.window, {setTimeout(callback, delay) { scheduledAttention = { callback, delay }; return 1; }}),
   clearTimeout() { scheduledAttention = null; },
   navigator: { onLine: true }, serverReachable: true,
   workspaceProject: () => ({ id: "older-project" }), workspacePrivatePresentationAllowed: () => true,
@@ -163,3 +164,32 @@ releaseDrafts(drafts);
 await stale;
 assert.equal(notice, null, "A delayed draft read must not expose the old account's data after an account switch.");
 console.log("Pending sync details passed: exact Project/item/reason, owner isolation, immutable inspection, blocker classification and stale-account guard.");
+
+// One account timer retries transient saves, backs off while the queue remains
+// pending, and stops as soon as every remaining draft requires user action.
+{
+  let nextTimer = 0, attempts = 0;
+  const timers = new Map(), eligible = {title:"Note", baseVersion:2, scope:"notebook-card"};
+  let queue = [eligible];
+  const retry = vm.createContext({
+    notebookRetryTimer:null, notebookRetryDelay:3000, notebookDraftSaveTitle,
+    canRunForegroundSync:()=>true, isProAccount:()=>true, isCurrentAccountRequest:id=>id===identity,
+    setTimeout(fn, delay) { const id=++nextTimer; timers.set(id,{fn,delay}); return id; },
+    clearTimeout:id=>timers.delete(id),
+    flushPendingNotebookDrafts:async options=>{assert.equal(options.automatic,true); attempts++;},
+    refreshNotebookPendingStatus:async id=>retry.schedulePendingNotebookRetry(queue,id)
+  });
+  vm.runInContext([actual("canRetryNotebookDraft"),actual("schedulePendingNotebookRetry")].join("\n"),retry);
+  retry.schedulePendingNotebookRetry(queue,identity);
+  retry.schedulePendingNotebookRetry(queue,identity);
+  assert.equal(timers.size,1);
+  async function fire(delay) {
+    const [id,timer]=[...timers][0]; assert.equal(timer.delay,delay);
+    timers.delete(id); await timer.fn();
+  }
+  await fire(3000);
+  queue=[{...eligible,retryNeedsReview:true}];
+  await fire(6000);
+  assert.equal(attempts,2);
+  assert.equal(timers.size,0);
+}

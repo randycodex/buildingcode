@@ -858,6 +858,11 @@ struct NotebookCardGetRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let projectID: String
     let cardID: String
+    var versionOnly: Bool? = nil
+}
+
+struct NotebookCardVersionResponse: Decodable {
+    let version: Int
 }
 
 struct NotebookCardSaveRequest: Codable, Hashable, Sendable {
@@ -871,6 +876,7 @@ struct NotebookCardSaveRequest: Codable, Hashable, Sendable {
     var evidenceLinks: [NotebookEvidenceLink] = []
     var clientMutationID: String? = nil
     var openQuestions: [NotebookQuestion]? = nil
+    var editedAtMS: Int64? = nil
 }
 
 struct NotebookCardDeleteRequest: Codable, Hashable, Sendable {

@@ -18,7 +18,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261126-sync-recovery-v2715";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261127-note-sync-v2716";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -39,7 +39,7 @@ import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=202611
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261109-notebook-desk-v1299";
 import { createNotebookReferenceTransition } from "./notebook-reference-transition.js?v=2";
-import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=4";
+import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=5";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=3";
 import { createReaderBlockWindow } from "./reader-block-window.js?v=11";
 import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=4";
@@ -180,7 +180,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261126-sync-recovery-v2715";
+} from "./offline-storage.js?v=20261127-note-sync-v2716";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -618,6 +618,8 @@ let notebookPendingDraftCount = 0;
 let notebookPendingDraftAttentionAt = Infinity;
 let connectionStatusAttentionTimer = null;
 let notebookDraftSyncPromise = null;
+let notebookRetryTimer = null;
+let notebookRetryDelay = 3_000;
 let workspaceMigrationError = null;
 let workspaceRestoreError = null;
 const initialPersistedAccount = loadPersistedAccount();
@@ -1689,6 +1691,10 @@ async function applyPendingProjectUpdates({automatic = false, checkForUpdates = 
       await checkVisibleProjectArtifactRevisions({manual:true,shouldApply});
       if (!shouldApply()) return false;
       pending = pendingProjectUpdate(projectID);
+      if (!pending?.domains.artifacts?.details?.includes("notebook")) {
+        await Promise.all([...notebookColumnMounts.values()].map(mount => mount.checkVersion?.()));
+        if (!shouldApply()) return false;
+      }
       if (!pending) return true;
     }
     if (pending.domains.project || pending.domains.sync) {
@@ -10668,6 +10674,9 @@ function replaceActiveAccount(nextAccount, options = {}) {
   foregroundSyncPromise = null;
   returnSyncCheckPromise = null;
   notebookDraftSyncPromise = null;
+  clearTimeout(notebookRetryTimer);
+  notebookRetryTimer = null;
+  notebookRetryDelay = 3_000;
   notebookPendingDraftCount = 0;
   notebookPendingDraftAttentionAt = Infinity;
   clearTimeout(connectionStatusAttentionTimer);
@@ -10874,9 +10883,21 @@ async function openPendingSyncDetails() {
       }
       list.append(row);
     }
-    await showWebNotice("Pending changes", items.length
-      ? "These changes are preserved on this device."
-      : "No changes remain waiting to sync.", { content: list, confirmLabel: "Close" });
+    const closeSyncedNotes = () => {
+      if (isCurrentAccountRequest(identity) && list.isConnected && draftRows.length && draftRows.length === items.length) {
+        activeWebWarningClose?.(false);
+      }
+    };
+    window.addEventListener("permitext:notebook-queue-drained", closeSyncedNotes);
+    try {
+      const notice = showWebNotice("Pending changes", items.length
+        ? "These changes are preserved on this device."
+        : "No changes remain waiting to sync.", { content: list, confirmLabel: "Close" });
+      if (!notebookPendingDraftCount) closeSyncedNotes();
+      await notice;
+    } finally {
+      window.removeEventListener("permitext:notebook-queue-drained", closeSyncedNotes);
+    }
   } catch (error) {
     if (isCurrentAccountRequest(identity)) await showWebNotice("Pending changes unavailable", error.message);
   }
@@ -14053,12 +14074,40 @@ async function flushPendingNotebookImages() {
   return uploaded;
 }
 
+function canRetryNotebookDraft(draft) {
+  const receipt = draft.pendingSave || draft;
+  return !draft.recoveryConflict && !draft.retryNeedsReview &&
+    (!draft.scope || draft.scope === "notebook-card") &&
+    Number.isSafeInteger(receipt.baseVersion) && receipt.baseVersion >= 0 &&
+    Boolean(draft.pendingSave ? String(receipt.title || "").trim() : notebookDraftSaveTitle(draft));
+}
+
+function schedulePendingNotebookRetry(drafts, identity) {
+  if (!drafts.some(canRetryNotebookDraft)) {
+    clearTimeout(notebookRetryTimer);
+    notebookRetryTimer = null;
+    notebookRetryDelay = 3_000;
+    return;
+  }
+  if (notebookRetryTimer || !canRunForegroundSync() || !isProAccount()) return;
+  notebookRetryTimer = setTimeout(async () => {
+    notebookRetryTimer = null;
+    if (!isCurrentAccountRequest(identity) || !canRunForegroundSync()) return;
+    notebookRetryDelay = Math.min(notebookRetryDelay * 2, 300_000);
+    await flushPendingNotebookDrafts({automatic: true}).catch(() => {});
+    if (isCurrentAccountRequest(identity)) await refreshNotebookPendingStatus(identity).catch(() => {});
+  }, notebookRetryDelay);
+}
+
 async function refreshNotebookPendingStatus(requestIdentity = captureAccountRequest()) {
   if (!requestIdentity.userID) return;
   const drafts = await pendingNotebookDrafts(requestIdentity.userID);
   if (!isCurrentAccountRequest(requestIdentity)) return;
   const ownedDrafts = drafts.filter(draft => draft.accountUserID === requestIdentity.userID);
+  schedulePendingNotebookRetry(ownedDrafts, requestIdentity);
+  const finished = notebookPendingDraftCount > 0 && !ownedDrafts.length;
   notebookPendingDraftCount = ownedDrafts.length;
+  if (finished) window.dispatchEvent(new Event("permitext:notebook-queue-drained"));
   notebookPendingDraftAttentionAt = ownedDrafts.reduce((earliest, draft) => Math.min(earliest, pendingSyncAttentionAt(draft, true)), Infinity);
   updateConnectionStatus();
 }
@@ -14086,6 +14135,7 @@ async function synchronizeNotebookDraft(draft, requestIdentity = captureAccountR
     cardID: submittedDraft.cardID || undefined,
     clientMutationID: submittedDraft.revision,
     expectedVersion: submittedDraft.baseVersion,
+    editedAtMS: Date.parse(submittedDraft.updatedAt),
     cardType: submittedDraft.cardType || "finding",
     title: submittedDraft.title,
     document: submittedDocument,
@@ -14100,7 +14150,8 @@ async function synchronizeNotebookDraft(draft, requestIdentity = captureAccountR
     }
     error.recoverableDraft = await recordNotebookDraftSaveError(requestIdentity.userID, draft.projectID,
       submittedDraft.cardID, submittedDraft.revision, error.message,
-      {rejected:error.status === 400 && error.payload?.rejectedBeforeSave === true && !invalidLegacyQuestions});
+      {rejected:error.status === 400 && error.payload?.rejectedBeforeSave === true && !invalidLegacyQuestions,
+        retryNeedsReview: error.status >= 400 && error.status < 500 && ![408, 425, 429].includes(error.status)});
     await refreshNotebookPendingStatus(requestIdentity);
     // Only a definitive rejection allows retiring an old invalid receipt.
     // Timeouts, conflicts and other uncertain outcomes keep the original body.
@@ -14119,7 +14170,7 @@ async function synchronizeNotebookDraft(draft, requestIdentity = captureAccountR
   return { ...payload, submittedDraft };
 }
 
-async function flushPendingNotebookDrafts() {
+async function flushPendingNotebookDrafts({automatic = false} = {}) {
   const requestIdentity = captureAccountRequest();
   if (!requestIdentity.userID || navigator.onLine === false || !isProAccount()) return;
   if (notebookDraftSyncPromise) return notebookDraftSyncPromise;
@@ -14129,6 +14180,7 @@ async function flushPendingNotebookDrafts() {
     for (const draft of drafts) {
       requireCurrentAccountRequest(requestIdentity);
       if (draft.recoveryConflict || (draft.scope && draft.scope !== "notebook-card")) continue;
+      if (automatic && !canRetryNotebookDraft(draft)) continue;
       const mount = notebookMounts.get(draft.projectID);
       if (await mount?.syncCard?.(draft.cardID || "")) {
         continue;
@@ -32426,6 +32478,7 @@ async function renderProjectNotebook(project, options = {}) {
   let draftDocument = emptyNotebookDocument();
   let dirty = false;
   let notebookRevision = 0;
+  let lastNotebookEditAt;
   let persistedRevision = -1;
   let persistedCardID = null;
   let persistedDraft = null;
@@ -32495,7 +32548,7 @@ async function renderProjectNotebook(project, options = {}) {
     const revision = notebookRevision;
     const cardID = activeCard.id || "";
     const snapshot = {
-      accountUserID, projectID, cardID, scope: "notebook-card",
+      accountUserID, projectID, cardID, scope: "notebook-card", updatedAt: lastNotebookEditAt,
       baseVersion: activeCard.version, cardType: activeCard.cardType || "finding",
       title: activeCard.title || "", document: structuredClone(draftDocument),
       evidenceLinks: structuredClone(activeCard.evidenceLinks || []),
@@ -32583,6 +32636,9 @@ async function renderProjectNotebook(project, options = {}) {
       void persistFocusedDraft().catch(() => {});
       disposed = true;
       window.clearTimeout(notebookAutosaveTimer);
+      window.clearInterval(noteVersionTimer);
+      document.removeEventListener("visibilitychange", checkNoteOnReturn);
+      window.removeEventListener("online", checkNoteOnReturn);
       window.clearTimeout(notebookIdlePrefetchTimer);
       if (notebookIdlePrefetchHandle !== null && typeof window.cancelIdleCallback === "function") {
         window.cancelIdleCallback(notebookIdlePrefetchHandle);
@@ -32597,6 +32653,33 @@ async function renderProjectNotebook(project, options = {}) {
       window.removeEventListener("permitext:notebook-image-uploaded", notebookImageUploaded);
     }
   };
+  let checkingVersion = null;
+  async function checkNoteVersion() {
+    if (checkingVersion) return checkingVersion;
+    const card = activeCard;
+    const revision = notebookRevision;
+    const generation = notebookCardLoadGeneration;
+    const current = () => !disposed && canRunForegroundSync() && isCurrentAccountRequest(requestIdentity) &&
+      activeWorkspaceID === returnScrollContext.workspaceID && activeCard === card &&
+      notebookRevision === revision && !dirty && !saveConflict && panel.isConnected;
+    if (!card?.id || !current() || panel.classList.contains("is-collapsed") || !panel.getClientRects().length) return;
+    const rect = panel.getBoundingClientRect();
+    if (rect.right <= 0 || rect.left >= window.innerWidth) return;
+    checkingVersion = (async () => {
+      let remote;
+      try { remote = await notebookRequest("/notebook/cards/get", {projectID, cardID: card.id, versionOnly: true}); }
+      catch (error) { if (error.status !== 404) throw error; }
+      if (!current() || generation !== notebookCardLoadGeneration) return;
+      if (remote && Number(remote.version ?? remote.card?.version) === Number(card.version) && !remote.archivedAt) return;
+      await refreshNotebookCards({shouldApply: current});
+    })().finally(() => { checkingVersion = null; });
+    return checkingVersion;
+  }
+  const checkNoteOnReturn = () => { void checkNoteVersion().catch(() => {}); };
+  const noteVersionTimer = window.setInterval(checkNoteOnReturn, 60_000);
+  document.addEventListener("visibilitychange", checkNoteOnReturn);
+  window.addEventListener("online", checkNoteOnReturn);
+  mountState.checkVersion = checkNoteVersion;
   notebookColumnRegistry.register(projectID, paneID, mountState);
   const focusThisColumn = () => notebookColumnRegistry.activate(paneID);
   panel.addEventListener('pointerdown', focusThisColumn, {capture:true});
@@ -32763,6 +32846,7 @@ async function renderProjectNotebook(project, options = {}) {
     }
 
     function markNotebookDirty() {
+      lastNotebookEditAt = new Date().toISOString();
       dirty = true;
       notebookRevision += 1;
       void persistFocusedDraft().catch((error) => showDraftStatus(`Device save failed: ${error.message}. Keep this Note open and copy your work.`));
@@ -32856,6 +32940,7 @@ async function renderProjectNotebook(project, options = {}) {
           if (disposed) return true;
           showDraftStatus("");
           renderCardList();
+          if (payload.superseded && !dirty) await renderFocusedCard();
           void refreshNotebookReportStatus().catch(() => false);
           if (dirty) scheduleNotebookAutosave(180);
           void reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
@@ -32863,8 +32948,11 @@ async function renderProjectNotebook(project, options = {}) {
         } catch (error) {
           if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
           if (error.recoverableDraft) {
-            persistedDraft = error.recoverableDraft;
-            persistedRevision = -1;
+            // Keep the failure attached to its persisted revision. Rewriting the
+            // same editor bytes here would erase the reason a retry was blocked.
+            if (notebookRevision === revisionAtStart && activeCard === cardAtStart) {
+              persistedDraft = error.recoverableDraft;
+            }
           }
           if (error.code === "OFFLINE_DRAFT_RECOVERY_REQUIRED") {
             persistedRevision = -1;
@@ -33022,6 +33110,7 @@ async function renderProjectNotebook(project, options = {}) {
       draftDocument = restoredPassages.document;
       saveConflict = false;
       dirty = useLocalDraft || currentCardLabels.changed || restoredWritable;
+      lastNotebookEditAt = localDraft?.updatedAt;
       persistedDraft = localDraft || null;
       persistedCardID = candidateCard.id || "";
       persistedRevision = localDraft ? notebookRevision : -1;
@@ -33233,8 +33322,10 @@ async function renderProjectNotebook(project, options = {}) {
 
     refreshNotebookCards = async (options = {}) => {
       if (disposed || options.shouldApply && !options.shouldApply()) return false;
+      const initialLoad = notebookCardLoadGeneration;
       const payload = await notebookRequest("/notebook/cards/list", { projectID });
       if (disposed || options.shouldApply && !options.shouldApply()) return false;
+      if (initialLoad !== notebookCardLoadGeneration) return false;
       let nextCards = payload.cards || [];
       notebookReadOnly = payload.access?.readOnly === true;
       const focusedCardID = activeCard?.id || "";
@@ -33267,6 +33358,7 @@ async function renderProjectNotebook(project, options = {}) {
         cardPayload: { cards, access: { readOnly: notebookReadOnly } }
       }).catch(() => {});
       if (options.shouldApply && !options.shouldApply()) return false;
+      if (disposed || initialLoad !== notebookCardLoadGeneration) return false;
       if (dirty || !focusedCardID) return true;
       if (!focusedSummary || focusedSummary.archivedAt || focusedSummary.deletedAt) {
         activeCard = null;

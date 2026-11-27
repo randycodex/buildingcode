@@ -36,7 +36,7 @@ try {
  execFileSync('xcrun', ['swiftc', '-parse-as-library', join(dir, 'verify.swift'), '-o', join(dir, 'verify')], {stdio:'inherit'});
  execFileSync(join(dir, 'verify'), [join(dir, 'draft.json')], {stdio:'inherit'});
  const fixStart = source.indexOf('        if editableContent == lastSyncedContent {');
- const fixEnd = source.indexOf('        lastLocalEditAt = Date()', fixStart);
+ const fixEnd = source.indexOf('\n        lastLocalEditAt = Date()', fixStart);
  assert.ok(fixStart > 0 && fixEnd > fixStart);
  const mutant = source.slice(0, fixStart) + '        guard editableContent != lastSyncedContent else { return }\n' + source.slice(fixEnd);
  await writeFile(join(dir, 'mutant.swift'), mutant);

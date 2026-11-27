@@ -1642,6 +1642,7 @@ export function createFileStoreAdapter() {
       const artifacts = (store.foundationArtifactsByUserID?.[userID] || [])
         .filter((item) => !idSet || idSet.has(item.envelope?.id))
         .slice();
+      if (options.envelopeOnly) return artifacts.map(({envelope}) => ({envelope}));
       return options.notebookSummaryOnly ? artifacts.map(notebookListArtifact) : artifacts;
     },
     async saveFoundationArtifact(userID, artifact) {
@@ -4836,6 +4837,11 @@ async function createPostgresStoreAdapter() {
         ? options.ids.map((value) => String(value || "").trim()).filter(Boolean)
         : null;
       if (ids && ids.length === 0) return [];
+      if (options.envelopeOnly && ids) {
+        const rows = await sql`SELECT envelope FROM permitext_foundation_artifacts
+          WHERE user_id = ${userID} AND id = ANY(${ids})`;
+        return rows.map(row => ({envelope: safeJSON(row.envelope, {})}));
+      }
       if (options.notebookSummaryOnly) {
         const rows = await sql`
           SELECT envelope,
@@ -16396,7 +16402,7 @@ async function notebookProjectAccess(context, response, permission) {
 
 async function ownedNotebookArtifact(userID, cardID, options = {}) {
   const normalizedCardID = String(cardID || "").trim();
-  return (await listStoredFoundationArtifacts(userID, { ids: [normalizedCardID] })).find((artifact) =>
+  return (await listStoredFoundationArtifacts(userID, { ids: [normalizedCardID], envelopeOnly: options.envelopeOnly })).find((artifact) =>
     artifact.envelope?.id === normalizedCardID &&
     artifact.envelope?.type === "notebookCard" &&
     (options.includeDeleted || !artifact.envelope?.deletedAt)
@@ -16655,7 +16661,7 @@ async function handleNotebookCardGet(request, response) {
   if (!access) return;
   const artifact = await ownedNotebookArtifact(
     access.storageOwnerUserID,
-    context.body.cardID
+    context.body.cardID, {envelopeOnly: context.body.versionOnly === true}
   );
   if (!artifact) {
     sendError(response, 404, "Notebook card not found.");
@@ -16672,6 +16678,10 @@ async function handleNotebookCardGet(request, response) {
     .map((link) => link.projectID);
   if (!projectIDs.includes(access.projectID)) {
     sendError(response, 404, "Notebook card not found.");
+    return;
+  }
+  if (context.body.versionOnly === true) {
+    sendJSON(response, 200, {version: artifact.envelope.version, archivedAt: artifact.envelope.archivedAt || null});
     return;
   }
   sendJSON(response, 200, { card: notebookCardForClient(artifact, projectIDs) });
@@ -16697,6 +16707,11 @@ async function handleNotebookCardSave(request, response) {
   if (!access) return;
   const storageOwnerUserID = access.storageOwnerUserID;
 
+  const editedAtMS = context.body.editedAtMS;
+  if (editedAtMS != null && (!Number.isSafeInteger(editedAtMS) || editedAtMS < 0 || editedAtMS > Date.now() + 300_000 || !context.body.clientMutationID)) {
+    sendError(response, 400, "Invalid Note edit time or save identifier.");
+    return;
+  }
   const requestedCardID = String(context.body.cardID || "").trim();
   const clientMutationID = context.body.clientMutationID;
   if (clientMutationID !== undefined && (typeof clientMutationID !== "string" ||
@@ -16719,7 +16734,7 @@ async function handleNotebookCardSave(request, response) {
   } : null;
   const existing = await ownedNotebookArtifact(storageOwnerUserID, cardID, { includeDeleted: true });
   const replaySavedMutation = async (current) => {
-    if (!receipt) return false;
+    if (!receipt || current?.payload?._saveReceipt?.clientMutationID !== receipt.clientMutationID) return false;
     const replay = notebookMutationReplay(current, await listStoredProjectLinks(storageOwnerUserID, { projectID, targetKind: "notebookCard", targetIDs: [cardID] }), receipt);
     if (!replay) return false;
     if (!current.payload._saveReceipt.revisionCommitted) {
@@ -16751,9 +16766,30 @@ async function handleNotebookCardSave(request, response) {
     return;
   }
 
+  // The deterministic ID identifies a retried creation, even after subsequent
+  // edits replaced the first receipt. It must never create or rewrite a note.
+  if (editedAtMS != null && !requestedCardID && expectedVersion === 0 && activeProjectLink &&
+      existing.envelope.version > 1 && !existing.envelope.deletedAt && !existing.envelope.archivedAt) {
+    sendJSON(response, 200, {card: notebookCardForClient(existing, [projectID]), superseded: true});
+    return;
+  }
+  // Untimestamped callers keep their version precondition. A delayed editor
+  // save competes by its original edit time across both clients.
+  const orderedEdit = editedAtMS != null && requestedCardID && existing &&
+    !existing.envelope.deletedAt && !existing.envelope.archivedAt &&
+    Number.isSafeInteger(expectedVersion) && expectedVersion >= 0 && expectedVersion <= existing.envelope.version &&
+    existing.payload?._saveReceipt?.clientMutationID !== clientMutationID;
+  if (orderedEdit) {
+    const savedTime = existing.payload._saveReceipt?.editedAtMS ?? Date.parse(existing.envelope.updatedAt);
+    if (editedAtMS < savedTime || (editedAtMS === savedTime && clientMutationID <= (existing.payload._saveReceipt?.clientMutationID || ""))) {
+      sendJSON(response, 200, {card: notebookCardForClient(existing, [projectID]), superseded: true});
+      return;
+    }
+  }
+  const commitVersion = orderedEdit ? existing.envelope.version : expectedVersion;
   if ((clientMutationID && existing?.payload?._saveReceipt?.clientMutationID === clientMutationID) ||
       !Number.isSafeInteger(expectedVersion) || expectedVersion < 0 ||
-      (existing ? existing.envelope.deletedAt || expectedVersion !== existing.envelope.version : expectedVersion !== 0)) {
+      (existing ? existing.envelope.deletedAt || commitVersion !== existing.envelope.version : expectedVersion !== 0)) {
     sendJSON(response, 409, {
       error: "This Notebook card changed after you opened it. Review the current version before saving.",
       code: "NOTEBOOK_VERSION_CONFLICT",
@@ -16775,7 +16811,8 @@ async function handleNotebookCardSave(request, response) {
       createdBy: existing?.payload?.createdBy || context.userID,
       updatedBy: context.userID
     });
-    if (receipt) payload._saveReceipt = {...receipt, revisionCommitted: true};
+    if (receipt) payload._saveReceipt = {...receipt, revisionCommitted: true, committedVersion: commitVersion + 1,
+      ...(editedAtMS != null ? {editedAtMS} : {})};
     await validateNotebookReferences(storageOwnerUserID, payload.references, payload.evidenceLinks);
     await validateNotebookImageAssets(storageOwnerUserID, projectID, payload.imageAssets);
     validatingCard = false;
@@ -16827,7 +16864,7 @@ async function handleNotebookCardSave(request, response) {
     });
     const artifactRevisions = await commitStoredNotebookCardMutation(storageOwnerUserID, {
       revisionChanges,
-      artifact, expectedVersion,
+      artifact, expectedVersion: commitVersion,
       links: activeProjectLink ? [] : [link],
       expectedLinks: activeProjectLink ? [activeProjectLink] : [],
       events: [event]
@@ -16847,6 +16884,10 @@ async function handleNotebookCardSave(request, response) {
       if (await replaySavedMutation(current)) return;
       const currentIsLinked = current && (await listStoredProjectLinks(storageOwnerUserID, { projectID, targetKind: "notebookCard", targetIDs: [cardID] })).some((link) =>
         !link.deletedAt && link.projectID === projectID && link.targetKind === "notebookCard" && link.targetID === cardID);
+      if (editedAtMS != null && currentIsLinked && !current.envelope.deletedAt && !current.envelope.archivedAt) {
+        sendJSON(response, 503, {error: "Another Note save completed. Retry the same edit.", code: "NOTEBOOK_SAVE_UNAVAILABLE"});
+        return;
+      }
       sendJSON(response, 409, { error: error.message, code: error.code,
         ...(currentIsLinked ? { card: notebookCardForClient(current, [projectID]) } : {}) });
       return;

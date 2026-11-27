@@ -20,7 +20,7 @@ const makeMount=(id,cardID)=>({panel:{dataset:{paneId:id,projectId:'project'}},c
   insertionTarget(){return {id:this.cardID,identity:this};},
   insertLinkedReference(id){assert.equal(id,this.cardID);events.push(['insert',id]);},
   async focusCard(id){this.cardID=id;},summary(){return {id:this.cardID,title:this.cardID};},
-  persistDraft(){events.push(['persist',this.cardID]);},syncDraft(){events.push(['sync',this.cardID]);},
+  hasPendingEdits:()=>true,persistDraft(){events.push(['persist',this.cardID]);},syncDraft(){events.push(['sync',this.cardID]);},
   confirmDiscardIfNeeded:async()=>true,dispose(){events.push(['dispose',this.cardID]);}});
 const a=makeMount(notebookColumnPaneID(initial[0]),'a'),b=makeMount(notebookColumnPaneID(initial[1]),'b');
 registry.register('project',a.panel.dataset.paneId,a);
@@ -31,6 +31,8 @@ registry.activate(b.panel.dataset.paneId);assert.equal(facade.insertionTarget().
 facade.insertLinkedReference('b');assert.deepEqual(events.at(-1),['insert','b']);
 await facade.persistDraft();assert(events.some(event=>event[0]==='persist'&&event[1]==='a'));
 assert(await facade.syncCard('a'),'Background notes sync through their own mounted editor.');
+a.hasPendingEdits=()=>false;
+assert.equal(await facade.syncCard('a'),false,'A clean open editor leaves the durable save for the queue to replay.');
 assert.equal(await facade.syncCard('missing'),false);
 registry.remove(b.panel.dataset.paneId);assert.equal(facade.activeCardID(),'a');
 assert.equal(a.body,'Unsaved text a');assert.equal(a.scrollTop,123);
@@ -158,7 +160,7 @@ const tabColumns=[...initial.map(column=>({...column,open:true})),
   {id:'recently-saved',projectID:'project',cardID:'recent',title:'Recently saved Note',open:true}];
 const tabs={children:[],replaceChildren(){this.children=[];},append(button){this.children.push(button);}};
 const tabState={paneOrder:[notebookColumnPaneID(tabColumns[1]),notebookColumnPaneID(tabColumns[2]),notebookColumnPaneID(tabColumns[0])]};
-const tabContext=vm.createContext({state:tabState,notebookTabs:tabs,newNotebookNoteButton:{},closedNotebookNotesButton:{},closedNotebookNoteChoices:null,notebookClosedMenu:null,
+const tabContext=vm.createContext({syncResearchNoteControls(){},state:tabState,notebookTabs:tabs,newNotebookNoteButton:{},closedNotebookNotesButton:{},closedNotebookNoteChoices:null,notebookClosedMenu:null,
   workspacePrivatePresentationAllowed:()=>true,workspaceProject:()=>project,projectDetailKey:p=>p.id,
   notebookCatalogs:new Map([['project',[{id:'a',title:'Note A'},{id:'closed',title:'Closed Note'},{id:'b',title:'Note B'}]]]),
   notebookColumnsForProject:()=>tabColumns,notebookColumnPaneID,notebookColumnMounts:new Map(),
@@ -184,7 +186,7 @@ assert.equal(captureWorkspaceLayout(selectedLayout).notebookColumns[0].selected,
 
 let view='notebook',evidenceID='evidence',visible=true;
 const pinState={pinnedPaneID:'reader:research'};
-const pinContext=vm.createContext({state:pinState,isProAccount:()=>true,currentColumnWorkflowView:()=>view,
+const pinContext=vm.createContext({sourceResultReaderOwner:()=>null,state:pinState,isProAccount:()=>true,currentColumnWorkflowView:()=>view,
   primarySavedPaneID:()=>evidenceID,workflowPaneIsVisible:()=>visible,savedEvidenceColumnGroup:()=>[]});
 vm.runInContext(actual('activePinnedPaneID'),pinContext);
 assert.equal(pinContext.activePinnedPaneID(),'','Notebook Evidence scrolls with Notes instead of covering them.');

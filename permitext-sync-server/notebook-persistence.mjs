@@ -7,7 +7,7 @@ export function notebookCreationID(userID, projectID, clientMutationID) {
 
 export function notebookMutationReplay(artifact, links, receipt, artifactType = "notebookCard") {
   if (!receipt || !artifact || artifact.envelope?.type !== artifactType || artifact.envelope.deletedAt ||
-      artifact.envelope.version !== receipt.expectedVersion + 1) return null;
+      artifact.envelope.version !== (artifact.payload?._saveReceipt?.committedVersion ?? receipt.expectedVersion + 1)) return null;
   const stored = artifact.payload?._saveReceipt;
   if (!stored || ["clientMutationID", "fingerprint", "expectedVersion", "projectID"].some((key) => stored[key] !== receipt[key])) return null;
   const link = links.find((item) => !item.deletedAt && item.projectID === receipt.projectID &&

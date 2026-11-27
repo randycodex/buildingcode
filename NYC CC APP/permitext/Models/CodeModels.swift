@@ -2827,6 +2827,7 @@ protocol PermitextBackendTransport {
     func researchConversationDelete(_ request: ResearchConversationDeleteRequest) async throws -> ResearchConversationDeleteResponse
     func notebookCardList(_ request: NotebookCardListRequest) async throws -> NotebookCardListResponse
     func notebookCardGet(_ request: NotebookCardGetRequest) async throws -> NotebookCardResponse
+    func notebookCardVersion(_ request: NotebookCardGetRequest) async throws -> Int
     func notebookCardSave(_ request: NotebookCardSaveRequest) async throws -> NotebookCardResponse
     func notebookCardDelete(_ request: NotebookCardDeleteRequest) async throws -> NotebookCardDeleteResponse
     func notebookAssetUpload(_ request: NotebookAssetUploadRequest, data: Data) async throws -> NotebookAssetUploadResponse
@@ -3223,6 +3224,11 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
     func notebookCardList(_ request: NotebookCardListRequest) async throws -> NotebookCardListResponse {
         try await post("notebook/cards/list", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func notebookCardVersion(_ request: NotebookCardGetRequest) async throws -> Int {
+        let response: NotebookCardVersionResponse = try await post("notebook/cards/get", body: request, bearerToken: request.auth.bearerToken)
+        return response.version
     }
 
     func notebookCardGet(_ request: NotebookCardGetRequest) async throws -> NotebookCardResponse {
@@ -5731,6 +5737,7 @@ protocol AccountBackendClient {
     func deleteResearchConversation(account: SignedInAccount, conversationID: String) async throws
     func notebookCards(account: SignedInAccount, projectID: String) async throws -> NotebookCardListResponse
     func notebookCard(account: SignedInAccount, projectID: String, cardID: String) async throws -> NotebookCard
+    func notebookCardVersion(account: SignedInAccount, projectID: String, cardID: String) async throws -> Int
     func saveNotebookCard(
         account: SignedInAccount,
         projectID: String,
@@ -5740,7 +5747,8 @@ protocol AccountBackendClient {
         document: NotebookDocument,
         evidenceLinks: [NotebookEvidenceLink],
         clientMutationID: String?,
-        openQuestions: [NotebookQuestion]?
+        openQuestions: [NotebookQuestion]?,
+        editedAtMS: Int64?
     ) async throws -> NotebookCard
     func deleteNotebookCard(
         account: SignedInAccount,
@@ -6917,6 +6925,10 @@ extension String {
 
 // Older local transports and mocks do not support server recovery migration.
 extension PermitextBackendTransport {
+    func notebookCardVersion(_ request: NotebookCardGetRequest) async throws -> Int {
+        try await notebookCardGet(request).card.version
+    }
+
     func renderProjectReportPDF(_ request: BackendProjectReportManifestRequest) async throws -> Data {
         throw URLError(.unsupportedURL)
     }

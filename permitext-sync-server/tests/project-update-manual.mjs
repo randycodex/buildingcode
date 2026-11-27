@@ -105,7 +105,7 @@ for(const changed of [false,true]) {
 function harness(scenario='changed') {
  let stored={},current=true,publicProbes=0;const calls=[];
  const c=vm.createContext({automaticContentUpdatesEnabled,
-  connectionStatus:{dataset:{state:scenario.startsWith('pending')?'pending':'clean'}},
+  notebookColumnMounts:new Map(),connectionStatus:{dataset:{state:scenario.startsWith('pending')?'pending':'clean'}},
   flushPendingContentWrites:async()=>{calls.push('retry-writes');if(scenario==='pending-success')c.connectionStatus.dataset.state='clean';},
   openPendingSyncDetails:async()=>calls.push('pending-details'),
   projectUpdatesApplying:new Set(),projectUpdateAutoGuards:new Map(),projectUpdateReviewRequired:new Set(),projectUpdateEditingGeneration:0,

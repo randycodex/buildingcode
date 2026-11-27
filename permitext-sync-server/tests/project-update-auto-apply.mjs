@@ -79,7 +79,7 @@ for (const marker of ['  refreshReportArtifacts = async (options', '  refreshRep
  const start=source.indexOf(marker),indent=marker.startsWith('    ')?'    ':'  ';
  assert(start>=0,marker);const end=source.indexOf('\n'+indent+'};',start)+indent.length+4;
  let allowed=true;const resolvers=[];
- const c=vm.createContext({disposed:false,deletingReport:false,deletingVersionID:null,historyMutationGeneration:0,reportSourcesRefreshGeneration:0,
+ const c=vm.createContext({notebookCardLoadGeneration:0,disposed:false,deletingReport:false,deletingVersionID:null,historyMutationGeneration:0,reportSourcesRefreshGeneration:0,
   showSavedVersions:savedVersionsSetting[1]==='true',
   isCurrentAccountRequest:()=>true,requestIdentity:1,projectID:'p',drafts:['retained'],sources:['retained'],cards:['retained'],
   reportRequest:()=>new Promise(resolve=>resolvers.push(resolve)),notebookRequest:()=>new Promise(resolve=>resolvers.push(resolve))});

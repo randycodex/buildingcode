@@ -66,6 +66,38 @@ try {
   assert.equal(read.status, 200);
   assert.deepEqual(read.json.card.document, saved.json.card.document);
   assert.equal((await request("/notebook/cards/save", { ...draft, title: "Changed receipt" })).status, 409);
+  const cardID = saved.json.card.id;
+  const editedAtMS = Date.now() - 5_000;
+  const initial = await request("/notebook/cards/save", {...draft, clientMutationID: "clocked-create", editedAtMS});
+  const clockedID = initial.json.card.id;
+  const edit = (id, title, offset, expectedVersion = 1) => ({...draft, cardID: clockedID, clientMutationID: id,
+    expectedVersion, title, editedAtMS: editedAtMS + offset});
+  const web = edit("web", "Web edit", 100);
+  const phone = edit("phone", "Later phone edit", 200);
+  assert.equal((await request("/notebook/cards/save", web)).json.card.version, 2);
+  assert.equal((await request("/notebook/cards/save", phone)).json.card.version, 3);
+  assert.equal((await request("/notebook/cards/save", phone)).json.replayed, true);
+  const delayed = await request("/notebook/cards/save", web);
+  assert.equal(delayed.json.superseded, true);
+  assert.equal(delayed.json.card.title, phone.title);
+  const laterWeb = edit("web-again", "Latest web edit", 300);
+  assert.equal((await request("/notebook/cards/save", laterWeb)).json.card.version, 4);
+  assert.equal((await request("/notebook/cards/save", phone)).json.card.title, laterWeb.title);
+  const probe = await request("/notebook/cards/get", {projectID, cardID: clockedID, versionOnly: true});
+  assert.deepEqual(probe.json, {version: 4, archivedAt: null});
+  assert.equal((await request("/notebook/cards/get", {projectID: "other-project", cardID, versionOnly: true})).status, 404);
+  assert.equal((await request("/notebook/cards/save", {...draft, clientMutationID: "clocked-create", editedAtMS})).json.card.version, 4);
+  const equalTimeWinner = edit("z-last", "Winner at same millisecond", 300);
+  assert.equal((await request("/notebook/cards/save", equalTimeWinner)).json.card.version, 5);
+  assert.equal((await request("/notebook/cards/save", laterWeb)).json.card.title, equalTimeWinner.title);
+
+  const simultaneous = [edit("newer", "Newest concurrent edit", 500), edit("older", "Older concurrent edit", 400)];
+  const responses = await Promise.all(simultaneous.map(body => request("/notebook/cards/save", body)));
+  for (const [index, response] of responses.entries()) {
+    if (response.status === 503) assert.equal((await request("/notebook/cards/save", simultaneous[index])).status, 200);
+    else assert.equal(response.status, 200);
+  }
+  assert.equal((await request("/notebook/cards/get", {projectID, cardID: clockedID})).json.card.title, simultaneous[0].title);
   const foreign = structuredClone(document);
   foreign.document[0].content[0].props.referenceID = "foreign-answer";
   const rejected = await request("/notebook/cards/save", { ...draft, clientMutationID: "foreign-reference", document: foreign });

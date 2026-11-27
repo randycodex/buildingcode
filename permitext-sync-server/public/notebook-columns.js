@@ -56,7 +56,7 @@ export function createNotebookMountRegistry(projects, {openCard}) {
       syncDraft: () => all(projectID, 'syncDraft'),
       async syncCard(cardID) {
         const match = entries(projectID).find(([, item]) => item.activeCardID?.() === cardID)?.[1];
-        if (!match) return false;
+        if (!match?.hasPendingEdits?.()) return false;
         await match.syncDraft?.(); return true;
       },
       refreshCards: options => all(projectID, 'refreshCards', options),

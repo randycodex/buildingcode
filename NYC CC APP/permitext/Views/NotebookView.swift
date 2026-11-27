@@ -893,6 +893,7 @@ struct NativeNotebookSaveAttempt: Codable, Hashable, Sendable {
     let content: NativeNotebookEditableContent
     // Missing on older receipts: replay their original question field unchanged.
     var preservesServerQuestions: Bool? = nil
+    var editedAtMS: Int64? = nil
 }
 
 struct NativeNotebookEditableContent: Codable, Hashable, Sendable {
@@ -1090,12 +1091,10 @@ private struct NotebookCardEditorView: View {
                                 guard isCurrentOwner else { return }
                                 autosaveDebounceTask?.cancel()
                                 autosaveDebounceTask = nil
-                                requiresConflictReview = true
-                                conflictingCard = nil
                                 document = retained
                                 lastLocalEditAt = Date()
-                                errorMessage = "You edited while a saved version was arriving. Your writing is preserved; review the latest Note before syncing."
-                                _ = cacheDraft()
+                                needsSave = true
+                                if cacheDraft() { Task { await saveNow() } }
                             },
                             resolveAsset: { url in try await resolveEditorAsset(url) },
                             uploadImage: { data, _, _ in try await uploadEditorImageData(data) }
@@ -1229,6 +1228,18 @@ private struct NotebookCardEditorView: View {
             }
         }
         .task { await loadCard(); await restoreEditorCaretIfNeeded() }
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
+            while !Task.isCancelled {
+                if isEditorVisible, isCurrentOwner, hasLoaded, !isSaving, !isLoading,
+                   library.isNetworkAvailable, let id = currentCardID, !currentDraft.hasUnsynchronizedChanges,
+                   let remoteVersion = try? await library.notebookCardVersion(projectID: projectID, cardID: id),
+                   !Task.isCancelled, isCurrentOwner, currentCardID == id, remoteVersion != version {
+                    await loadCard(forceNetwork: true)
+                }
+                do { try await Task.sleep(for: .seconds(60)) } catch { return }
+            }
+        }
         .onAppear {
             isEditorVisible = true
             Task {
@@ -1721,6 +1732,12 @@ private struct NotebookCardEditorView: View {
             case .preservePending:
                 retryAfterReconnect = true
                 _ = cacheDraft()
+            case .reviewConflict where draft?.editedAt != nil:
+                // Submit the original edit time so both clients use the same winner.
+                requiresConflictReview = false
+                needsSave = true
+                retryAfterReconnect = true
+                _ = cacheDraft()
             case .reviewConflict:
                 conflictingCard = card
                 requiresConflictReview = true
@@ -1826,6 +1843,7 @@ private struct NotebookCardEditorView: View {
             // A reverted edit still matters while an earlier write is uncertain:
             // persist it without cancelling that request or claiming it synced.
             if pendingSave != nil || isSaving || requiresConflictReview {
+                lastLocalEditAt = Date()
                 cacheDraft()
                 return
             }
@@ -1934,7 +1952,8 @@ private struct NotebookCardEditorView: View {
             }
         }
         let attempt = pendingSave ?? NativeNotebookSaveAttempt(
-            clientMutationID: draftMutationID, cardID: currentCardID, expectedVersion: version, content: editableContent, preservesServerQuestions: true
+            clientMutationID: draftMutationID, cardID: currentCardID, expectedVersion: version, content: editableContent, preservesServerQuestions: true,
+            editedAtMS: lastLocalEditAt.map { Int64($0.timeIntervalSince1970 * 1000) }
         )
         pendingSave = attempt
         guard cacheDraft() else { return }
@@ -1943,7 +1962,8 @@ private struct NotebookCardEditorView: View {
                 projectID: projectID, cardID: attempt.cardID, expectedVersion: attempt.expectedVersion,
                 title: normalizedTitle(attempt.content.title), document: attempt.content.document,
                 evidenceLinks: attempt.content.evidenceLinks, clientMutationID: attempt.clientMutationID,
-                openQuestions: attempt.preservesServerQuestions == true ? nil : attempt.content.openQuestions
+                openQuestions: attempt.preservesServerQuestions == true ? nil : attempt.content.openQuestions,
+                editedAtMS: attempt.editedAtMS
             )
             guard isCurrentOwner, !Task.isCancelled else { return }
             pendingSave = nil
