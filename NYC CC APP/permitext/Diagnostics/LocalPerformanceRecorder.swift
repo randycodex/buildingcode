@@ -16,6 +16,11 @@ enum LocalPerformanceRecorder {
         case searchResultOpenRequested, searchResultDestinationPrepared
         case passageDataReady, passageContentAppeared, passageReferencesReady
         case chapterOpenRequested, chapterDestinationPrepared, nativeChapterContentAppeared, nativeChapterRestorationCompleted
+        case newNoteOpenRequested, notebookEditorLoadRequested, notebookEditorShellLoaded
+        case notebookEditorDocumentMounted, notebookEditorReady
+        case evidencePassageOpenRequested, linkedChapterPrepared
+        case nativeChapterPositioningStarted, nativeChapterTargetPositioned, nativeChapterTransitionSettled
+        case nativeChapterPositioningFailed, nativeChapterFallbackRequested
     }
 
     static func record(_ milestone: Milestone) {

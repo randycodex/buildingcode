@@ -1251,14 +1251,16 @@ private struct ProjectFactDraft: Identifiable {
 }
 
 private struct ProjectEvidenceRowButtonStyle: PrimitiveButtonStyle {
+    var onTrigger: () -> Void = {}
+
     func makeBody(configuration: Configuration) -> some View {
         // The standard NavigationLink can activate on a horizontal drag in a
         // vertical ScrollView. Require a recognized tap for Evidence rows.
         configuration.label
-            .onTapGesture { configuration.trigger() }
+            .onTapGesture { onTrigger(); configuration.trigger() }
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isButton)
-            .accessibilityAction { configuration.trigger() }
+            .accessibilityAction { onTrigger(); configuration.trigger() }
     }
 }
 
@@ -2553,7 +2555,9 @@ struct ProjectView: View {
                 }
             }
         }
-        .buttonStyle(ProjectEvidenceRowButtonStyle())
+        .buttonStyle(ProjectEvidenceRowButtonStyle(onTrigger: {
+            if isProjectFolder && !isSelecting { LocalPerformanceRecorder.record(.evidencePassageOpenRequested) }
+        }))
         .accessibilityIdentifier("project-bookmark-\(bookmark.rowID)")
         .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
     }

@@ -254,23 +254,13 @@ async function configure(command) {
       ariaLabel: "Note body",
       toolbar: false,
       native: true,
+      synchronousMount: true,
       tableHandles: false,
       sideMenu: false,
       slashMenu: false,
       insertItems: ["evidence", "research", "image"],
       onInsert: (kind) => chooseInsert(kind === "image" ? "image" : "reference"),
-      onReady(instance) {
-        editor = instance;
-        if (inputTracingEnabled) previousTransactionText = fixtureDocumentText(controller.getDocument());
-        traceInput("mounted");
-        editor.onSelectionChange(() => {
-          if (!replacing) insertionPosition = controller.getEditingPosition();
-          post("formatting", { formatting: formattingSnapshot() });
-          measure(true);
-        });
-        measure();
-        resolve();
-      },
+      onReady: resolve,
       onChange() {
         if (!controller || !editor) return;
         if (replacing) { traceInput("replacement-transaction-suppressed"); return; }
@@ -295,7 +285,16 @@ async function configure(command) {
       }
     });
   });
-  await ready;
+  // A synchronous mount can call onReady before it returns the controller.
+  editor = await ready;
+  if (inputTracingEnabled) previousTransactionText = fixtureDocumentText(controller.getDocument());
+  traceInput("mounted");
+  editor.onSelectionChange(() => {
+    if (!replacing) insertionPosition = controller.getEditingPosition();
+    post("formatting", { formatting: formattingSnapshot() });
+    measure(true);
+  });
+  measure();
   return snapshot();
 }
 

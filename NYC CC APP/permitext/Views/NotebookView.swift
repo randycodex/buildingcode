@@ -450,10 +450,16 @@ private struct ProjectNotebookSessionView: View {
             guard isVisible, editorRoute == nil else { return }
             Task { await loadCards(forceNetwork: true) }
         }
-        .onAppear { isVisible = true }
+        .onAppear {
+            isVisible = true
+            if isCurrentOwner { NotebookDocumentEditor.preload() }
+        }
         .onDisappear { isVisible = false }
         .onChange(of: editorRoute) { _, route in
-            if route == nil { refreshLocalDrafts() }
+            if route == nil {
+                if isCurrentOwner { NotebookDocumentEditor.preload() }
+                refreshLocalDrafts()
+            }
         }
         .onChange(of: library.notebookReconnectRevision) {
             guard isVisible, editorRoute == nil, initialCardID == nil, !startNewNote else { return }
@@ -583,6 +589,7 @@ private struct ProjectNotebookSessionView: View {
                     }
                     if !access.readOnly || permitsLocalDraftEditing {
                         Button {
+                            LocalPerformanceRecorder.record(.newNoteOpenRequested)
                             editorRoute = NativeNotebookEditorRoute()
                         } label: {
                             ToolbarActionIcon(systemImage: "plus")
@@ -1252,7 +1259,10 @@ private struct NotebookCardEditorView: View {
             if !loading { Task { await restoreEditorCaretIfNeeded() } }
         }
         .onChange(of: documentEditor.isReady) { _, ready in
-            if ready { Task { await restoreEditorCaretIfNeeded() } }
+            if ready {
+                LocalPerformanceRecorder.record(.notebookEditorReady)
+                Task { await restoreEditorCaretIfNeeded() }
+            }
         }
         .onChange(of: referenceRoute) { previous, current in
             if previous != nil && current == nil { Task { await restoreEditorCaretIfNeeded() } }

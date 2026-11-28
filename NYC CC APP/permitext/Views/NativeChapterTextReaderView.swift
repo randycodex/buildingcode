@@ -43,7 +43,6 @@ struct NativeChapterTextReaderView: View {
     }
     @State private var explicitNavigation = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @State private var initialTargetIsVisible = false
     @State private var failureMessage: String?
     @State private var hasRequestedFallback = false
     @State private var expandedMedia: NativeReaderExpandedMedia?
@@ -208,7 +207,6 @@ struct NativeChapterTextReaderView: View {
         proxy: ScrollViewProxy
     ) -> some View {
         trackedReaderScroll(document: document, proxy: proxy)
-        .opacity(pendingInitialBlockID == nil ? 1 : 0)
         .allowsHitTesting(pendingInitialBlockID == nil)
         .accessibilityHidden(pendingInitialBlockID != nil)
         .onAppear {
@@ -232,7 +230,10 @@ struct NativeChapterTextReaderView: View {
         }
         .overlay {
             if pendingInitialBlockID != nil {
+                // Keep the native scroll view mounted and laying out while
+                // the preview covers its temporary starting position.
                 openingPassage(document: document, proxy: proxy)
+                    .background(CodeAppBackdrop.color)
             }
         }
         .task(id: "\(route.id)|\(searchQuery)|\(isBrowserTabActive)") {
@@ -249,7 +250,7 @@ struct NativeChapterTextReaderView: View {
         }
         .task(id: "\(route.id)|\(pendingInitialBlockID ?? "")|\(isBrowserTabActive)") {
             guard isBrowserTabActive else { return }
-            await restoreInitialPosition(document: document, proxy: proxy)
+            await restoreInitialPosition(proxy: proxy)
         }
         .chapterFindBar(isPresented: isSearchPresented) { usesReaderBottomBar in
             ChapterFindControls(
@@ -632,13 +633,6 @@ struct NativeChapterTextReaderView: View {
         _ blockID: String?,
         document: NativeReaderRuntimeDocument
     ) {
-        // Lazy layout can briefly report the target before preceding rows finish
-        // measuring. Keep restoration active until its settling pass completes.
-        if let target = pendingInitialBlockID {
-            initialTargetIsVisible = blockID == target
-            if initialTargetIsVisible { scrollState.visibleBlockID = target }
-            return
-        }
         guard pendingInitialBlockID == nil,
               let blockID,
               scrollState.visibleBlockID != blockID else { return }
@@ -915,6 +909,7 @@ struct NativeChapterTextReaderView: View {
         failureMessage = message
         guard !hasRequestedFallback else { return }
         hasRequestedFallback = true
+        LocalPerformanceRecorder.record(.nativeChapterFallbackRequested)
         // Carry navigation intent without recording an unobserved arrival.
         let requestedBlockID = pendingInitialBlockID ?? scrollState.restorationLease?.blockID
         let requestedAnchorID = requestedBlockID.flatMap { navigationIndex[$0]?.anchorID }
@@ -924,61 +919,41 @@ struct NativeChapterTextReaderView: View {
     }
 
     @MainActor
-    private func restoreInitialPosition(
-        document: NativeReaderRuntimeDocument,
-        proxy: ScrollViewProxy
-    ) async {
+    private func restoreInitialPosition(proxy: ScrollViewProxy) async {
         guard isBrowserTabActive, let targetBlockID = pendingInitialBlockID else { return }
         traceRestoration("initial-start", observing: targetBlockID)
-
-        // A distant LazyVStack destination initially uses estimated row heights.
-        // Reapply the anchor while those rows settle, rather than accepting the
-        // first transient geometry report and revealing the wrong passage.
-        initialTargetIsVisible = false
+        LocalPerformanceRecorder.record(.nativeChapterPositioningStarted)
         await Task.yield()
-        var stablePasses = 0
-        var previousGeometry: (offset: CGFloat, height: CGFloat)?
-        for _ in 0..<50 {
-            guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return }
-            if !initialTargetIsVisible {
-                var transaction = Transaction(animation: nil)
-                transaction.disablesAnimations = true
-                withTransaction(transaction) { proxy.scrollTo(targetBlockID, anchor: .top) }
+
+        let opensAtLinkedHighlight = linkedHighlight?.firstBlockID == targetBlockID
+            && rememberedViewport.wrappedValue == nil && !explicitNavigation
+        if opensAtLinkedHighlight, !Task.isCancelled {
+            jumpToInitialTarget(targetBlockID, proxy: proxy)
+        }
+        var alignedY = await alignInitialTarget(targetBlockID, proxy: proxy, revealExactTarget: opensAtLinkedHighlight)
+        guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return }
+        if let minY = alignedY {
+            LocalPerformanceRecorder.record(.nativeChapterTargetPositioned)
+            // A fresh evidence link already has an exact measured target.
+            // Reveal it during the push and let the lease absorb later layout.
+            if !opensAtLinkedHighlight {
+                // UIKit can update the safe area and content offset mid-push.
+                await scrollState.waitForNavigationTransition()
+                LocalPerformanceRecorder.record(.nativeChapterTransitionSettled)
+                guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return }
+                if initialTargetY(for: targetBlockID) != minY || !targetHasArrived(targetBlockID, minY: minY) {
+                    alignedY = await alignInitialTarget(targetBlockID, proxy: proxy)
+                }
             }
-            try? await Task.sleep(for: .milliseconds(16))
-            if initialTargetIsVisible,
-               let offset = scrollState.viewportY(for: targetBlockID),
-               let scrollView = scrollState.scrollView {
-                let height = scrollView.contentSize.height
-                if let previousGeometry,
-                   abs(previousGeometry.offset - offset) < 1,
-                   abs(previousGeometry.height - height) < 1 {
-                    stablePasses += 1
-                } else { stablePasses = 0 }
-                previousGeometry = (offset, height)
-            } else {
-                stablePasses = 0
-                previousGeometry = nil
-            }
-            if stablePasses >= 3 { break }
         }
         guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return }
-        await scrollState.waitForNavigationTransition()
-        guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return }
-        let saved = rememberedViewport.wrappedValue
-        let usesSavedViewport = !explicitNavigation && saved?.blockID == targetBlockID
-            && saved?.routeID == route.id && saved?.theme == library.readerTheme
-            && rememberedBlockID.wrappedValue == targetBlockID
-            && abs(Double(scrollState.scrollView?.bounds.width ?? 0) - (saved?.width ?? 0)) < 1
-        let targetY = usesSavedViewport ? CGFloat(saved?.minY ?? 0) : 0
-        let aligned = await alignInitialTarget(targetBlockID, minY: targetY, proxy: proxy)
-        guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return }
-        guard aligned else {
-            traceRestoration("alignment-result", detail: "success=false desiredMinY=\(targetY)")
+        guard let targetY = alignedY else {
+            LocalPerformanceRecorder.record(.nativeChapterPositioningFailed)
+            traceRestoration("alignment-result", detail: "success=false")
             requestFallbackToHTML("The requested passage could not be positioned reliably.")
             return
         }
-        traceRestoration("alignment-result", detail: "success=\(aligned) desiredMinY=\(targetY)")
+        traceRestoration("alignment-result", detail: "success=true desiredMinY=\(targetY)")
         beginRestorationLease(blockID: targetBlockID, minY: targetY)
         scrollState.visibleBlockID = targetBlockID
         pendingInitialBlockID = nil
@@ -987,40 +962,62 @@ struct NativeChapterTextReaderView: View {
         persistLocation(blockID: targetBlockID)
     }
 
+    private func initialTargetY(for blockID: String) -> CGFloat {
+        guard !explicitNavigation, let saved = rememberedViewport.wrappedValue,
+              saved.blockID == blockID, saved.routeID == route.id, saved.theme == library.readerTheme,
+              rememberedBlockID.wrappedValue == blockID, let view = scrollState.scrollView,
+              abs(Double(view.bounds.width) - saved.width) < 1 else { return 0 }
+        return CGFloat(saved.minY)
+    }
+
     @MainActor
-    private func alignInitialTarget(_ targetBlockID: String, minY: CGFloat, proxy: ScrollViewProxy) async -> Bool {
+    private func alignInitialTarget(
+        _ targetBlockID: String,
+        proxy: ScrollViewProxy,
+        revealExactTarget: Bool = false
+    ) async -> CGFloat? {
 #if DEBUG
         if explicitNavigation && ProcessInfo.processInfo.arguments.contains("--native-reader-force-picker-alignment-failure") {
-            return false
+            return nil
         }
 #endif
         var stablePasses = 0
-        var previousHeight: CGFloat?
-        for _ in 0..<50 {
-            guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return false }
-            if let view = scrollState.scrollView,
+        var previousY: CGFloat?
+        for _ in 0..<100 {
+            guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return nil }
+            let minY = initialTargetY(for: targetBlockID)
+            if let view = scrollState.scrollView, view.bounds.height > 0,
                let currentY = scrollState.viewportY(for: targetBlockID), currentY.isFinite {
                 let desired = boundedOffset(view.contentOffset.y + currentY - minY, in: view)
-                let height = view.contentSize.height
                 if abs(desired - view.contentOffset.y) >= 1 {
                     view.setContentOffset(CGPoint(x: view.contentOffset.x, y: desired), animated: false)
                     stablePasses = 0
-                } else if let previousHeight, abs(previousHeight - height) < 1,
+                } else if revealExactTarget && abs(currentY - minY) < 1 {
+                    // This rendered row is exactly at the anchor. The lease
+                    // will correct shifts from any remaining offscreen layout.
+                    return minY
+                } else if let previousY, abs(previousY - currentY) < 1,
                           currentY >= minY - 1, currentY < view.bounds.height {
                     stablePasses += 1
                 } else { stablePasses = 0 }
-                previousHeight = height
+                previousY = currentY
             } else {
-                var transaction = Transaction(animation: nil)
-                transaction.disablesAnimations = true
-                withTransaction(transaction) { proxy.scrollTo(targetBlockID, anchor: .top) }
+                jumpToInitialTarget(targetBlockID, proxy: proxy)
                 stablePasses = 0
-                previousHeight = nil
+                previousY = nil
             }
-            if stablePasses >= 3 { return true }
+            // Offscreen rows can still change the estimated content height.
+            // The measured target and the post-reveal lease handle actual shifts.
+            if stablePasses >= 3 { return minY }
             try? await Task.sleep(for: .milliseconds(16))
         }
-        return false
+        return nil
+    }
+
+    private func jumpToInitialTarget(_ blockID: String, proxy: ScrollViewProxy) {
+        var transaction = Transaction(animation: nil)
+        transaction.disablesAnimations = true
+        withTransaction(transaction) { proxy.scrollTo(blockID, anchor: .top) }
     }
 
     private func boundedOffset(_ value: CGFloat, in view: UIScrollView) -> CGFloat {
@@ -1064,10 +1061,14 @@ struct NativeChapterTextReaderView: View {
     }
 
     private func restorationHasArrived(_ lease: NativeReaderRestorationLease) -> Bool {
+        targetHasArrived(lease.blockID, minY: lease.minY)
+    }
+
+    private func targetHasArrived(_ blockID: String, minY: CGFloat) -> Bool {
         guard let view = scrollState.scrollView,
-              let y = scrollState.viewportY(for: lease.blockID), y.isFinite,
-              y >= lease.minY - 1, y < view.bounds.height else { return false }
-        return abs(boundedOffset(view.contentOffset.y + y - lease.minY, in: view) - view.contentOffset.y) < 1
+              let y = scrollState.viewportY(for: blockID), y.isFinite,
+              y >= minY - 1, y < view.bounds.height else { return false }
+        return abs(boundedOffset(view.contentOffset.y + y - minY, in: view) - view.contentOffset.y) < 1
     }
 
     // Returns true while layout is being corrected, withholding intermediate
@@ -1477,7 +1478,11 @@ private final class NativeReaderScrollState: ObservableObject {
     var textPrefetchTask: Task<Void, Never>?
 
     func viewportY(for blockID: String) -> CGFloat? {
-        blockPositions[blockID].map { $0 + contentTopInViewport }
+        // Block positions use content coordinates. Read the current UIKit
+        // offset so positioning never re-applies a delta from a SwiftUI
+        // viewport report that still describes the preceding scroll offset.
+        let contentTop = scrollView.map { -$0.contentOffset.y } ?? contentTopInViewport
+        return blockPositions[blockID].map { $0 + contentTop }
     }
 
     func waitForNavigationTransition() async {
@@ -3839,16 +3844,50 @@ private struct NativeReaderLoadingPlaceholder: View {
 
 private struct NativeReaderScrollViewProbe: UIViewRepresentable {
     var resolved: (UIScrollView) -> Void
-    func makeUIView(context: Context) -> UIView { UIView(frame: .zero) }
-    func updateUIView(_ view: UIView, context: Context) {
-        DispatchQueue.main.async {
-            var ancestor = view.superview
-            while let current = ancestor {
-                if let scrollView = current as? UIScrollView {
-                    resolved(scrollView)
-                    return
+
+    func makeUIView(context: Context) -> ProbeView { ProbeView(frame: .zero) }
+
+    func updateUIView(_ view: ProbeView, context: Context) {
+        view.resolved = resolved
+        view.scheduleResolution()
+    }
+
+    final class ProbeView: UIView {
+        var resolved: ((UIScrollView) -> Void)?
+        private weak var resolvedScrollView: UIScrollView?
+        private var resolutionScheduled = false
+
+        override func didMoveToSuperview() {
+            super.didMoveToSuperview()
+            resolvedScrollView = nil
+            scheduleResolution()
+        }
+
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            scheduleResolution()
+        }
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            if resolvedScrollView == nil { scheduleResolution() }
+        }
+
+        func scheduleResolution() {
+            guard !resolutionScheduled else { return }
+            resolutionScheduled = true
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                resolutionScheduled = false
+                var ancestor = superview
+                while let current = ancestor {
+                    if let scrollView = current as? UIScrollView {
+                        resolvedScrollView = scrollView
+                        resolved?(scrollView)
+                        return
+                    }
+                    ancestor = current.superview
                 }
-                ancestor = current.superview
             }
         }
     }

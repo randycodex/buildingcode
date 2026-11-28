@@ -142,13 +142,13 @@ struct NotebookDocumentEditor: UIViewRepresentable {
     var resolveAsset: (String) async throws -> Data
     var uploadImage: ((Data, String, String) async throws -> String)? = nil
 
+    static func preload() { NotebookDocumentWebView.preload() }
+
     func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
 
     func makeUIView(context: Context) -> WKWebView {
-        let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = .nonPersistent()
-        configuration.userContentController.add(context.coordinator, name: "permitextNotebook")
-        let view = NotebookDocumentWebView(frame: .zero, configuration: configuration)
+        let view = NotebookDocumentWebView.takePreloadedPage()
+        view.configuration.userContentController.add(context.coordinator, name: "permitextNotebook")
         view.inputAssistantItem.leadingBarButtonGroups = []
         view.inputAssistantItem.trailingBarButtonGroups = []
         view.navigationDelegate = context.coordinator
@@ -209,16 +209,21 @@ struct NotebookDocumentEditor: UIViewRepresentable {
             appliedReadOnly = parent.isReadOnly
         }
 
-        func attach(_ view: WKWebView) {
+        fileprivate func attach(_ view: NotebookDocumentWebView) {
             webView = view
             parent.controller.coordinator = self
             publishReadinessAfterViewUpdate()
-            guard let url = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "NotebookEditor") else {
+            guard let url = NotebookDocumentWebView.shellURL else {
                 report("The bundled note editor is missing. Reinstall this build before editing Notes.")
                 return
             }
             documentURL = url
-            view.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+            LocalPerformanceRecorder.record(.notebookEditorLoadRequested)
+            if view.didFinishPreloading {
+                configure()
+            } else {
+                view.loadShellIfNeeded(from: url)
+            }
         }
 
         func update(_ incoming: NotebookDocumentEditor) {
@@ -437,14 +442,16 @@ struct NotebookDocumentEditor: UIViewRepresentable {
 
         private func configure() {
             guard !configuring, !ready, !detached else { return }
+            LocalPerformanceRecorder.record(.notebookEditorShellLoaded)
             configuring = true
             tasks["configure"] = Task { [weak self] in
                 guard let self else { return }
                 do {
                     let initial = parent.document
+                    let initialWidth = availableWidth
                     let response = try await command(type: "configure", payload: [
                         "document": try NotebookDocumentEditorController.json(initial), "readOnly": parent.isReadOnly,
-                        "bodyFontSize": parent.bodyFontSize, "availableWidth": availableWidth,
+                        "bodyFontSize": parent.bodyFontSize, "availableWidth": initialWidth,
                         "referenceColors": CodeSectionThemeProfile.notebookReferenceProfiles.mapValues {
                             ["light": $0.lightAccentHex, "dark": $0.darkAccentHex]
                         },
@@ -452,13 +459,16 @@ struct NotebookDocumentEditor: UIViewRepresentable {
                         "inputDiagnostics": inputTracingEnabled, "syntheticFixture": inputTracingEnabled
                     ])
                     guard !Task.isCancelled else { return }
+                    LocalPerformanceRecorder.record(.notebookEditorDocumentMounted)
                     // Mounting can normalize old block IDs. Accept only if the
                     // owner did not receive a fresher server/draft while loading.
                     _ = try acceptSnapshot(response, publish: parent.document == initial)
                     ready = true
                     // Layout may have resolved while the JS editor mounted.
                     // Apply the latest bounds even if its initial width was zero.
-                    _ = try await command(type: "layout", payload: ["availableWidth": availableWidth])
+                    if availableWidth != initialWidth {
+                        _ = try await command(type: "layout", payload: ["availableWidth": availableWidth])
+                    }
                     configuring = false
                     publishReadinessAfterViewUpdate()
                     update(parent)
@@ -545,6 +555,11 @@ struct NotebookDocumentEditor: UIViewRepresentable {
 
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { report(error.localizedDescription) }
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { report(error.localizedDescription) }
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            // If the shell posted its loaded message during preloading, no
+            // coordinator was attached yet to receive it.
+            configure()
+        }
 
         func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
             ready = false
@@ -568,7 +583,59 @@ struct NotebookDocumentEditor: UIViewRepresentable {
 /// WebKit forwards its focused content's accessory request through WKWebView's
 /// public UIResponder property. Notes supplies one native formatting toolbar,
 /// so the browser's previous/next/Done form accessory is redundant.
-private final class NotebookDocumentWebView: WKWebView {
+private final class NotebookDocumentWebView: WKWebView, WKNavigationDelegate {
+    static let shellURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "NotebookEditor")
+    private static let dataStore = WKWebsiteDataStore.nonPersistent()
+    private static var preloadedPage: NotebookDocumentWebView?
+    private static var preloadExpiry: Task<Void, Never>?
+
+    private var didRequestShell = false
+    private var preloadFailed = false
+    private(set) var didFinishPreloading = false
+
+    private static func makePage() -> NotebookDocumentWebView {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = dataStore
+        return NotebookDocumentWebView(frame: .zero, configuration: configuration)
+    }
+
+    static func preload() {
+        guard preloadedPage == nil, let shellURL else { return }
+        let view = makePage()
+        // Load only the bundled shell. Each mounted note gets its own page
+        // and bridge session, and a used page never returns to this slot.
+        view.navigationDelegate = view
+        preloadedPage = view
+        view.loadShellIfNeeded(from: shellURL)
+        preloadExpiry = Task {
+            do { try await Task.sleep(for: .seconds(15)) } catch { return }
+            preloadedPage?.stopLoading()
+            preloadedPage = nil
+            preloadExpiry = nil
+        }
+    }
+
+    static func takePreloadedPage() -> NotebookDocumentWebView {
+        defer {
+            preloadedPage = nil
+            preloadExpiry?.cancel()
+            preloadExpiry = nil
+        }
+        guard let preloadedPage, !preloadedPage.preloadFailed else { return makePage() }
+        return preloadedPage
+    }
+
+    func loadShellIfNeeded(from url: URL) {
+        guard !didRequestShell else { return }
+        didRequestShell = true
+        loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { didFinishPreloading = true }
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { preloadFailed = true }
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { preloadFailed = true }
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) { preloadFailed = true }
+
     override var inputAccessoryView: UIView? { nil }
     var onWidthChange: ((CGFloat) -> Void)?
 

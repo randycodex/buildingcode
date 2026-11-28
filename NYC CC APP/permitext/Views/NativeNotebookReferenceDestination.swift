@@ -305,6 +305,7 @@ struct LinkedChapterReaderDestination: View {
                     route: SearchReaderRoute(sectionID: sectionID, sourceVersion: codeVersion, codeSectionID: codeSectionID),
                     sharedLibrary: sharedLibrary)
                 guard !Task.isCancelled, sharedLibrary.privateSessionID == sessionID else { return }
+                LocalPerformanceRecorder.record(.linkedChapterPrepared)
                 prepared = destination
             } catch {
                 guard !Task.isCancelled, sharedLibrary.privateSessionID == sessionID else { return }
